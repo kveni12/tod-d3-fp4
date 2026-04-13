@@ -1,0 +1,3068 @@
+--------------------------------------------------------------------------------
+Codebook for NHGIS data file 'nhgis0006_ts_geog2010_tract'
+--------------------------------------------------------------------------------
+ 
+Contents
+    - Data Summary
+    - Data Dictionary
+    - Geographic Integration Methods
+    - Source Data
+    - Citation and Use
+ 
+Detailed notes on time series design and comparability are available at: 
+    https://assets.nhgis.org/NHGIS_Time_Series_Tables.pdf 
+ 
+--------------------------------------------------------------------------------
+Data Summary
+--------------------------------------------------------------------------------
+ 
+Time series layout:     Time varies by column
+Geographic level:       Census Tract (by State--County)
+Geographic integration: Standardized to 2010
+Data measurement years: 1990, 2000, 2010, 2020
+Extent:                 Massachusetts
+ 
+Tables:
+ 
+1. Total Population
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CL8
+ 
+2. Persons by Age [22]
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CW3
+ 
+3. Persons by Race [7*]
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CM1
+ 
+4. Persons by Living Arrangements [2]
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CP9
+ 
+5. Persons in Households by Household Type [2]
+   Selected year(s): 1990, 2000, 2010
+   Code: CQ0
+ 
+6. Persons in Group Quarters by Group Quarters Type [2]
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CQ1
+ 
+7. Households by Household Type [6]
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CS1
+ 
+8. Total Housing Units
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CM7
+ 
+9. Housing Units by Occupancy Status [2]
+   Selected year(s): 1990, 2000, 2010, 2020
+   Code: CM9
+ 
+10. Vacant Housing Units by Vacancy Status [6]
+    Selected year(s): 1990, 2000, 2010, 2020
+    Code: CN0
+ 
+11. Occupied Housing Units by Tenure [2]
+    Selected year(s): 1990, 2000, 2010, 2020
+    Code: CN1
+ 
+12. Persons in Occupied Housing Units by Tenure [2]
+    Selected year(s): 1990, 2000, 2010
+    Code: CN2
+ 
+13. Occupied Housing Units by Race of Householder [6*]
+    Selected year(s): 1990, 2000, 2010, 2020
+    Code: CY4
+ 
+14. Occupied Housing Units by Tenure [2] by Race of Householder [6*]
+    Selected year(s): 1990, 2000, 2010, 2020
+    Code: CY5
+ 
+--------------------------------------------------------------------------------
+Data Dictionary
+--------------------------------------------------------------------------------
+ 
+Context Fields 
+        GISJOIN:     GIS Join Match Code
+        GEOGYEAR:    Geography Year
+        STATE:       State Name
+        STATEA:      State Code
+        COUNTY:      County Name
+        COUNTYA:     County Code
+        TRACTA:      Census Tract Code
+ 
+Table 1: (CL8) Total Population
+    Time series AA: Persons: Total
+        CL8AA1990:   1990: Persons: Total
+        CL8AA1990L:  Lower bound: 1990: Persons: Total
+        CL8AA1990U:  Upper bound: 1990: Persons: Total
+        CL8AA2000:   2000: Persons: Total
+        CL8AA2000L:  Lower bound: 2000: Persons: Total
+        CL8AA2000U:  Upper bound: 2000: Persons: Total
+        CL8AA2010:   2010: Persons: Total
+        CL8AA2020:   2020: Persons: Total
+        CL8AA2020L:  Lower bound: 2020: Persons: Total
+        CL8AA2020U:  Upper bound: 2020: Persons: Total
+ 
+Table 2: (CW3) Persons by Age [22]
+    Time series AA: Persons: Under 5 years
+        CW3AA1990:   1990: Persons: Under 5 years
+        CW3AA1990L:  Lower bound: 1990: Persons: Under 5 years
+        CW3AA1990U:  Upper bound: 1990: Persons: Under 5 years
+        CW3AA2000:   2000: Persons: Under 5 years
+        CW3AA2000L:  Lower bound: 2000: Persons: Under 5 years
+        CW3AA2000U:  Upper bound: 2000: Persons: Under 5 years
+        CW3AA2010:   2010: Persons: Under 5 years
+        CW3AA2020:   2020: Persons: Under 5 years
+        CW3AA2020L:  Lower bound: 2020: Persons: Under 5 years
+        CW3AA2020U:  Upper bound: 2020: Persons: Under 5 years
+    Time series AB: Persons: 5 to 9 years
+        CW3AB1990:   1990: Persons: 5 to 9 years
+        CW3AB1990L:  Lower bound: 1990: Persons: 5 to 9 years
+        CW3AB1990U:  Upper bound: 1990: Persons: 5 to 9 years
+        CW3AB2000:   2000: Persons: 5 to 9 years
+        CW3AB2000L:  Lower bound: 2000: Persons: 5 to 9 years
+        CW3AB2000U:  Upper bound: 2000: Persons: 5 to 9 years
+        CW3AB2010:   2010: Persons: 5 to 9 years
+        CW3AB2020:   2020: Persons: 5 to 9 years
+        CW3AB2020L:  Lower bound: 2020: Persons: 5 to 9 years
+        CW3AB2020U:  Upper bound: 2020: Persons: 5 to 9 years
+    Time series AC: Persons: 10 to 14 years
+        CW3AC1990:   1990: Persons: 10 to 14 years
+        CW3AC1990L:  Lower bound: 1990: Persons: 10 to 14 years
+        CW3AC1990U:  Upper bound: 1990: Persons: 10 to 14 years
+        CW3AC2000:   2000: Persons: 10 to 14 years
+        CW3AC2000L:  Lower bound: 2000: Persons: 10 to 14 years
+        CW3AC2000U:  Upper bound: 2000: Persons: 10 to 14 years
+        CW3AC2010:   2010: Persons: 10 to 14 years
+        CW3AC2020:   2020: Persons: 10 to 14 years
+        CW3AC2020L:  Lower bound: 2020: Persons: 10 to 14 years
+        CW3AC2020U:  Upper bound: 2020: Persons: 10 to 14 years
+    Time series AD: Persons: 15 to 17 years
+        CW3AD1990:   1990: Persons: 15 to 17 years
+        CW3AD1990L:  Lower bound: 1990: Persons: 15 to 17 years
+        CW3AD1990U:  Upper bound: 1990: Persons: 15 to 17 years
+        CW3AD2000:   2000: Persons: 15 to 17 years
+        CW3AD2000L:  Lower bound: 2000: Persons: 15 to 17 years
+        CW3AD2000U:  Upper bound: 2000: Persons: 15 to 17 years
+        CW3AD2010:   2010: Persons: 15 to 17 years
+        CW3AD2020:   2020: Persons: 15 to 17 years
+        CW3AD2020L:  Lower bound: 2020: Persons: 15 to 17 years
+        CW3AD2020U:  Upper bound: 2020: Persons: 15 to 17 years
+    Time series AE: Persons: 18 and 19 years
+        CW3AE1990:   1990: Persons: 18 and 19 years
+        CW3AE1990L:  Lower bound: 1990: Persons: 18 and 19 years
+        CW3AE1990U:  Upper bound: 1990: Persons: 18 and 19 years
+        CW3AE2000:   2000: Persons: 18 and 19 years
+        CW3AE2000L:  Lower bound: 2000: Persons: 18 and 19 years
+        CW3AE2000U:  Upper bound: 2000: Persons: 18 and 19 years
+        CW3AE2010:   2010: Persons: 18 and 19 years
+        CW3AE2020:   2020: Persons: 18 and 19 years
+        CW3AE2020L:  Lower bound: 2020: Persons: 18 and 19 years
+        CW3AE2020U:  Upper bound: 2020: Persons: 18 and 19 years
+    Time series AF: Persons: 20 years
+        CW3AF1990:   1990: Persons: 20 years
+        CW3AF1990L:  Lower bound: 1990: Persons: 20 years
+        CW3AF1990U:  Upper bound: 1990: Persons: 20 years
+        CW3AF2000:   2000: Persons: 20 years
+        CW3AF2000L:  Lower bound: 2000: Persons: 20 years
+        CW3AF2000U:  Upper bound: 2000: Persons: 20 years
+        CW3AF2010:   2010: Persons: 20 years
+        CW3AF2020:   2020: Persons: 20 years
+        CW3AF2020L:  Lower bound: 2020: Persons: 20 years
+        CW3AF2020U:  Upper bound: 2020: Persons: 20 years
+    Time series AG: Persons: 21 years
+        CW3AG1990:   1990: Persons: 21 years
+        CW3AG1990L:  Lower bound: 1990: Persons: 21 years
+        CW3AG1990U:  Upper bound: 1990: Persons: 21 years
+        CW3AG2000:   2000: Persons: 21 years
+        CW3AG2000L:  Lower bound: 2000: Persons: 21 years
+        CW3AG2000U:  Upper bound: 2000: Persons: 21 years
+        CW3AG2010:   2010: Persons: 21 years
+        CW3AG2020:   2020: Persons: 21 years
+        CW3AG2020L:  Lower bound: 2020: Persons: 21 years
+        CW3AG2020U:  Upper bound: 2020: Persons: 21 years
+    Time series AH: Persons: 22 to 24 years
+        CW3AH1990:   1990: Persons: 22 to 24 years
+        CW3AH1990L:  Lower bound: 1990: Persons: 22 to 24 years
+        CW3AH1990U:  Upper bound: 1990: Persons: 22 to 24 years
+        CW3AH2000:   2000: Persons: 22 to 24 years
+        CW3AH2000L:  Lower bound: 2000: Persons: 22 to 24 years
+        CW3AH2000U:  Upper bound: 2000: Persons: 22 to 24 years
+        CW3AH2010:   2010: Persons: 22 to 24 years
+        CW3AH2020:   2020: Persons: 22 to 24 years
+        CW3AH2020L:  Lower bound: 2020: Persons: 22 to 24 years
+        CW3AH2020U:  Upper bound: 2020: Persons: 22 to 24 years
+    Time series AI: Persons: 25 to 29 years
+        CW3AI1990:   1990: Persons: 25 to 29 years
+        CW3AI1990L:  Lower bound: 1990: Persons: 25 to 29 years
+        CW3AI1990U:  Upper bound: 1990: Persons: 25 to 29 years
+        CW3AI2000:   2000: Persons: 25 to 29 years
+        CW3AI2000L:  Lower bound: 2000: Persons: 25 to 29 years
+        CW3AI2000U:  Upper bound: 2000: Persons: 25 to 29 years
+        CW3AI2010:   2010: Persons: 25 to 29 years
+        CW3AI2020:   2020: Persons: 25 to 29 years
+        CW3AI2020L:  Lower bound: 2020: Persons: 25 to 29 years
+        CW3AI2020U:  Upper bound: 2020: Persons: 25 to 29 years
+    Time series AJ: Persons: 30 to 34 years
+        CW3AJ1990:   1990: Persons: 30 to 34 years
+        CW3AJ1990L:  Lower bound: 1990: Persons: 30 to 34 years
+        CW3AJ1990U:  Upper bound: 1990: Persons: 30 to 34 years
+        CW3AJ2000:   2000: Persons: 30 to 34 years
+        CW3AJ2000L:  Lower bound: 2000: Persons: 30 to 34 years
+        CW3AJ2000U:  Upper bound: 2000: Persons: 30 to 34 years
+        CW3AJ2010:   2010: Persons: 30 to 34 years
+        CW3AJ2020:   2020: Persons: 30 to 34 years
+        CW3AJ2020L:  Lower bound: 2020: Persons: 30 to 34 years
+        CW3AJ2020U:  Upper bound: 2020: Persons: 30 to 34 years
+    Time series AK: Persons: 35 to 39 years
+        CW3AK1990:   1990: Persons: 35 to 39 years
+        CW3AK1990L:  Lower bound: 1990: Persons: 35 to 39 years
+        CW3AK1990U:  Upper bound: 1990: Persons: 35 to 39 years
+        CW3AK2000:   2000: Persons: 35 to 39 years
+        CW3AK2000L:  Lower bound: 2000: Persons: 35 to 39 years
+        CW3AK2000U:  Upper bound: 2000: Persons: 35 to 39 years
+        CW3AK2010:   2010: Persons: 35 to 39 years
+        CW3AK2020:   2020: Persons: 35 to 39 years
+        CW3AK2020L:  Lower bound: 2020: Persons: 35 to 39 years
+        CW3AK2020U:  Upper bound: 2020: Persons: 35 to 39 years
+    Time series AL: Persons: 40 to 44 years
+        CW3AL1990:   1990: Persons: 40 to 44 years
+        CW3AL1990L:  Lower bound: 1990: Persons: 40 to 44 years
+        CW3AL1990U:  Upper bound: 1990: Persons: 40 to 44 years
+        CW3AL2000:   2000: Persons: 40 to 44 years
+        CW3AL2000L:  Lower bound: 2000: Persons: 40 to 44 years
+        CW3AL2000U:  Upper bound: 2000: Persons: 40 to 44 years
+        CW3AL2010:   2010: Persons: 40 to 44 years
+        CW3AL2020:   2020: Persons: 40 to 44 years
+        CW3AL2020L:  Lower bound: 2020: Persons: 40 to 44 years
+        CW3AL2020U:  Upper bound: 2020: Persons: 40 to 44 years
+    Time series AM: Persons: 45 to 49 years
+        CW3AM1990:   1990: Persons: 45 to 49 years
+        CW3AM1990L:  Lower bound: 1990: Persons: 45 to 49 years
+        CW3AM1990U:  Upper bound: 1990: Persons: 45 to 49 years
+        CW3AM2000:   2000: Persons: 45 to 49 years
+        CW3AM2000L:  Lower bound: 2000: Persons: 45 to 49 years
+        CW3AM2000U:  Upper bound: 2000: Persons: 45 to 49 years
+        CW3AM2010:   2010: Persons: 45 to 49 years
+        CW3AM2020:   2020: Persons: 45 to 49 years
+        CW3AM2020L:  Lower bound: 2020: Persons: 45 to 49 years
+        CW3AM2020U:  Upper bound: 2020: Persons: 45 to 49 years
+    Time series AN: Persons: 50 to 54 years
+        CW3AN1990:   1990: Persons: 50 to 54 years
+        CW3AN1990L:  Lower bound: 1990: Persons: 50 to 54 years
+        CW3AN1990U:  Upper bound: 1990: Persons: 50 to 54 years
+        CW3AN2000:   2000: Persons: 50 to 54 years
+        CW3AN2000L:  Lower bound: 2000: Persons: 50 to 54 years
+        CW3AN2000U:  Upper bound: 2000: Persons: 50 to 54 years
+        CW3AN2010:   2010: Persons: 50 to 54 years
+        CW3AN2020:   2020: Persons: 50 to 54 years
+        CW3AN2020L:  Lower bound: 2020: Persons: 50 to 54 years
+        CW3AN2020U:  Upper bound: 2020: Persons: 50 to 54 years
+    Time series AO: Persons: 55 to 59 years
+        CW3AO1990:   1990: Persons: 55 to 59 years
+        CW3AO1990L:  Lower bound: 1990: Persons: 55 to 59 years
+        CW3AO1990U:  Upper bound: 1990: Persons: 55 to 59 years
+        CW3AO2000:   2000: Persons: 55 to 59 years
+        CW3AO2000L:  Lower bound: 2000: Persons: 55 to 59 years
+        CW3AO2000U:  Upper bound: 2000: Persons: 55 to 59 years
+        CW3AO2010:   2010: Persons: 55 to 59 years
+        CW3AO2020:   2020: Persons: 55 to 59 years
+        CW3AO2020L:  Lower bound: 2020: Persons: 55 to 59 years
+        CW3AO2020U:  Upper bound: 2020: Persons: 55 to 59 years
+    Time series AP: Persons: 60 and 61 years
+        CW3AP1990:   1990: Persons: 60 and 61 years
+        CW3AP1990L:  Lower bound: 1990: Persons: 60 and 61 years
+        CW3AP1990U:  Upper bound: 1990: Persons: 60 and 61 years
+        CW3AP2000:   2000: Persons: 60 and 61 years
+        CW3AP2000L:  Lower bound: 2000: Persons: 60 and 61 years
+        CW3AP2000U:  Upper bound: 2000: Persons: 60 and 61 years
+        CW3AP2010:   2010: Persons: 60 and 61 years
+        CW3AP2020:   2020: Persons: 60 and 61 years
+        CW3AP2020L:  Lower bound: 2020: Persons: 60 and 61 years
+        CW3AP2020U:  Upper bound: 2020: Persons: 60 and 61 years
+    Time series AQ: Persons: 62 to 64 years
+        CW3AQ1990:   1990: Persons: 62 to 64 years
+        CW3AQ1990L:  Lower bound: 1990: Persons: 62 to 64 years
+        CW3AQ1990U:  Upper bound: 1990: Persons: 62 to 64 years
+        CW3AQ2000:   2000: Persons: 62 to 64 years
+        CW3AQ2000L:  Lower bound: 2000: Persons: 62 to 64 years
+        CW3AQ2000U:  Upper bound: 2000: Persons: 62 to 64 years
+        CW3AQ2010:   2010: Persons: 62 to 64 years
+        CW3AQ2020:   2020: Persons: 62 to 64 years
+        CW3AQ2020L:  Lower bound: 2020: Persons: 62 to 64 years
+        CW3AQ2020U:  Upper bound: 2020: Persons: 62 to 64 years
+    Time series AR: Persons: 65 to 69 years
+        CW3AR1990:   1990: Persons: 65 to 69 years
+        CW3AR1990L:  Lower bound: 1990: Persons: 65 to 69 years
+        CW3AR1990U:  Upper bound: 1990: Persons: 65 to 69 years
+        CW3AR2000:   2000: Persons: 65 to 69 years
+        CW3AR2000L:  Lower bound: 2000: Persons: 65 to 69 years
+        CW3AR2000U:  Upper bound: 2000: Persons: 65 to 69 years
+        CW3AR2010:   2010: Persons: 65 to 69 years
+        CW3AR2020:   2020: Persons: 65 to 69 years
+        CW3AR2020L:  Lower bound: 2020: Persons: 65 to 69 years
+        CW3AR2020U:  Upper bound: 2020: Persons: 65 to 69 years
+    Time series AS: Persons: 70 to 74 years
+        CW3AS1990:   1990: Persons: 70 to 74 years
+        CW3AS1990L:  Lower bound: 1990: Persons: 70 to 74 years
+        CW3AS1990U:  Upper bound: 1990: Persons: 70 to 74 years
+        CW3AS2000:   2000: Persons: 70 to 74 years
+        CW3AS2000L:  Lower bound: 2000: Persons: 70 to 74 years
+        CW3AS2000U:  Upper bound: 2000: Persons: 70 to 74 years
+        CW3AS2010:   2010: Persons: 70 to 74 years
+        CW3AS2020:   2020: Persons: 70 to 74 years
+        CW3AS2020L:  Lower bound: 2020: Persons: 70 to 74 years
+        CW3AS2020U:  Upper bound: 2020: Persons: 70 to 74 years
+    Time series AT: Persons: 75 to 79 years
+        CW3AT1990:   1990: Persons: 75 to 79 years
+        CW3AT1990L:  Lower bound: 1990: Persons: 75 to 79 years
+        CW3AT1990U:  Upper bound: 1990: Persons: 75 to 79 years
+        CW3AT2000:   2000: Persons: 75 to 79 years
+        CW3AT2000L:  Lower bound: 2000: Persons: 75 to 79 years
+        CW3AT2000U:  Upper bound: 2000: Persons: 75 to 79 years
+        CW3AT2010:   2010: Persons: 75 to 79 years
+        CW3AT2020:   2020: Persons: 75 to 79 years
+        CW3AT2020L:  Lower bound: 2020: Persons: 75 to 79 years
+        CW3AT2020U:  Upper bound: 2020: Persons: 75 to 79 years
+    Time series AU: Persons: 80 to 84 years
+        CW3AU1990:   1990: Persons: 80 to 84 years
+        CW3AU1990L:  Lower bound: 1990: Persons: 80 to 84 years
+        CW3AU1990U:  Upper bound: 1990: Persons: 80 to 84 years
+        CW3AU2000:   2000: Persons: 80 to 84 years
+        CW3AU2000L:  Lower bound: 2000: Persons: 80 to 84 years
+        CW3AU2000U:  Upper bound: 2000: Persons: 80 to 84 years
+        CW3AU2010:   2010: Persons: 80 to 84 years
+        CW3AU2020:   2020: Persons: 80 to 84 years
+        CW3AU2020L:  Lower bound: 2020: Persons: 80 to 84 years
+        CW3AU2020U:  Upper bound: 2020: Persons: 80 to 84 years
+    Time series AV: Persons: 85 years and over
+        CW3AV1990:   1990: Persons: 85 years and over
+        CW3AV1990L:  Lower bound: 1990: Persons: 85 years and over
+        CW3AV1990U:  Upper bound: 1990: Persons: 85 years and over
+        CW3AV2000:   2000: Persons: 85 years and over
+        CW3AV2000L:  Lower bound: 2000: Persons: 85 years and over
+        CW3AV2000U:  Upper bound: 2000: Persons: 85 years and over
+        CW3AV2010:   2010: Persons: 85 years and over
+        CW3AV2020:   2020: Persons: 85 years and over
+        CW3AV2020L:  Lower bound: 2020: Persons: 85 years and over
+        CW3AV2020U:  Upper bound: 2020: Persons: 85 years and over
+ 
+Table 3: (CM1) Persons by Race [7*]
+    Time series AA: Persons: White (single race)
+        CM1AA1990:   1990: Persons: White (single race)
+        CM1AA1990L:  Lower bound: 1990: Persons: White (single race)
+        CM1AA1990U:  Upper bound: 1990: Persons: White (single race)
+        CM1AA2000:   2000: Persons: White (single race)
+        CM1AA2000L:  Lower bound: 2000: Persons: White (single race)
+        CM1AA2000U:  Upper bound: 2000: Persons: White (single race)
+        CM1AA2010:   2010: Persons: White (single race)
+        CM1AA2020:   2020: Persons: White (single race)
+        CM1AA2020L:  Lower bound: 2020: Persons: White (single race)
+        CM1AA2020U:  Upper bound: 2020: Persons: White (single race)
+    Time series AB: Persons: Black or African American (single race)
+        CM1AB1990:   1990: Persons: Black or African American (single race)
+        CM1AB1990L:  Lower bound: 1990: Persons: Black or African American (single race)
+        CM1AB1990U:  Upper bound: 1990: Persons: Black or African American (single race)
+        CM1AB2000:   2000: Persons: Black or African American (single race)
+        CM1AB2000L:  Lower bound: 2000: Persons: Black or African American (single race)
+        CM1AB2000U:  Upper bound: 2000: Persons: Black or African American (single race)
+        CM1AB2010:   2010: Persons: Black or African American (single race)
+        CM1AB2020:   2020: Persons: Black or African American (single race)
+        CM1AB2020L:  Lower bound: 2020: Persons: Black or African American (single race)
+        CM1AB2020U:  Upper bound: 2020: Persons: Black or African American (single race)
+    Time series AC: Persons: American Indian and Alaska Native (single race)
+        CM1AC1990:   1990: Persons: American Indian and Alaska Native (single race)
+        CM1AC1990L:  Lower bound: 1990: Persons: American Indian and Alaska Native (single race)
+        CM1AC1990U:  Upper bound: 1990: Persons: American Indian and Alaska Native (single race)
+        CM1AC2000:   2000: Persons: American Indian and Alaska Native (single race)
+        CM1AC2000L:  Lower bound: 2000: Persons: American Indian and Alaska Native (single race)
+        CM1AC2000U:  Upper bound: 2000: Persons: American Indian and Alaska Native (single race)
+        CM1AC2010:   2010: Persons: American Indian and Alaska Native (single race)
+        CM1AC2020:   2020: Persons: American Indian and Alaska Native (single race)
+        CM1AC2020L:  Lower bound: 2020: Persons: American Indian and Alaska Native (single race)
+        CM1AC2020U:  Upper bound: 2020: Persons: American Indian and Alaska Native (single race)
+    Time series AD: Persons: Asian (single race)
+        CM1AD1990:   1990: Persons: Asian (single race)
+        CM1AD1990L:  Lower bound: 1990: Persons: Asian (single race)
+        CM1AD1990U:  Upper bound: 1990: Persons: Asian (single race)
+        CM1AD2000:   2000: Persons: Asian (single race)
+        CM1AD2000L:  Lower bound: 2000: Persons: Asian (single race)
+        CM1AD2000U:  Upper bound: 2000: Persons: Asian (single race)
+        CM1AD2010:   2010: Persons: Asian (single race)
+        CM1AD2020:   2020: Persons: Asian (single race)
+        CM1AD2020L:  Lower bound: 2020: Persons: Asian (single race)
+        CM1AD2020U:  Upper bound: 2020: Persons: Asian (single race)
+    Time series AE: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE1990:   1990: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE1990L:  Lower bound: 1990: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE1990U:  Upper bound: 1990: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE2000:   2000: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE2000L:  Lower bound: 2000: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE2000U:  Upper bound: 2000: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE2010:   2010: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE2020:   2020: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE2020L:  Lower bound: 2020: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        CM1AE2020U:  Upper bound: 2020: Persons: Native Hawaiian and Other Pacific Islander (single race)
+    Time series AF: Persons: Some Other Race (single race)
+        CM1AF1990:   1990: Persons: Some Other Race (single race)
+        CM1AF1990L:  Lower bound: 1990: Persons: Some Other Race (single race)
+        CM1AF1990U:  Upper bound: 1990: Persons: Some Other Race (single race)
+        CM1AF2000:   2000: Persons: Some Other Race (single race)
+        CM1AF2000L:  Lower bound: 2000: Persons: Some Other Race (single race)
+        CM1AF2000U:  Upper bound: 2000: Persons: Some Other Race (single race)
+        CM1AF2010:   2010: Persons: Some Other Race (single race)
+        CM1AF2020:   2020: Persons: Some Other Race (single race)
+        CM1AF2020L:  Lower bound: 2020: Persons: Some Other Race (single race)
+        CM1AF2020U:  Upper bound: 2020: Persons: Some Other Race (single race)
+    Time series AG: Persons: Two or More Races
+        CM1AG2000:   2000: Persons: Two or More Races
+        CM1AG2000L:  Lower bound: 2000: Persons: Two or More Races
+        CM1AG2000U:  Upper bound: 2000: Persons: Two or More Races
+        CM1AG2010:   2010: Persons: Two or More Races
+        CM1AG2020:   2020: Persons: Two or More Races
+        CM1AG2020L:  Lower bound: 2020: Persons: Two or More Races
+        CM1AG2020U:  Upper bound: 2020: Persons: Two or More Races
+ 
+Table 4: (CP9) Persons by Living Arrangements [2]
+    Time series AA: Persons: In households
+        CP9AA1990:   1990: Persons: In households
+        CP9AA1990L:  Lower bound: 1990: Persons: In households
+        CP9AA1990U:  Upper bound: 1990: Persons: In households
+        CP9AA2000:   2000: Persons: In households
+        CP9AA2000L:  Lower bound: 2000: Persons: In households
+        CP9AA2000U:  Upper bound: 2000: Persons: In households
+        CP9AA2010:   2010: Persons: In households
+        CP9AA2020:   2020: Persons: In households
+        CP9AA2020L:  Lower bound: 2020: Persons: In households
+        CP9AA2020U:  Upper bound: 2020: Persons: In households
+    Time series AB: Persons: In group quarters
+        CP9AB1990:   1990: Persons: In group quarters
+        CP9AB1990L:  Lower bound: 1990: Persons: In group quarters
+        CP9AB1990U:  Upper bound: 1990: Persons: In group quarters
+        CP9AB2000:   2000: Persons: In group quarters
+        CP9AB2000L:  Lower bound: 2000: Persons: In group quarters
+        CP9AB2000U:  Upper bound: 2000: Persons: In group quarters
+        CP9AB2010:   2010: Persons: In group quarters
+        CP9AB2020:   2020: Persons: In group quarters
+        CP9AB2020L:  Lower bound: 2020: Persons: In group quarters
+        CP9AB2020U:  Upper bound: 2020: Persons: In group quarters
+ 
+Table 5: (CQ0) Persons in Households by Household Type [2]
+    Time series AA: Persons: In family households
+        CQ0AA1990:   1990: Persons: In family households
+        CQ0AA1990L:  Lower bound: 1990: Persons: In family households
+        CQ0AA1990U:  Upper bound: 1990: Persons: In family households
+        CQ0AA2000:   2000: Persons: In family households
+        CQ0AA2000L:  Lower bound: 2000: Persons: In family households
+        CQ0AA2000U:  Upper bound: 2000: Persons: In family households
+        CQ0AA2010:   2010: Persons: In family households
+    Time series AB: Persons: In nonfamily households
+        CQ0AB1990:   1990: Persons: In nonfamily households
+        CQ0AB1990L:  Lower bound: 1990: Persons: In nonfamily households
+        CQ0AB1990U:  Upper bound: 1990: Persons: In nonfamily households
+        CQ0AB2000:   2000: Persons: In nonfamily households
+        CQ0AB2000L:  Lower bound: 2000: Persons: In nonfamily households
+        CQ0AB2000U:  Upper bound: 2000: Persons: In nonfamily households
+        CQ0AB2010:   2010: Persons: In nonfamily households
+ 
+Table 6: (CQ1) Persons in Group Quarters by Group Quarters Type [2]
+    Time series AA: Persons: In group quarters--Institutionalized
+        CQ1AA1990:   1990: Persons: In group quarters--Institutionalized
+        CQ1AA1990L:  Lower bound: 1990: Persons: In group quarters--Institutionalized
+        CQ1AA1990U:  Upper bound: 1990: Persons: In group quarters--Institutionalized
+        CQ1AA2000:   2000: Persons: In group quarters--Institutionalized
+        CQ1AA2000L:  Lower bound: 2000: Persons: In group quarters--Institutionalized
+        CQ1AA2000U:  Upper bound: 2000: Persons: In group quarters--Institutionalized
+        CQ1AA2010:   2010: Persons: In group quarters--Institutionalized
+        CQ1AA2020:   2020: Persons: In group quarters--Institutionalized
+        CQ1AA2020L:  Lower bound: 2020: Persons: In group quarters--Institutionalized
+        CQ1AA2020U:  Upper bound: 2020: Persons: In group quarters--Institutionalized
+    Time series AB: Persons: In group quarters--Noninstitutionalized
+        CQ1AB1990:   1990: Persons: In group quarters--Noninstitutionalized
+        CQ1AB1990L:  Lower bound: 1990: Persons: In group quarters--Noninstitutionalized
+        CQ1AB1990U:  Upper bound: 1990: Persons: In group quarters--Noninstitutionalized
+        CQ1AB2000:   2000: Persons: In group quarters--Noninstitutionalized
+        CQ1AB2000L:  Lower bound: 2000: Persons: In group quarters--Noninstitutionalized
+        CQ1AB2000U:  Upper bound: 2000: Persons: In group quarters--Noninstitutionalized
+        CQ1AB2010:   2010: Persons: In group quarters--Noninstitutionalized
+        CQ1AB2020:   2020: Persons: In group quarters--Noninstitutionalized
+        CQ1AB2020L:  Lower bound: 2020: Persons: In group quarters--Noninstitutionalized
+        CQ1AB2020U:  Upper bound: 2020: Persons: In group quarters--Noninstitutionalized
+ 
+Table 7: (CS1) Households by Household Type [6]
+    Time series AA: Households: Family
+        CS1AA1990:   1990: Households: Family
+        CS1AA1990L:  Lower bound: 1990: Households: Family
+        CS1AA1990U:  Upper bound: 1990: Households: Family
+        CS1AA2000:   2000: Households: Family
+        CS1AA2000L:  Lower bound: 2000: Households: Family
+        CS1AA2000U:  Upper bound: 2000: Households: Family
+        CS1AA2010:   2010: Households: Family
+        CS1AA2020:   2020: Households: Family
+        CS1AA2020L:  Lower bound: 2020: Households: Family
+        CS1AA2020U:  Upper bound: 2020: Households: Family
+    Time series AB: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB1990:   1990: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB1990L:  Lower bound: 1990: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB1990U:  Upper bound: 1990: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB2000:   2000: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB2000L:  Lower bound: 2000: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB2000U:  Upper bound: 2000: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB2010:   2010: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB2020:   2020: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB2020L:  Lower bound: 2020: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        CS1AB2020U:  Upper bound: 2020: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+    Time series AC: Households: Family--Other family
+        CS1AC1990:   1990: Households: Family--Other family
+        CS1AC1990L:  Lower bound: 1990: Households: Family--Other family
+        CS1AC1990U:  Upper bound: 1990: Households: Family--Other family
+        CS1AC2000:   2000: Households: Family--Other family
+        CS1AC2000L:  Lower bound: 2000: Households: Family--Other family
+        CS1AC2000U:  Upper bound: 2000: Households: Family--Other family
+        CS1AC2010:   2010: Households: Family--Other family
+        CS1AC2020:   2020: Households: Family--Other family
+        CS1AC2020L:  Lower bound: 2020: Households: Family--Other family
+        CS1AC2020U:  Upper bound: 2020: Households: Family--Other family
+    Time series AD: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD1990:   1990: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD1990L:  Lower bound: 1990: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD1990U:  Upper bound: 1990: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD2000:   2000: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD2000L:  Lower bound: 2000: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD2000U:  Upper bound: 2000: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD2010:   2010: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD2020:   2020: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD2020L:  Lower bound: 2020: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        CS1AD2020U:  Upper bound: 2020: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+    Time series AE: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE1990:   1990: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE1990L:  Lower bound: 1990: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE1990U:  Upper bound: 1990: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE2000:   2000: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE2000L:  Lower bound: 2000: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE2000U:  Upper bound: 2000: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE2010:   2010: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE2020:   2020: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE2020L:  Lower bound: 2020: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        CS1AE2020U:  Upper bound: 2020: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+    Time series AF: Households: Nonfamily
+        CS1AF1990:   1990: Households: Nonfamily
+        CS1AF1990L:  Lower bound: 1990: Households: Nonfamily
+        CS1AF1990U:  Upper bound: 1990: Households: Nonfamily
+        CS1AF2000:   2000: Households: Nonfamily
+        CS1AF2000L:  Lower bound: 2000: Households: Nonfamily
+        CS1AF2000U:  Upper bound: 2000: Households: Nonfamily
+        CS1AF2010:   2010: Households: Nonfamily
+        CS1AF2020:   2020: Households: Nonfamily
+        CS1AF2020L:  Lower bound: 2020: Households: Nonfamily
+        CS1AF2020U:  Upper bound: 2020: Households: Nonfamily
+ 
+Table 8: (CM7) Total Housing Units
+    Time series AA: Housing units: Total
+        CM7AA1990:   1990: Housing units: Total
+        CM7AA1990L:  Lower bound: 1990: Housing units: Total
+        CM7AA1990U:  Upper bound: 1990: Housing units: Total
+        CM7AA2000:   2000: Housing units: Total
+        CM7AA2000L:  Lower bound: 2000: Housing units: Total
+        CM7AA2000U:  Upper bound: 2000: Housing units: Total
+        CM7AA2010:   2010: Housing units: Total
+        CM7AA2020:   2020: Housing units: Total
+        CM7AA2020L:  Lower bound: 2020: Housing units: Total
+        CM7AA2020U:  Upper bound: 2020: Housing units: Total
+ 
+Table 9: (CM9) Housing Units by Occupancy Status [2]
+    Time series AA: Housing units: Occupied
+        CM9AA1990:   1990: Housing units: Occupied
+        CM9AA1990L:  Lower bound: 1990: Housing units: Occupied
+        CM9AA1990U:  Upper bound: 1990: Housing units: Occupied
+        CM9AA2000:   2000: Housing units: Occupied
+        CM9AA2000L:  Lower bound: 2000: Housing units: Occupied
+        CM9AA2000U:  Upper bound: 2000: Housing units: Occupied
+        CM9AA2010:   2010: Housing units: Occupied
+        CM9AA2020:   2020: Housing units: Occupied
+        CM9AA2020L:  Lower bound: 2020: Housing units: Occupied
+        CM9AA2020U:  Upper bound: 2020: Housing units: Occupied
+    Time series AB: Housing units: Vacant
+        CM9AB1990:   1990: Housing units: Vacant
+        CM9AB1990L:  Lower bound: 1990: Housing units: Vacant
+        CM9AB1990U:  Upper bound: 1990: Housing units: Vacant
+        CM9AB2000:   2000: Housing units: Vacant
+        CM9AB2000L:  Lower bound: 2000: Housing units: Vacant
+        CM9AB2000U:  Upper bound: 2000: Housing units: Vacant
+        CM9AB2010:   2010: Housing units: Vacant
+        CM9AB2020:   2020: Housing units: Vacant
+        CM9AB2020L:  Lower bound: 2020: Housing units: Vacant
+        CM9AB2020U:  Upper bound: 2020: Housing units: Vacant
+ 
+Table 10: (CN0) Vacant Housing Units by Vacancy Status [6]
+    Time series AA: Housing units: Vacant--For rent
+        CN0AA1990:   1990: Housing units: Vacant--For rent
+        CN0AA1990L:  Lower bound: 1990: Housing units: Vacant--For rent
+        CN0AA1990U:  Upper bound: 1990: Housing units: Vacant--For rent
+        CN0AA2000:   2000: Housing units: Vacant--For rent
+        CN0AA2000L:  Lower bound: 2000: Housing units: Vacant--For rent
+        CN0AA2000U:  Upper bound: 2000: Housing units: Vacant--For rent
+        CN0AA2010:   2010: Housing units: Vacant--For rent
+        CN0AA2020:   2020: Housing units: Vacant--For rent
+        CN0AA2020L:  Lower bound: 2020: Housing units: Vacant--For rent
+        CN0AA2020U:  Upper bound: 2020: Housing units: Vacant--For rent
+    Time series AB: Housing units: Vacant--For sale only
+        CN0AB1990:   1990: Housing units: Vacant--For sale only
+        CN0AB1990L:  Lower bound: 1990: Housing units: Vacant--For sale only
+        CN0AB1990U:  Upper bound: 1990: Housing units: Vacant--For sale only
+        CN0AB2000:   2000: Housing units: Vacant--For sale only
+        CN0AB2000L:  Lower bound: 2000: Housing units: Vacant--For sale only
+        CN0AB2000U:  Upper bound: 2000: Housing units: Vacant--For sale only
+        CN0AB2010:   2010: Housing units: Vacant--For sale only
+        CN0AB2020:   2020: Housing units: Vacant--For sale only
+        CN0AB2020L:  Lower bound: 2020: Housing units: Vacant--For sale only
+        CN0AB2020U:  Upper bound: 2020: Housing units: Vacant--For sale only
+    Time series AC: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC1990:   1990: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC1990L:  Lower bound: 1990: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC1990U:  Upper bound: 1990: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC2000:   2000: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC2000L:  Lower bound: 2000: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC2000U:  Upper bound: 2000: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC2010:   2010: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC2020:   2020: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC2020L:  Lower bound: 2020: Housing units: Vacant--Rented or sold, not occupied
+        CN0AC2020U:  Upper bound: 2020: Housing units: Vacant--Rented or sold, not occupied
+    Time series AD: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD1990:   1990: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD1990L:  Lower bound: 1990: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD1990U:  Upper bound: 1990: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD2000:   2000: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD2000L:  Lower bound: 2000: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD2000U:  Upper bound: 2000: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD2010:   2010: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD2020:   2020: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD2020L:  Lower bound: 2020: Housing units: Vacant--Seasonal, recreational, or occasional use
+        CN0AD2020U:  Upper bound: 2020: Housing units: Vacant--Seasonal, recreational, or occasional use
+    Time series AE: Housing units: Vacant--For migrant workers
+        CN0AE1990:   1990: Housing units: Vacant--For migrant workers
+        CN0AE1990L:  Lower bound: 1990: Housing units: Vacant--For migrant workers
+        CN0AE1990U:  Upper bound: 1990: Housing units: Vacant--For migrant workers
+        CN0AE2000:   2000: Housing units: Vacant--For migrant workers
+        CN0AE2000L:  Lower bound: 2000: Housing units: Vacant--For migrant workers
+        CN0AE2000U:  Upper bound: 2000: Housing units: Vacant--For migrant workers
+        CN0AE2010:   2010: Housing units: Vacant--For migrant workers
+        CN0AE2020:   2020: Housing units: Vacant--For migrant workers
+        CN0AE2020L:  Lower bound: 2020: Housing units: Vacant--For migrant workers
+        CN0AE2020U:  Upper bound: 2020: Housing units: Vacant--For migrant workers
+    Time series AF: Housing units: Vacant--Other vacant
+        CN0AF1990:   1990: Housing units: Vacant--Other vacant
+        CN0AF1990L:  Lower bound: 1990: Housing units: Vacant--Other vacant
+        CN0AF1990U:  Upper bound: 1990: Housing units: Vacant--Other vacant
+        CN0AF2000:   2000: Housing units: Vacant--Other vacant
+        CN0AF2000L:  Lower bound: 2000: Housing units: Vacant--Other vacant
+        CN0AF2000U:  Upper bound: 2000: Housing units: Vacant--Other vacant
+        CN0AF2010:   2010: Housing units: Vacant--Other vacant
+        CN0AF2020:   2020: Housing units: Vacant--Other vacant
+        CN0AF2020L:  Lower bound: 2020: Housing units: Vacant--Other vacant
+        CN0AF2020U:  Upper bound: 2020: Housing units: Vacant--Other vacant
+ 
+Table 11: (CN1) Occupied Housing Units by Tenure [2]
+    Time series AA: Housing units: Owner occupied
+        CN1AA1990:   1990: Housing units: Owner occupied
+        CN1AA1990L:  Lower bound: 1990: Housing units: Owner occupied
+        CN1AA1990U:  Upper bound: 1990: Housing units: Owner occupied
+        CN1AA2000:   2000: Housing units: Owner occupied
+        CN1AA2000L:  Lower bound: 2000: Housing units: Owner occupied
+        CN1AA2000U:  Upper bound: 2000: Housing units: Owner occupied
+        CN1AA2010:   2010: Housing units: Owner occupied
+        CN1AA2020:   2020: Housing units: Owner occupied
+        CN1AA2020L:  Lower bound: 2020: Housing units: Owner occupied
+        CN1AA2020U:  Upper bound: 2020: Housing units: Owner occupied
+    Time series AB: Housing units: Renter occupied
+        CN1AB1990:   1990: Housing units: Renter occupied
+        CN1AB1990L:  Lower bound: 1990: Housing units: Renter occupied
+        CN1AB1990U:  Upper bound: 1990: Housing units: Renter occupied
+        CN1AB2000:   2000: Housing units: Renter occupied
+        CN1AB2000L:  Lower bound: 2000: Housing units: Renter occupied
+        CN1AB2000U:  Upper bound: 2000: Housing units: Renter occupied
+        CN1AB2010:   2010: Housing units: Renter occupied
+        CN1AB2020:   2020: Housing units: Renter occupied
+        CN1AB2020L:  Lower bound: 2020: Housing units: Renter occupied
+        CN1AB2020U:  Upper bound: 2020: Housing units: Renter occupied
+ 
+Table 12: (CN2) Persons in Occupied Housing Units by Tenure [2]
+    Time series AA: Persons: In owner-occupied housing units
+        CN2AA1990:   1990: Persons: In owner-occupied housing units
+        CN2AA1990L:  Lower bound: 1990: Persons: In owner-occupied housing units
+        CN2AA1990U:  Upper bound: 1990: Persons: In owner-occupied housing units
+        CN2AA2000:   2000: Persons: In owner-occupied housing units
+        CN2AA2000L:  Lower bound: 2000: Persons: In owner-occupied housing units
+        CN2AA2000U:  Upper bound: 2000: Persons: In owner-occupied housing units
+        CN2AA2010:   2010: Persons: In owner-occupied housing units
+    Time series AB: Persons: In renter-occupied housing units
+        CN2AB1990:   1990: Persons: In renter-occupied housing units
+        CN2AB1990L:  Lower bound: 1990: Persons: In renter-occupied housing units
+        CN2AB1990U:  Upper bound: 1990: Persons: In renter-occupied housing units
+        CN2AB2000:   2000: Persons: In renter-occupied housing units
+        CN2AB2000L:  Lower bound: 2000: Persons: In renter-occupied housing units
+        CN2AB2000U:  Upper bound: 2000: Persons: In renter-occupied housing units
+        CN2AB2010:   2010: Persons: In renter-occupied housing units
+ 
+Table 13: (CY4) Occupied Housing Units by Race of Householder [6*]
+    Time series AA: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA1990:   1990: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA1990L:  Lower bound: 1990: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA1990U:  Upper bound: 1990: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA2000:   2000: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA2000L:  Lower bound: 2000: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA2000U:  Upper bound: 2000: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA2010:   2010: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA2020:   2020: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA2020L:  Lower bound: 2020: Housing units: Occupied ~ Householder is White (single race)
+        CY4AA2020U:  Upper bound: 2020: Housing units: Occupied ~ Householder is White (single race)
+    Time series AB: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB1990:   1990: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB1990L:  Lower bound: 1990: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB1990U:  Upper bound: 1990: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB2000:   2000: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB2000L:  Lower bound: 2000: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB2000U:  Upper bound: 2000: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB2010:   2010: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB2020:   2020: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB2020L:  Lower bound: 2020: Housing units: Occupied ~ Householder is Black or African American (single race)
+        CY4AB2020U:  Upper bound: 2020: Housing units: Occupied ~ Householder is Black or African American (single race)
+    Time series AC: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC1990:   1990: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC1990L:  Lower bound: 1990: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC1990U:  Upper bound: 1990: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC2000:   2000: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC2000L:  Lower bound: 2000: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC2000U:  Upper bound: 2000: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC2010:   2010: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC2020:   2020: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC2020L:  Lower bound: 2020: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY4AC2020U:  Upper bound: 2020: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+    Time series AD: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD1990:   1990: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD1990L:  Lower bound: 1990: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD1990U:  Upper bound: 1990: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD2000:   2000: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD2000L:  Lower bound: 2000: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD2000U:  Upper bound: 2000: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD2010:   2010: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD2020:   2020: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD2020L:  Lower bound: 2020: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY4AD2020U:  Upper bound: 2020: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+    Time series AE: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE1990:   1990: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE1990L:  Lower bound: 1990: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE1990U:  Upper bound: 1990: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE2000:   2000: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE2000L:  Lower bound: 2000: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE2000U:  Upper bound: 2000: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE2010:   2010: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE2020:   2020: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE2020L:  Lower bound: 2020: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        CY4AE2020U:  Upper bound: 2020: Housing units: Occupied ~ Householder is Some Other Race (single race)
+    Time series AF: Housing units: Occupied ~ Householder is Two or More Races
+        CY4AF2000:   2000: Housing units: Occupied ~ Householder is Two or More Races
+        CY4AF2000L:  Lower bound: 2000: Housing units: Occupied ~ Householder is Two or More Races
+        CY4AF2000U:  Upper bound: 2000: Housing units: Occupied ~ Householder is Two or More Races
+        CY4AF2010:   2010: Housing units: Occupied ~ Householder is Two or More Races
+        CY4AF2020:   2020: Housing units: Occupied ~ Householder is Two or More Races
+        CY4AF2020L:  Lower bound: 2020: Housing units: Occupied ~ Householder is Two or More Races
+        CY4AF2020U:  Upper bound: 2020: Housing units: Occupied ~ Householder is Two or More Races
+ 
+Table 14: (CY5) Occupied Housing Units by Tenure [2] by Race of Householder [6*]
+    Time series AA: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA1990:   1990: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA1990L:  Lower bound: 1990: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA1990U:  Upper bound: 1990: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA2000:   2000: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA2000L:  Lower bound: 2000: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA2000U:  Upper bound: 2000: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA2010:   2010: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA2020:   2020: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA2020L:  Lower bound: 2020: Housing units: Owner occupied ~ Householder is White (single race)
+        CY5AA2020U:  Upper bound: 2020: Housing units: Owner occupied ~ Householder is White (single race)
+    Time series AB: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB1990:   1990: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB1990L:  Lower bound: 1990: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB1990U:  Upper bound: 1990: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB2000:   2000: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB2000L:  Lower bound: 2000: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB2000U:  Upper bound: 2000: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB2010:   2010: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB2020:   2020: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB2020L:  Lower bound: 2020: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        CY5AB2020U:  Upper bound: 2020: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+    Time series AC: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC1990:   1990: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC1990L:  Lower bound: 1990: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC1990U:  Upper bound: 1990: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC2000:   2000: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC2000L:  Lower bound: 2000: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC2000U:  Upper bound: 2000: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC2010:   2010: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC2020:   2020: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC2020L:  Lower bound: 2020: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AC2020U:  Upper bound: 2020: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+    Time series AD: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD1990:   1990: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD1990L:  Lower bound: 1990: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD1990U:  Upper bound: 1990: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD2000:   2000: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD2000L:  Lower bound: 2000: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD2000U:  Upper bound: 2000: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD2010:   2010: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD2020:   2020: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD2020L:  Lower bound: 2020: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AD2020U:  Upper bound: 2020: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+    Time series AE: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE1990:   1990: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE1990L:  Lower bound: 1990: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE1990U:  Upper bound: 1990: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE2000:   2000: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE2000L:  Lower bound: 2000: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE2000U:  Upper bound: 2000: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE2010:   2010: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE2020:   2020: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE2020L:  Lower bound: 2020: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        CY5AE2020U:  Upper bound: 2020: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+    Time series AF: Housing units: Owner occupied ~ Householder is Two or More Races
+        CY5AF2000:   2000: Housing units: Owner occupied ~ Householder is Two or More Races
+        CY5AF2000L:  Lower bound: 2000: Housing units: Owner occupied ~ Householder is Two or More Races
+        CY5AF2000U:  Upper bound: 2000: Housing units: Owner occupied ~ Householder is Two or More Races
+        CY5AF2010:   2010: Housing units: Owner occupied ~ Householder is Two or More Races
+        CY5AF2020:   2020: Housing units: Owner occupied ~ Householder is Two or More Races
+        CY5AF2020L:  Lower bound: 2020: Housing units: Owner occupied ~ Householder is Two or More Races
+        CY5AF2020U:  Upper bound: 2020: Housing units: Owner occupied ~ Householder is Two or More Races
+    Time series AG: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG1990:   1990: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG1990L:  Lower bound: 1990: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG1990U:  Upper bound: 1990: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG2000:   2000: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG2000L:  Lower bound: 2000: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG2000U:  Upper bound: 2000: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG2010:   2010: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG2020:   2020: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG2020L:  Lower bound: 2020: Housing units: Renter occupied ~ Householder is White (single race)
+        CY5AG2020U:  Upper bound: 2020: Housing units: Renter occupied ~ Householder is White (single race)
+    Time series AH: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH1990:   1990: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH1990L:  Lower bound: 1990: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH1990U:  Upper bound: 1990: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH2000:   2000: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH2000L:  Lower bound: 2000: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH2000U:  Upper bound: 2000: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH2010:   2010: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH2020:   2020: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH2020L:  Lower bound: 2020: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        CY5AH2020U:  Upper bound: 2020: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+    Time series AI: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI1990:   1990: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI1990L:  Lower bound: 1990: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI1990U:  Upper bound: 1990: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI2000:   2000: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI2000L:  Lower bound: 2000: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI2000U:  Upper bound: 2000: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI2010:   2010: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI2020:   2020: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI2020L:  Lower bound: 2020: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        CY5AI2020U:  Upper bound: 2020: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+    Time series AJ: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ1990:   1990: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ1990L:  Lower bound: 1990: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ1990U:  Upper bound: 1990: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ2000:   2000: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ2000L:  Lower bound: 2000: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ2000U:  Upper bound: 2000: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ2010:   2010: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ2020:   2020: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ2020L:  Lower bound: 2020: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        CY5AJ2020U:  Upper bound: 2020: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+    Time series AK: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK1990:   1990: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK1990L:  Lower bound: 1990: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK1990U:  Upper bound: 1990: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK2000:   2000: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK2000L:  Lower bound: 2000: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK2000U:  Upper bound: 2000: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK2010:   2010: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK2020:   2020: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK2020L:  Lower bound: 2020: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        CY5AK2020U:  Upper bound: 2020: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+    Time series AL: Housing units: Renter occupied ~ Householder is Two or More Races
+        CY5AL2000:   2000: Housing units: Renter occupied ~ Householder is Two or More Races
+        CY5AL2000L:  Lower bound: 2000: Housing units: Renter occupied ~ Householder is Two or More Races
+        CY5AL2000U:  Upper bound: 2000: Housing units: Renter occupied ~ Householder is Two or More Races
+        CY5AL2010:   2010: Housing units: Renter occupied ~ Householder is Two or More Races
+        CY5AL2020:   2020: Housing units: Renter occupied ~ Householder is Two or More Races
+        CY5AL2020L:  Lower bound: 2020: Housing units: Renter occupied ~ Householder is Two or More Races
+        CY5AL2020U:  Upper bound: 2020: Housing units: Renter occupied ~ Householder is Two or More Races
+ 
+--------------------------------------------------------------------------------
+Geographic Integration Methods
+--------------------------------------------------------------------------------
+ 
+1990 Block Data Standardized to 2010 Geography:
+
+    NHGIS standardizes the 1990 data in these time series tables to 2010 census
+    geography in two steps, first allocating census counts from 1990 census
+    blocks to 2010 census blocks and then summing the reallocated 1990 counts
+    for all 2010 blocks that lie within each target 2010 unit. In cases where a
+    1990 block may intersect multiple 2010 units, NHGIS applies interpolation to
+    estimate how 1990 block characteristics are distributed among the
+    intersecting 2010 blocks, primarily using the population and housing
+    densities of 2000 and 2010 blocks to model the distribution of 1990
+    characteristics within 1990 blocks.
+    
+    For details on the interpolation model, see:
+    https://www.nhgis.org/documentation/time-series/1990-blocks-to-2010-geog
+
+2000 Block Data Standardized to 2010 Geography:
+
+    NHGIS standardizes the 2000 data in these time series tables to 2010 census
+    geography in two steps, first allocating census counts from 2000 census
+    blocks to 2010 census blocks and then summing the reallocated 2000 counts
+    for all 2010 blocks that lie within each target 2010 unit. Where a 2000
+    block intersects multiple 2010 blocks, NHGIS applies areal interpolation to
+    estimate how the 2000 block characteristics are distributed among the
+    intersecting 2010 blocks.
+    
+    In addition to the 2000 block data drawn from 2000 Census Summary File 1
+    (NHGIS dataset 2000_SF1b), NHGIS uses information from three ancillary
+    sources to refine the interpolation model:
+    
+    * 2010 census block population and housing unit counts from 2010 Census
+    Summary File 1 (NHGIS dataset 2010_SF1a)
+    
+    * Locations of residential roads from the U.S. Census Bureau's 2010
+    TIGER/Line Shapefiles
+    
+    * Extents of developed land, which we define as 30-meter square cells in the
+    2001 National Land Cover Database (NLCD 2001) (2011 Edition) with at least
+    5% of their area covered by impervious surface.
+    
+    For details on the interpolation model, see:
+    https://www.nhgis.org/documentation/time-series/2000-blocks-to-2010-geog
+
+2010 Standardized Data:
+
+    For time series tables that are standardized to 2010 census geography, NHGIS
+    draws the 2010 data directly from 2010 Census Summary Files without any
+    estimation. The only adjustment NHGIS may make to the 2010 source data is,
+    for some time series, to sum source counts together to compute larger
+    subtotals.
+
+2020 Block Data Standardized to 2010 Geography:
+
+    NHGIS standardizes the 2020 data to 2010 census geography in two steps,
+    first allocating census counts from 2020 census blocks to 2010 census blocks
+    and then summing the reallocated 2020 counts for all 2010 blocks that lie
+    within each target 2010 unit. Where a 2020 block intersects multiple 2010
+    units, NHGIS uses the population and housing densities of 2010 blocks to
+    model the distribution of 2020 characteristics within 2020 blocks.
+    
+    For more details, see:
+    https://www.nhgis.org/time-series-tables#standardization
+
+Complete documentation on time series integration methods is available at:
+    https://www.nhgis.org/documentation/time-series
+ 
+--------------------------------------------------------------------------------
+Source Data
+--------------------------------------------------------------------------------
+ 
+Additional documentation on NHGIS data sources is available at:
+    https://www.nhgis.org/documentation/tabular-data
+
+Table 1: (CL8) Total Population
+ 
+    Time series AA: Persons: Total
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP1. Persons
+                    Universe: Persons
+                        Variable: [ET1001] Total
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP001A. Total Population
+                    Universe: Persons
+                        Variable: [FXS001] Total
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P1. Total Population
+                    Universe: Total population
+                        Variable: [H7V001] Total
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P1. Total Population
+                    Universe: Total population
+                        Variable: [U7H001] Total
+ 
+ 
+Table 2: (CW3) Persons by Age [22]
+ 
+    Time series AA: Persons: Under 5 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3001] Under 1 year
+                        Variable: [ET3002] 1 and 2 years
+                        Variable: [ET3003] 3 and 4 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM001] Male >> Under 5 years
+                        Variable: [FYM024] Female >> Under 5 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76003] Male: Under 5 years
+                        Variable: [H76027] Female: Under 5 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S003] Male: Under 5 years
+                        Variable: [U7S027] Female: Under 5 years
+ 
+    Time series AB: Persons: 5 to 9 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3004] 5 years
+                        Variable: [ET3005] 6 years
+                        Variable: [ET3006] 7 to 9 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM002] Male >> 5 to 9 years
+                        Variable: [FYM025] Female >> 5 to 9 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76004] Male: 5 to 9 years
+                        Variable: [H76028] Female: 5 to 9 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S004] Male: 5 to 9 years
+                        Variable: [U7S028] Female: 5 to 9 years
+ 
+    Time series AC: Persons: 10 to 14 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3007] 10 and 11 years
+                        Variable: [ET3008] 12 and 13 years
+                        Variable: [ET3009] 14 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM003] Male >> 10 to 14 years
+                        Variable: [FYM026] Female >> 10 to 14 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76005] Male: 10 to 14 years
+                        Variable: [H76029] Female: 10 to 14 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S005] Male: 10 to 14 years
+                        Variable: [U7S029] Female: 10 to 14 years
+ 
+    Time series AD: Persons: 15 to 17 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3010] 15 years
+                        Variable: [ET3011] 16 years
+                        Variable: [ET3012] 17 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM004] Male >> 15 to 17 years
+                        Variable: [FYM027] Female >> 15 to 17 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76006] Male: 15 to 17 years
+                        Variable: [H76030] Female: 15 to 17 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S006] Male: 15 to 17 years
+                        Variable: [U7S030] Female: 15 to 17 years
+ 
+    Time series AE: Persons: 18 and 19 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3013] 18 years
+                        Variable: [ET3014] 19 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM005] Male >> 18 and 19 years
+                        Variable: [FYM028] Female >> 18 and 19 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76007] Male: 18 and 19 years
+                        Variable: [H76031] Female: 18 and 19 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S007] Male: 18 and 19 years
+                        Variable: [U7S031] Female: 18 and 19 years
+ 
+    Time series AF: Persons: 20 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3015] 20 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM006] Male >> 20 years
+                        Variable: [FYM029] Female >> 20 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76008] Male: 20 years
+                        Variable: [H76032] Female: 20 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S008] Male: 20 years
+                        Variable: [U7S032] Female: 20 years
+ 
+    Time series AG: Persons: 21 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3016] 21 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM007] Male >> 21 years
+                        Variable: [FYM030] Female >> 21 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76009] Male: 21 years
+                        Variable: [H76033] Female: 21 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S009] Male: 21 years
+                        Variable: [U7S033] Female: 21 years
+ 
+    Time series AH: Persons: 22 to 24 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3017] 22 to 24 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM008] Male >> 22 to 24 years
+                        Variable: [FYM031] Female >> 22 to 24 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76010] Male: 22 to 24 years
+                        Variable: [H76034] Female: 22 to 24 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S010] Male: 22 to 24 years
+                        Variable: [U7S034] Female: 22 to 24 years
+ 
+    Time series AI: Persons: 25 to 29 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3018] 25 to 29 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM009] Male >> 25 to 29 years
+                        Variable: [FYM032] Female >> 25 to 29 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76011] Male: 25 to 29 years
+                        Variable: [H76035] Female: 25 to 29 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S011] Male: 25 to 29 years
+                        Variable: [U7S035] Female: 25 to 29 years
+ 
+    Time series AJ: Persons: 30 to 34 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3019] 30 to 34 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM010] Male >> 30 to 34 years
+                        Variable: [FYM033] Female >> 30 to 34 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76012] Male: 30 to 34 years
+                        Variable: [H76036] Female: 30 to 34 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S012] Male: 30 to 34 years
+                        Variable: [U7S036] Female: 30 to 34 years
+ 
+    Time series AK: Persons: 35 to 39 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3020] 35 to 39 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM011] Male >> 35 to 39 years
+                        Variable: [FYM034] Female >> 35 to 39 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76013] Male: 35 to 39 years
+                        Variable: [H76037] Female: 35 to 39 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S013] Male: 35 to 39 years
+                        Variable: [U7S037] Female: 35 to 39 years
+ 
+    Time series AL: Persons: 40 to 44 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3021] 40 to 44 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM012] Male >> 40 to 44 years
+                        Variable: [FYM035] Female >> 40 to 44 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76014] Male: 40 to 44 years
+                        Variable: [H76038] Female: 40 to 44 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S014] Male: 40 to 44 years
+                        Variable: [U7S038] Female: 40 to 44 years
+ 
+    Time series AM: Persons: 45 to 49 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3022] 45 to 49 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM013] Male >> 45 to 49 years
+                        Variable: [FYM036] Female >> 45 to 49 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76015] Male: 45 to 49 years
+                        Variable: [H76039] Female: 45 to 49 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S015] Male: 45 to 49 years
+                        Variable: [U7S039] Female: 45 to 49 years
+ 
+    Time series AN: Persons: 50 to 54 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3023] 50 to 54 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM014] Male >> 50 to 54 years
+                        Variable: [FYM037] Female >> 50 to 54 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76016] Male: 50 to 54 years
+                        Variable: [H76040] Female: 50 to 54 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S016] Male: 50 to 54 years
+                        Variable: [U7S040] Female: 50 to 54 years
+ 
+    Time series AO: Persons: 55 to 59 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3024] 55 to 59 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM015] Male >> 55 to 59 years
+                        Variable: [FYM038] Female >> 55 to 59 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76017] Male: 55 to 59 years
+                        Variable: [H76041] Female: 55 to 59 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S017] Male: 55 to 59 years
+                        Variable: [U7S041] Female: 55 to 59 years
+ 
+    Time series AP: Persons: 60 and 61 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3025] 60 and 61 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM016] Male >> 60 and 61 years
+                        Variable: [FYM039] Female >> 60 and 61 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76018] Male: 60 and 61 years
+                        Variable: [H76042] Female: 60 and 61 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S018] Male: 60 and 61 years
+                        Variable: [U7S042] Female: 60 and 61 years
+ 
+    Time series AQ: Persons: 62 to 64 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3026] 62 to 64 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM017] Male >> 62 to 64 years
+                        Variable: [FYM040] Female >> 62 to 64 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76019] Male: 62 to 64 years
+                        Variable: [H76043] Female: 62 to 64 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S019] Male: 62 to 64 years
+                        Variable: [U7S043] Female: 62 to 64 years
+ 
+    Time series AR: Persons: 65 to 69 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3027] 65 to 69 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM018] Male >> 65 and 66 years
+                        Variable: [FYM019] Male >> 67 to 69 years
+                        Variable: [FYM041] Female >> 65 and 66 years
+                        Variable: [FYM042] Female >> 67 to 69 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76020] Male: 65 and 66 years
+                        Variable: [H76021] Male: 67 to 69 years
+                        Variable: [H76044] Female: 65 and 66 years
+                        Variable: [H76045] Female: 67 to 69 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S020] Male: 65 and 66 years
+                        Variable: [U7S021] Male: 67 to 69 years
+                        Variable: [U7S044] Female: 65 and 66 years
+                        Variable: [U7S045] Female: 67 to 69 years
+ 
+    Time series AS: Persons: 70 to 74 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3028] 70 to 74 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM020] Male >> 70 to 74 years
+                        Variable: [FYM043] Female >> 70 to 74 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76022] Male: 70 to 74 years
+                        Variable: [H76046] Female: 70 to 74 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S022] Male: 70 to 74 years
+                        Variable: [U7S046] Female: 70 to 74 years
+ 
+    Time series AT: Persons: 75 to 79 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3029] 75 to 79 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM021] Male >> 75 to 79 years
+                        Variable: [FYM044] Female >> 75 to 79 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76023] Male: 75 to 79 years
+                        Variable: [H76047] Female: 75 to 79 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S023] Male: 75 to 79 years
+                        Variable: [U7S047] Female: 75 to 79 years
+ 
+    Time series AU: Persons: 80 to 84 years
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3030] 80 to 84 years
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM022] Male >> 80 to 84 years
+                        Variable: [FYM045] Female >> 80 to 84 years
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76024] Male: 80 to 84 years
+                        Variable: [H76048] Female: 80 to 84 years
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S024] Male: 80 to 84 years
+                        Variable: [U7S048] Female: 80 to 84 years
+ 
+    Time series AV: Persons: 85 years and over
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP11. Age
+                    Universe: Persons
+                        Variable: [ET3031] 85 years and over
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP012B. Population by Sex by Age
+                    Universe: Persons
+                        Variable: [FYM023] Male >> 85 years and over
+                        Variable: [FYM046] Female >> 85 years and over
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age
+                    Universe: Total population
+                        Variable: [H76025] Male: 85 years and over
+                        Variable: [H76049] Female: 85 years and over
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P12. Sex by Age for Selected Age Categories
+                    Universe: Total population
+                        Variable: [U7S025] Male: 85 years and over
+                        Variable: [U7S049] Female: 85 years and over
+ 
+ 
+Table 3: (CM1) Persons by Race [7*]
+ 
+    Time series AA: Persons: White (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP6. Race
+                    Universe: Persons
+                        Variable: [EUY001] White
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP007A. Population by Race
+                    Universe: Persons
+                        Variable: [FYE001] White alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [H7X002] White alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [U7J002] White alone
+ 
+    Time series AB: Persons: Black or African American (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP6. Race
+                    Universe: Persons
+                        Variable: [EUY002] Black
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP007A. Population by Race
+                    Universe: Persons
+                        Variable: [FYE002] Black or African American alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [H7X003] Black or African American alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [U7J003] Black or African American alone
+ 
+    Time series AC: Persons: American Indian and Alaska Native (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP6. Race
+                    Universe: Persons
+                        Variable: [EUY003] American Indian, Eskimo, or Aleut
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP007A. Population by Race
+                    Universe: Persons
+                        Variable: [FYE003] American Indian and Alaska Native alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [H7X004] American Indian and Alaska Native alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [U7J004] American Indian and Alaska Native alone
+ 
+    Time series AD: Persons: Asian (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP7. Race
+                    Universe: Persons
+                        Variable: [EUZ006] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Chinese (605-607, 976)
+                        Variable: [EUZ007] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Filipino (608, 977)
+                        Variable: [EUZ008] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Japanese (611, 981)
+                        Variable: [EUZ009] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Asian Indian (600, 982)
+                        Variable: [EUZ010] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Korean (612, 979)
+                        Variable: [EUZ011] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Vietnamese (619, 980)
+                        Variable: [EUZ012] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Cambodian (604)
+                        Variable: [EUZ013] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Hmong (609)
+                        Variable: [EUZ014] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Laotian (613)
+                        Variable: [EUZ015] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Thai (618)
+                        Variable: [EUZ016] Asian or Pacific Islander (600-699, 976-985): Asian (600-652, 976, 977, 979-982, 985): Other Asian (601-603, 610, 614-617, 620-652, 985)
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP007A. Population by Race
+                    Universe: Persons
+                        Variable: [FYE004] Asian alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [H7X005] Asian alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [U7J005] Asian alone
+ 
+    Time series AE: Persons: Native Hawaiian and Other Pacific Islander (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP7. Race
+                    Universe: Persons
+                        Variable: [EUZ017] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Polynesian (653-659, 978, 983): Hawaiian (653, 654, 978)
+                        Variable: [EUZ018] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Polynesian (653-659, 978, 983): Samoan (655, 983)
+                        Variable: [EUZ019] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Polynesian (653-659, 978, 983): Tongan (657)
+                        Variable: [EUZ020] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Polynesian (653-659, 978, 983): Other Polynesian (656, 658, 659)
+                        Variable: [EUZ021] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Micronesian (660-675, 984): Guamanian (660, 984)
+                        Variable: [EUZ022] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Micronesian (660-675, 984): Other Micronesian (661-675)
+                        Variable: [EUZ023] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Micronesian (660-675, 984): Melanesian (676-680)
+                        Variable: [EUZ024] Asian or Pacific Islander (600-699, 976-985): Pacific Islander (653-699, 978, 983, 984): Micronesian (660-675, 984): Pacific Islander, not specified (681-699)
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP007A. Population by Race
+                    Universe: Persons
+                        Variable: [FYE005] Native Hawaiian and Other Pacific Islander alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [H7X006] Native Hawaiian and Other Pacific Islander alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [U7J006] Native Hawaiian and Other Pacific Islander alone
+ 
+    Time series AF: Persons: Some Other Race (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP6. Race
+                    Universe: Persons
+                        Variable: [EUY005] Other race
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP007A. Population by Race
+                    Universe: Persons
+                        Variable: [FYE006] Some other race alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [H7X007] Some Other Race alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [U7J007] Some Other Race alone
+ 
+    Time series AG: Persons: Two or More Races
+        Year: 1990
+            *NOT AVAILABLE for this time*
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP007A. Population by Race
+                    Universe: Persons
+                        Variable: [FYE007] Two or more races
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [H7X008] Two or More Races
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P3. Race
+                    Universe: Total population
+                        Variable: [U7J008] Two or More Races
+ 
+ 
+Table 4: (CP9) Persons by Living Arrangements [2]
+ 
+    Time series AA: Persons: In households
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP15. Household Type and Relationship
+                    Universe: Persons
+                        Variable: [ET7001] In family households: Householder
+                        Variable: [ET7002] In family households: Spouse
+                        Variable: [ET7003] In family households: Child: Natural-born or adopted
+                        Variable: [ET7004] In family households: Child: Step
+                        Variable: [ET7005] In family households: Grandchild
+                        Variable: [ET7006] In family households: Other relatives
+                        Variable: [ET7007] In family households: Nonrelatives
+                        Variable: [ET7008] In nonfamily households: Householder living alone
+                        Variable: [ET7009] In nonfamily households: Householder not living alone
+                        Variable: [ET7010] In nonfamily households: Nonrelatives
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP027A. Population by Residence Type
+                    Universe: Persons
+                        Variable: [F0N001] Households
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P29. Household Type by Relationship
+                    Universe: Total population
+                        Variable: [H8N002] In households
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P17. Household Type (Including Living Alone) by Relationship
+                    Universe: Total population
+                        Variable: [U9Q002] In households
+ 
+    Time series AB: Persons: In group quarters
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP15. Household Type and Relationship
+                    Universe: Persons
+                        Variable: [ET7011] In group quarters: Institutionalized persons
+                        Variable: [ET7012] In group quarters: Other persons in group quarters
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP027A. Population by Residence Type
+                    Universe: Persons
+                        Variable: [F0N002] Group quarters
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P29. Household Type by Relationship
+                    Universe: Total population
+                        Variable: [H8N026] In group quarters
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P17. Household Type (Including Living Alone) by Relationship
+                    Universe: Total population
+                        Variable: [U9Q029] In group quarters
+ 
+ 
+Table 5: (CQ0) Persons in Households by Household Type [2]
+ 
+    Time series AA: Persons: In family households
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP15. Household Type and Relationship
+                    Universe: Persons
+                        Variable: [ET7001] In family households: Householder
+                        Variable: [ET7002] In family households: Spouse
+                        Variable: [ET7003] In family households: Child: Natural-born or adopted
+                        Variable: [ET7004] In family households: Child: Step
+                        Variable: [ET7005] In family households: Grandchild
+                        Variable: [ET7006] In family households: Other relatives
+                        Variable: [ET7007] In family households: Nonrelatives
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP027B. Population in Households by Household Type
+                    Universe: Persons in Households
+                        Variable: [F0O001] Family households
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P29. Household Type by Relationship
+                    Universe: Total population
+                        Variable: [H8N003] In households: In family households
+ 
+    Time series AB: Persons: In nonfamily households
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP15. Household Type and Relationship
+                    Universe: Persons
+                        Variable: [ET7008] In nonfamily households: Householder living alone
+                        Variable: [ET7009] In nonfamily households: Householder not living alone
+                        Variable: [ET7010] In nonfamily households: Nonrelatives
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP027B. Population in Households by Household Type
+                    Universe: Persons in Households
+                        Variable: [F0O002] Nonfamily households
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P29. Household Type by Relationship
+                    Universe: Total population
+                        Variable: [H8N018] In households: In nonfamily households
+ 
+ 
+Table 6: (CQ1) Persons in Group Quarters by Group Quarters Type [2]
+ 
+    Time series AA: Persons: In group quarters--Institutionalized
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP15. Household Type and Relationship
+                    Universe: Persons
+                        Variable: [ET7011] In group quarters: Institutionalized persons
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP027H. Population in Group Quarters by Group Quarter Type
+                    Universe: Persons in Group Quarters
+                        Variable: [F0U001] Institutionalized
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P29. Household Type by Relationship
+                    Universe: Total population
+                        Variable: [H8N027] In group quarters: Institutionalized population
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P17. Household Type (Including Living Alone) by Relationship
+                    Universe: Total population
+                        Variable: [U9Q030] In group quarters: Institutionalized population
+ 
+    Time series AB: Persons: In group quarters--Noninstitutionalized
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP15. Household Type and Relationship
+                    Universe: Persons
+                        Variable: [ET7012] In group quarters: Other persons in group quarters
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP027H. Population in Group Quarters by Group Quarter Type
+                    Universe: Persons in Group Quarters
+                        Variable: [F0U002] Noninstitutionalized
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P29. Household Type by Relationship
+                    Universe: Total population
+                        Variable: [H8N028] In group quarters: Noninstitutionalized population
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P17. Household Type (Including Living Alone) by Relationship
+                    Universe: Total population
+                        Variable: [U9Q031] In group quarters: Noninstitutionalized population
+ 
+ 
+Table 7: (CS1) Households by Household Type [6]
+ 
+    Time series AA: Households: Family
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP16. Household Size and Household Type
+                    Universe: Households
+                        Variable: [ET8003] 2 or more persons: Family households: Married-couple family: With related children
+                        Variable: [ET8004] 2 or more persons: Family households: Married-couple family: No related children
+                        Variable: [ET8005] 2 or more persons: Family households: Other family: Male householder, no wife present: With related children
+                        Variable: [ET8006] 2 or more persons: Family households: Other family: Male householder, no wife present: No related children
+                        Variable: [ET8007] 2 or more persons: Family households: Other family: Female householder, no husband present: With related children
+                        Variable: [ET8008] 2 or more persons: Family households: Other family: Female householder, no husband present: No related children
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP021A. Households by Household Type
+                    Universe: Households
+                        Variable: [FZ0001] Family households
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P18. Household Type
+                    Universe: Households
+                        Variable: [H8C002] Family households
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P16. Household Type
+                    Universe: Households
+                        Variable: [U83002] Family households
+ 
+    Time series AB: Households: Family--Husband-wife family (until 2012) or married-couple family (since 2013)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP16. Household Size and Household Type
+                    Universe: Households
+                        Variable: [ET8003] 2 or more persons: Family households: Married-couple family: With related children
+                        Variable: [ET8004] 2 or more persons: Family households: Married-couple family: No related children
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP018D. Family Households by Family Household Type
+                    Universe: Family Households
+                        Variable: [FZJ001] Married-couple family
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P18. Household Type
+                    Universe: Households
+                        Variable: [H8C003] Family households: Husband-wife family
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P16. Household Type
+                    Universe: Households
+                        Variable: [U83003] Family households: Married couple family
+ 
+    Time series AC: Households: Family--Other family
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP16. Household Size and Household Type
+                    Universe: Households
+                        Variable: [ET8005] 2 or more persons: Family households: Other family: Male householder, no wife present: With related children
+                        Variable: [ET8006] 2 or more persons: Family households: Other family: Male householder, no wife present: No related children
+                        Variable: [ET8007] 2 or more persons: Family households: Other family: Female householder, no husband present: With related children
+                        Variable: [ET8008] 2 or more persons: Family households: Other family: Female householder, no husband present: No related children
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP018D. Family Households by Family Household Type
+                    Universe: Family Households
+                        Variable: [FZJ002] Other family
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P18. Household Type
+                    Universe: Households
+                        Variable: [H8C004] Family households: Other family
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P16. Household Type
+                    Universe: Households
+                        Variable: [U83004] Family households: Other family
+ 
+    Time series AD: Households: Family--Other family--Male householder, no wife present (until 2012) or no spouse present (since 2013)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP16. Household Size and Household Type
+                    Universe: Households
+                        Variable: [ET8005] 2 or more persons: Family households: Other family: Male householder, no wife present: With related children
+                        Variable: [ET8006] 2 or more persons: Family households: Other family: Male householder, no wife present: No related children
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP018F. Other Family Households by Other Family Type
+                    Universe: Other Family Households
+                        Variable: [FZL001] Male householder, no wife present
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P18. Household Type
+                    Universe: Households
+                        Variable: [H8C005] Family households: Other family: Male householder, no wife present
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P16. Household Type
+                    Universe: Households
+                        Variable: [U83005] Family households: Other family: Male householder, no spouse present
+ 
+    Time series AE: Households: Family--Other family--Female householder, no husband present (until 2012) or no spouse present (since 2013)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP16. Household Size and Household Type
+                    Universe: Households
+                        Variable: [ET8007] 2 or more persons: Family households: Other family: Female householder, no husband present: With related children
+                        Variable: [ET8008] 2 or more persons: Family households: Other family: Female householder, no husband present: No related children
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP018F. Other Family Households by Other Family Type
+                    Universe: Other Family Households
+                        Variable: [FZL002] Female householder, no husband present
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P18. Household Type
+                    Universe: Households
+                        Variable: [H8C006] Family households: Other family: Female householder, no husband present
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P16. Household Type
+                    Universe: Households
+                        Variable: [U83006] Family households: Other family: Female householder, no spouse present
+ 
+    Time series AF: Households: Nonfamily
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NP16. Household Size and Household Type
+                    Universe: Households
+                        Variable: [ET8001] 1 person: Male householder
+                        Variable: [ET8002] 1 person: Female householder
+                        Variable: [ET8009] 2 or more persons: Nonfamily households: Male householder
+                        Variable: [ET8010] 2 or more persons: Nonfamily households: Female householder
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NP021A. Households by Household Type
+                    Universe: Households
+                        Variable: [FZ0002] Nonfamily households
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: P18. Household Type
+                    Universe: Households
+                        Variable: [H8C007] Nonfamily households
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: P16. Household Type
+                    Universe: Households
+                        Variable: [U83007] Nonfamily households
+ 
+ 
+Table 8: (CM7) Total Housing Units
+ 
+    Time series AA: Housing units: Total
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH1. Housing Units
+                    Universe: Housing units
+                        Variable: [ESA001] Total
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH001A. Total Housing Units
+                    Universe: Housing Units
+                        Variable: [FV5001] Total
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H1. Housing Units
+                    Universe: Housing units
+                        Variable: [IFC001] Total
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H1. Housing Units
+                    Universe: Housing units
+                        Variable: [U9V001] Total
+ 
+ 
+Table 9: (CM9) Housing Units by Occupancy Status [2]
+ 
+    Time series AA: Housing units: Occupied
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH2. Occupancy Status
+                    Universe: Housing units
+                        Variable: [ESN001] Occupied
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH003A. Housing Units by Occupancy Status
+                    Universe: Housing Units
+                        Variable: [FV8001] Occupied
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H3. Occupancy Status
+                    Universe: Housing units
+                        Variable: [IFE002] Occupied
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H3. Occupancy Status
+                    Universe: Housing units
+                        Variable: [U9X002] Occupied
+ 
+    Time series AB: Housing units: Vacant
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH2. Occupancy Status
+                    Universe: Housing units
+                        Variable: [ESN002] Vacant
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH003A. Housing Units by Occupancy Status
+                    Universe: Housing Units
+                        Variable: [FV8002] Vacant
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H3. Occupancy Status
+                    Universe: Housing units
+                        Variable: [IFE003] Vacant
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H3. Occupancy Status
+                    Universe: Housing units
+                        Variable: [U9X003] Vacant
+ 
+ 
+Table 10: (CN0) Vacant Housing Units by Vacancy Status [6]
+ 
+    Time series AA: Housing units: Vacant--For rent
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [ETQ001] For rent
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH005B. Vacant Housing Units by Vacancy Status
+                    Universe: Vacant Housing Units
+                        Variable: [FWC001] For rent
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [IFG002] For rent
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [VAL002] For rent
+ 
+    Time series AB: Housing units: Vacant--For sale only
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [ETQ002] For sale only
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH005B. Vacant Housing Units by Vacancy Status
+                    Universe: Vacant Housing Units
+                        Variable: [FWC002] For sale only
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [IFG004] For sale only
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [VAL004] For sale only
+ 
+    Time series AC: Housing units: Vacant--Rented or sold, not occupied
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [ETQ003] Rented or sold, not occupied
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH005B. Vacant Housing Units by Vacancy Status
+                    Universe: Vacant Housing Units
+                        Variable: [FWC003] Rented or sold, not occupied
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [IFG003] Rented, not occupied
+                        Variable: [IFG005] Sold, not occupied
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [VAL003] Rented, not occupied
+                        Variable: [VAL005] Sold, not occupied
+ 
+    Time series AD: Housing units: Vacant--Seasonal, recreational, or occasional use
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [ETQ004] For seasonal, recreational, or occasional use
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH005B. Vacant Housing Units by Vacancy Status
+                    Universe: Vacant Housing Units
+                        Variable: [FWC004] For seasonal, recreational, or occasional use
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [IFG006] For seasonal, recreational, or occasional use
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [VAL006] For seasonal, recreational, or occasional use
+ 
+    Time series AE: Housing units: Vacant--For migrant workers
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [ETQ005] For migrant workers
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH005B. Vacant Housing Units by Vacancy Status
+                    Universe: Vacant Housing Units
+                        Variable: [FWC005] For migrant workers
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [IFG007] For migrant workers
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [VAL007] For migrant workers
+ 
+    Time series AF: Housing units: Vacant--Other vacant
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [ETQ006] Other vacant
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH005B. Vacant Housing Units by Vacancy Status
+                    Universe: Vacant Housing Units
+                        Variable: [FWC006] Other vacant
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [IFG008] Other vacant
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H5. Vacancy Status
+                    Universe: Vacant housing units
+                        Variable: [VAL008] Other vacant
+ 
+ 
+Table 11: (CN1) Occupied Housing Units by Tenure [2]
+ 
+    Time series AA: Housing units: Owner occupied
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH3. Tenure
+                    Universe: Occupied housing units
+                        Variable: [ES1001] Owner occupied
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH004B. Occupied Housing Units by Tenure
+                    Universe: Occupied Housing Units
+                        Variable: [FWA001] Owner occupied
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H4. Tenure
+                    Universe: Occupied housing units
+                        Variable: [IFF002] Owned with a mortgage or a loan
+                        Variable: [IFF003] Owned free and clear
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H4. Tenure
+                    Universe: Occupied housing units
+                        Variable: [U9Y002] Owned with a mortgage or a loan
+                        Variable: [U9Y003] Owned free and clear
+ 
+    Time series AB: Housing units: Renter occupied
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH3. Tenure
+                    Universe: Occupied housing units
+                        Variable: [ES1002] Renter occupied
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH004B. Occupied Housing Units by Tenure
+                    Universe: Occupied Housing Units
+                        Variable: [FWA002] Renter occupied
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H4. Tenure
+                    Universe: Occupied housing units
+                        Variable: [IFF004] Renter occupied
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H4. Tenure
+                    Universe: Occupied housing units
+                        Variable: [U9Y004] Renter occupied
+ 
+ 
+Table 12: (CN2) Persons in Occupied Housing Units by Tenure [2]
+ 
+    Time series AA: Persons: In owner-occupied housing units
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH20. Aggregate Persons by Tenure
+                    Universe: Persons in occupied housing units
+                        Variable: [ESO001] Aggregate persons >> Owner occupied
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH011A. Population in Occupied Housing Units by Tenure
+                    Universe: Persons in Occupied Housing Units
+                        Variable: [FWL001] Owner occupied
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H11. Total Population in Occupied Housing Units by Tenure
+                    Universe: Population in occupied housing units
+                        Variable: [IFM002] Owned with a mortgage or a loan
+                        Variable: [IFM003] Owned free and clear
+ 
+    Time series AB: Persons: In renter-occupied housing units
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH20. Aggregate Persons by Tenure
+                    Universe: Persons in occupied housing units
+                        Variable: [ESO002] Aggregate persons >> Renter occupied
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH011A. Population in Occupied Housing Units by Tenure
+                    Universe: Persons in Occupied Housing Units
+                        Variable: [FWL002] Renter occupied
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H11. Total Population in Occupied Housing Units by Tenure
+                    Universe: Population in occupied housing units
+                        Variable: [IFM004] Renter occupied
+ 
+ 
+Table 13: (CY4) Occupied Housing Units by Race of Householder [6*]
+ 
+    Time series AA: Housing units: Occupied ~ Householder is White (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH8. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ETZ001] White
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH006A. Occupied Housing Units by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FWD001] White alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFH002] Householder who is White alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAM002] Householder who is White alone
+ 
+    Time series AB: Housing units: Occupied ~ Householder is Black or African American (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH8. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ETZ002] Black
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH006A. Occupied Housing Units by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FWD002] Black or African American alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFH003] Householder who is Black or African American alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAM003] Householder who is Black or African American alone
+ 
+    Time series AC: Housing units: Occupied ~ Householder is American Indian and Alaska Native (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH8. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ETZ003] American Indian, Eskimo, or Aleut
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH006A. Occupied Housing Units by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FWD003] American Indian and Alaska Native alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFH004] Householder who is American Indian and Alaska Native alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAM004] Householder who is American Indian and Alaska Native alone
+ 
+    Time series AD: Housing units: Occupied ~ Householder is Asian and Pacific Islander (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH8. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ETZ004] Asian or Pacific Islander
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH006A. Occupied Housing Units by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FWD004] Asian alone
+                        Variable: [FWD005] Native Hawaiian and Other Pacific Islander alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFH005] Householder who is Asian alone
+                        Variable: [IFH006] Householder who is Native Hawaiian and Other Pacific Islander alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAM005] Householder who is Asian alone
+                        Variable: [VAM006] Householder who is Native Hawaiian and Other Pacific Islander alone
+ 
+    Time series AE: Housing units: Occupied ~ Householder is Some Other Race (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH8. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ETZ005] Other race
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH006A. Occupied Housing Units by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FWD006] Some other race alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFH007] Householder who is Some Other Race alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAM007] Householder who is Some Other Race alone
+ 
+    Time series AF: Housing units: Occupied ~ Householder is Two or More Races
+        Year: 1990
+            *NOT AVAILABLE for this time*
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH006A. Occupied Housing Units by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FWD007] Two or more races
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFH008] Householder who is Two or More Races
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H6. Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAM008] Householder who is Two or More Races
+ 
+ 
+Table 14: (CY5) Occupied Housing Units by Tenure [2] by Race of Householder [6*]
+ 
+    Time series AA: Housing units: Owner occupied ~ Householder is White (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0001] Owner occupied >> White
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1001] Owner occupied >> White alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP003] Owner occupied: Householder who is White alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ003] Owner occupied: Householder who is White alone
+ 
+    Time series AB: Housing units: Owner occupied ~ Householder is Black or African American (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0002] Owner occupied >> Black
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1002] Owner occupied >> Black or African American alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP004] Owner occupied: Householder who is Black or African American alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ004] Owner occupied: Householder who is Black or African American alone
+ 
+    Time series AC: Housing units: Owner occupied ~ Householder is American Indian and Alaska Native (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0003] Owner occupied >> American Indian, Eskimo, or Aleut
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1003] Owner occupied >> American Indian and Alaska Native alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP005] Owner occupied: Householder who is American Indian and Alaska Native alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ005] Owner occupied: Householder who is American Indian and Alaska Native alone
+ 
+    Time series AD: Housing units: Owner occupied ~ Householder is Asian and Pacific Islander (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0004] Owner occupied >> Asian or Pacific Islander
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1004] Owner occupied >> Asian alone
+                        Variable: [FW1005] Owner occupied >> Native Hawaiian and Other Pacific Islander alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP006] Owner occupied: Householder who is Asian alone
+                        Variable: [IFP007] Owner occupied: Householder who is Native Hawaiian and Other Pacific Islander alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ006] Owner occupied: Householder who is Asian alone
+                        Variable: [VAQ007] Owner occupied: Householder who is Native Hawaiian and Other Pacific Islander alone
+ 
+    Time series AE: Housing units: Owner occupied ~ Householder is Some Other Race (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0005] Owner occupied >> Other race
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1006] Owner occupied >> Some other race alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP008] Owner occupied: Householder who is Some Other Race alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ008] Owner occupied: Householder who is Some Other Race alone
+ 
+    Time series AF: Housing units: Owner occupied ~ Householder is Two or More Races
+        Year: 1990
+            *NOT AVAILABLE for this time*
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1007] Owner occupied >> Two or more races
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP009] Owner occupied: Householder who is Two or More Races
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ009] Owner occupied: Householder who is Two or More Races
+ 
+    Time series AG: Housing units: Renter occupied ~ Householder is White (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0006] Renter occupied >> White
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1008] Renter occupied >> White alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP011] Renter occupied: Householder who is White alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ011] Renter occupied: Householder who is White alone
+ 
+    Time series AH: Housing units: Renter occupied ~ Householder is Black or African American (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0007] Renter occupied >> Black
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1009] Renter occupied >> Black or African American alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP012] Renter occupied: Householder who is Black or African American alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ012] Renter occupied: Householder who is Black or African American alone
+ 
+    Time series AI: Housing units: Renter occupied ~ Householder is American Indian and Alaska Native (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0008] Renter occupied >> American Indian, Eskimo, or Aleut
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1010] Renter occupied >> American Indian and Alaska Native alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP013] Renter occupied: Householder who is American Indian and Alaska Native alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ013] Renter occupied: Householder who is American Indian and Alaska Native alone
+ 
+    Time series AJ: Housing units: Renter occupied ~ Householder is Asian and Pacific Islander (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0009] Renter occupied >> Asian or Pacific Islander
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1011] Renter occupied >> Asian alone
+                        Variable: [FW1012] Renter occupied >> Native Hawaiian and Other Pacific Islander alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP014] Renter occupied: Householder who is Asian alone
+                        Variable: [IFP015] Renter occupied: Householder who is Native Hawaiian and Other Pacific Islander alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ014] Renter occupied: Householder who is Asian alone
+                        Variable: [VAQ015] Renter occupied: Householder who is Native Hawaiian and Other Pacific Islander alone
+ 
+    Time series AK: Housing units: Renter occupied ~ Householder is Some Other Race (single race)
+        Year: 1990
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 1990 Census: STF 1 - 100% Data
+                Source table: NH9. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [ET0010] Renter occupied >> Other race
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1013] Renter occupied >> Some other race alone
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP016] Renter occupied: Householder who is Some Other Race alone
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ016] Renter occupied: Householder who is Some Other Race alone
+ 
+    Time series AL: Housing units: Renter occupied ~ Householder is Two or More Races
+        Year: 1990
+            *NOT AVAILABLE for this time*
+        Year: 2000
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2000 Census: SF 1b - 100% Data [Blocks & Block Groups]
+                Source table: NH014A. Occupied Housing Units by Tenure by Race of Householder
+                    Universe: Occupied Housing Units
+                        Variable: [FW1014] Renter occupied >> Two or more races
+        Year: 2010
+            Source geographic level: Census Tract (by State--County)
+            Source dataset: 2010 Census: SF 1a - P & H Tables [Blocks & Larger Areas]
+                Source table: H14. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [IFP017] Renter occupied: Householder who is Two or More Races
+        Year: 2020
+            Source geographic level: Block (by State--County--Tract)
+            Source dataset: 2020 Census: DHC - P & H Tables [Blocks & Larger Areas]
+                Source table: H10. Tenure by Race of Householder
+                    Universe: Occupied housing units
+                        Variable: [VAQ017] Renter occupied: Householder who is Two or More Races
+ 
+--------------------------------------------------------------------------------
+Citation and Use of NHGIS Data
+--------------------------------------------------------------------------------
+ 
+All persons are granted a limited license to use this documentation and the
+accompanying data, subject to the following conditions:
+
+* REDISTRIBUTION: You will not redistribute the data without permission.
+
+  You may publish a subset of the data to meet journal requirements for accessing 
+  data related to a particular publication. Contact us for permission for any other 
+  redistribution; we will consider requests for free and commercial redistribution.
+
+* CITATION: You will cite NHGIS appropriately.
+
+    * Publications and research reports employing NHGIS data (either tabular or GIS) 
+      should include the following citation:
+
+        Jonathan Schroeder, David Van Riper, Steven Manson, Katherine Knowles, Tracy Kugler, Finn Roberts, and Steven Ruggles. 
+        IPUMS National Historical Geographic Information System: Version 20.0 
+        [dataset]. Minneapolis, MN: IPUMS. 2025. 
+        http://doi.org/10.18128/D050.V20.0
+
+    * For policy briefs, online resources, or articles in the popular press, we 
+      recommend that you cite the use of NHGIS data as follows:
+
+        IPUMS NHGIS, University of Minnesota, www.nhgis.org.
+
+These terms of use are a legally binding agreement. You can use the data only in 
+accordance with these terms, and any other use is a violation of the agreement. 
+Violations may result in revocation of the agreement and prohibition from using other 
+IPUMS data. If IPUMS or our partners are harmed from your violation, you are 
+responsible for all damages, including reasonable attorney's fees and expenses.
+        
+In addition, we request that users send us a copy of any publications, research
+reports, or educational material making use of the data or documentation.
+
+Send electronic material to: nhgis@umn.edu
+
+Printed matter should be sent to:
+
+    IPUMS NHGIS
+    Institute for Social Research and Data Innovation
+    University of Minnesota
+    50 Willey Hall
+    225 19th Ave S
+    Minneapolis, MN 55455

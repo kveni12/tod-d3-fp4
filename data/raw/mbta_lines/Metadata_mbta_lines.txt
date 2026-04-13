@@ -1,0 +1,67 @@
+Title: MBTA Transit Routes from GTFS
+Table: mbta_lines(_deduplicated)
+Type: geojson
+
+Data Source:
+MBTA GTFS:
+    Source: Massachusetts Bay Transportation Authority (MBTA)
+    GTFS Download: https://cdn.mbta.com/MBTA_GTFS.zip
+    Archive Version: 20250131 (valid until 20250405, "Winter 2025, version D")
+    Archive URL: https://cdn.mbtace.com/archive/20250131.zip
+    Documentation: https://github.com/mbta/gtfs-documentation/blob/master/reference/gtfs-archive.md
+
+Extracted Using:
+    Tool: gtfs-to-geojson
+    Repository: https://github.com/blinktaginc/gtfs-to-geojson
+
+Description:
+This GeoJSON dataset was generated from the MBTA’s GTFS feed. It contains transit route data represented as multiline geometries. Each feature corresponds to a transit route served by the MBTA, with associated attributes including route names, descriptions, colors, and URLs. The data is derived from the GTFS routes.txt file and converted into a GeoJSON MULTILINESTRING format using the gtfs-to-geojson tool. In the `_deduplicated` version, we removed the lines with duplicated `route_long_name` fields. Through this process, we removed duplicated 3 routes. For more info and the respective scripts see https://github.com/RicoFio/vis-society-25-gtfs-prep/tree/main
+
+Attributes:
+    agency_name:
+        Type: String
+        Description: The name of the transit agency operating the route.
+    
+    route_id:
+        Type: String
+        Description: The unique identifier for the transit route.
+    
+    agency_id:
+        Type: String
+        Description: The identifier for the transit agency.
+    
+    route_short_name:
+        Type: String
+        Description: The short name of the transit route (e.g., "Red").
+    
+    route_long_name:
+        Type: String
+        Description: The full name of the transit route (e.g., "Red Line").
+    
+    route_desc:
+        Type: String
+        Description: A brief description of the transit route.
+    
+    route_type:
+        Type: Integer
+        Description: The type of transit service (e.g., 0 for light rail, 1 for subway, etc.), following the GTFS specification.
+    
+    route_url:
+        Type: String
+        Description: A URL linking to additional information about the route on the MBTA website.
+    
+    route_color:
+        Type: String
+        Description: The hexadecimal color code associated with the route.
+    
+    route_sort_order:
+        Type: Integer
+        Description: An order value used for sorting routes.
+    
+    network_id:
+        Type: String
+        Description: An identifier for the transit network classification (e.g., "rapid_transit", "m_rapid_transit").
+    
+    geometry:
+        Type: GeoJSON MultiLineString
+        Description: The geographic representation of the transit route as a series of connected line segments.

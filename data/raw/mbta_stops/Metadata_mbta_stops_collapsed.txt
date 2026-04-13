@@ -1,0 +1,59 @@
+Title: MBTA Transit Stops from GTFS
+Table: mbta_stops(_collapsed)
+Type: geojson
+
+Data Source:
+MBTA GTFS:
+    Source: Massachusetts Bay Transportation Authority (MBTA)
+    Latest GTFS Download: https://cdn.mbta.com/MBTA_GTFS.zip
+    Archive Version: 20250131 (valid until 20250405, "Winter 2025, version D")
+    Archive URL: https://cdn.mbtace.com/archive/20250131.zip
+    Documentation: https://github.com/mbta/gtfs-documentation/blob/master/reference/gtfs-archive.md
+
+Extracted Using:
+    Tool: gtfs-to-geojson
+    Repository: https://github.com/blinktaginc/gtfs-to-geojson
+
+Description:
+This GeoJSON dataset was generated from the MBTA’s GTFS feed. It contains transit stop information for the MBTA network, including stop locations, names, and related attributes. The data—extracted from the GTFS stops.txt file and enriched with route associations—was converted into GeoJSON format using the gtfs-to-geojson tool. In the `_collapsed` version, we removed stops with the same 'stop_name', 'zone_id', and 'stop_url', i.e. only the first entry has been kept. Through this process, we removed 569 duplicated stops. For more info and the respective scripts see https://github.com/RicoFio/vis-society-25-gtfs-prep/tree/main
+
+Attributes:
+    stop_name:
+        Type: String
+        Description: The name of the transit stop.
+    
+    zone_id:
+        Type: String
+        Description: The fare zone identifier associated with the stop.
+    
+    stop_url:
+        Type: String
+        Description: A URL linking to additional information about the stop on the MBTA website.
+    
+    stop_id:
+        Type: String
+        Description: The unique identifier for the stop.
+    
+    stop_code:
+        Type: String
+        Description: A short code used to represent the stop.
+    
+    parent_station:
+        Type: String or Null
+        Description: Identifier for the parent station if the stop is part of a larger station complex; otherwise null.
+    
+    wheelchair_boarding:
+        Type: Integer
+        Description: An indicator of wheelchair accessibility (commonly 1 for accessible, 2 for not accessible, or 0/unspecified for unknown).
+    
+    level_id:
+        Type: String or Null
+        Description: Identifier for the station level or platform, if applicable.
+    
+    routes:
+        Type: Array
+        Description: An array of objects representing the routes that serve the stop. Each object typically includes details such as route_id and agency_id.
+    
+    geometry:
+        Type: GeoJSON Point
+        Description: The geographic location of the stop represented as a GeoJSON Point.
