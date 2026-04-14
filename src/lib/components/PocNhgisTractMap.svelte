@@ -2429,9 +2429,9 @@
 
 	.poc-stepper-side {
 		display: grid;
-		gap: 18px;
+		gap: 14px;
 		align-content: start;
-		padding-top: 8px;
+		padding-top: 12px;
 		min-width: 0;
 		position: relative;
 		z-index: 1;
@@ -2442,12 +2442,11 @@
 		top: 16px;
 		z-index: 3;
 		display: grid;
-		gap: 6px;
-		padding: 14px 16px;
-		border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
-		border-radius: 16px;
-		background: color-mix(in srgb, var(--bg-card) 94%, white 6%);
-		box-shadow: 0 8px 24px rgba(18, 30, 51, 0.06);
+		gap: 4px;
+		padding: 12px 14px;
+		border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+		border-radius: var(--radius-sm);
+		background: color-mix(in srgb, var(--bg-card) 96%, white);
 	}
 
 	.poc-stepper-inline-kicker,
@@ -2463,15 +2462,15 @@
 	.poc-stepper-inline-hint,
 	.poc-stepper-inline-body-copy {
 		margin: 0;
-		font-size: 0.8rem;
-		line-height: 1.5;
+		font-size: 0.76rem;
+		line-height: 1.4;
 		color: var(--text-muted);
 	}
 
 	.poc-stepper-inline-rail {
 		display: grid;
-		gap: 14vh;
-		padding-top: 136px;
+		gap: 16vh;
+		padding-top: 132px;
 		/* Extra runway after step 3 so the page does not jump to the next section immediately */
 		padding-bottom: 32vh;
 		isolation: isolate;
@@ -2479,28 +2478,26 @@
 
 	.poc-stepper-card {
 		display: grid;
-		align-content: start;
-		gap: 14px;
+		align-content: center;
+		gap: 12px;
 		width: 100%;
 		min-height: 58vh;
-		padding: 18px 18px 18px 20px;
-		border-left: 3px solid color-mix(in srgb, var(--accent) 18%, var(--border));
-		border-radius: 16px;
-		border-top: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
-		border-right: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
-		border-bottom: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
-		background: color-mix(in srgb, var(--bg-card) 95%, white 5%);
-		box-shadow: 0 10px 24px rgba(18, 30, 51, 0.04);
+		padding: 10px 0 0;
+		border-left: 2px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+		padding-left: 18px;
+		border-radius: var(--radius-sm);
+		border-top: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
+		border-right: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
+		border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
+		background: color-mix(in srgb, var(--bg-card) 97%, white 3%);
 		text-align: left;
 		color: var(--text);
-		opacity: 0.58;
-		transform: translateY(10px);
+		opacity: 0.48;
+		transform: translateY(14px);
 		transition:
 			opacity 220ms ease,
 			transform 220ms ease,
-			border-color 220ms ease,
-			box-shadow 220ms ease,
-			background 220ms ease;
+			border-color 220ms ease;
 	}
 
 	.poc-stepper-card--active {
@@ -2508,8 +2505,6 @@
 		border-top-color: color-mix(in srgb, var(--accent) 24%, var(--border));
 		border-right-color: color-mix(in srgb, var(--accent) 24%, var(--border));
 		border-bottom-color: color-mix(in srgb, var(--accent) 24%, var(--border));
-		background: color-mix(in srgb, var(--bg-card) 90%, white 10%);
-		box-shadow: 0 16px 32px rgba(18, 30, 51, 0.08);
 		opacity: 1;
 		transform: translateY(0);
 	}
@@ -2525,14 +2520,13 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 32px;
-		height: 32px;
+		width: 28px;
+		height: 28px;
 		border-radius: 999px;
 		border: 1px solid var(--border);
-		font-size: 0.84rem;
+		font-size: 0.82rem;
 		font-weight: 700;
 		color: var(--text);
-		background: color-mix(in srgb, var(--bg-card) 94%, white 6%);
 	}
 
 	.poc-stepper-card--active .poc-stepper-pill-num {
@@ -2546,28 +2540,26 @@
 	}
 
 	.poc-stepper-pill-title {
-		font-size: 0.98rem;
-		font-weight: 700;
+		font-size: 0.82rem;
+		font-weight: 600;
 		line-height: 1.25;
 		color: var(--text);
-		text-wrap: balance;
 	}
 
 	.poc-stepper-pill-kicker {
-		font-size: 0.68rem;
+		font-size: 0.65rem;
 		line-height: 1.25;
 		color: var(--text-muted);
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.05em;
 	}
 
 	.poc-stepper-card-body {
 		margin: 0;
-		max-width: 31ch;
-		font-size: 0.95rem;
-		line-height: 1.72;
-		color: color-mix(in srgb, var(--text) 78%, var(--text-muted));
-		text-wrap: pretty;
+		max-width: 22.4ch; /* ~30% narrower than 32ch — more room for the map column */
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--text-muted);
 	}
 
 	/* Transit toggles ~1/4 width; text legend ~3/4 on wide viewports */
@@ -2728,16 +2720,12 @@
 		}
 
 		.poc-stepper-inline-rail {
-			gap: 20px;
-			padding-top: 18px;
-			padding-bottom: 18px;
+			gap: 18px;
 		}
 
 		.poc-stepper-card {
 			min-height: 0;
-			padding: 16px;
-			opacity: 1;
-			transform: none;
+			padding-top: 0;
 		}
 	}
 
