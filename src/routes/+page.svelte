@@ -11,9 +11,9 @@
 		renderMuniScatter,
 		renderMuniComposition,
 		renderMuniGrowthCapture,
-		renderMuniAffordableTrend,
+		renderMuniAffordableTrend
 	} from '$lib/utils/municipalCharts.js';
-	import { tractData, developments, storyNhgisRows } from '$lib/stores/data.svelte.js';
+	import { tractData, developments, storyNhgisRows, meta } from '$lib/stores/data.svelte.js';
 	import { loadStoryData } from '$lib/stores/data.svelte.js';
 	import {
 		DEFAULT_MAIN_POC_DEV_OPTS,
@@ -26,6 +26,14 @@
 	} from '$lib/utils/mainPocTractModel.js';
 	import { createPanelState } from '$lib/stores/panelState.svelte.js';
 	import PocNhgisTractMap from '$lib/components/PocNhgisTractMap.svelte';
+	import TodIntensityScatter from '$lib/components/TodIntensityScatter.svelte';
+	import {
+		buildCohortDevelopmentSplit,
+		cohortYMeansForYKey,
+		popWeightKey,
+		yMetricDisplayKind,
+		formatYMetricSummary
+	} from '$lib/utils/derived.js';
 
 	/* ═══════════════════════════════════════════════════════
 	   MUNICIPAL STATE (Part 1)
@@ -235,6 +243,84 @@
 		if (storyNhgisRows.length) return storyNhgisRows;
 		return buildNhgisLikeRows(tractListFiltered, tractDevClassByGj, tractTimePeriod);
 	});
+
+	const tractPanelConfig = $derived({
+		timePeriod: tractTimePeriod,
+		transitDistanceMi: threshold,
+		sigDevMinPctStockIncrease: tractSigDevMin,
+		todFractionCutoff: tractTodFractionCutoff,
+		huChangeSource: 'massbuilds',
+		minPopulation: DEFAULT_MAIN_POC_UNIVERSE.minPopulation,
+		minPopDensity: DEFAULT_MAIN_POC_UNIVERSE.minPopDensity,
+		minStops: DEFAULT_MAIN_POC_UNIVERSE.minStops,
+		minUnitsPerProject: DEFAULT_MAIN_POC_DEV_OPTS.minUnitsPerProject,
+		minDevMultifamilyRatioPct: DEFAULT_MAIN_POC_DEV_OPTS.minDevMultifamilyRatioPct,
+		minDevAffordableRatioPct: DEFAULT_MAIN_POC_DEV_OPTS.minDevAffordableRatioPct,
+		includeRedevelopment: DEFAULT_MAIN_POC_DEV_OPTS.includeRedevelopment
+	});
+
+	const cohortDevSplit = $derived.by(() => {
+		if (!tractData.length || !developments.length) return { tod: [], nonTod: [], minimal: [] };
+		return buildCohortDevelopmentSplit(tractData, tractPanelConfig, developments);
+	});
+
+	const cohortRowsByY = $derived.by(() => {
+		if (!meta.yVariables?.length) return [];
+		const weightKey = popWeightKey(tractTimePeriod);
+		return meta.yVariables.map((v) => {
+			const yKey = `${v.key}_${tractTimePeriod}`;
+			const raw = cohortYMeansForYKey(cohortDevSplit, yKey, weightKey);
+			const kind = yMetricDisplayKind(v);
+			return {
+				key: v.key,
+				fmtTod: formatYMetricSummary(raw.meanTod, kind),
+				fmtCtrl: formatYMetricSummary(raw.meanNonTod, kind),
+				fmtMinimal: formatYMetricSummary(raw.meanMinimal, kind)
+			};
+		});
+	});
+
+	const incomeRow = $derived(cohortRowsByY.find((r) => r.key === 'median_income_change_pct'));
+	const eduRow = $derived(cohortRowsByY.find((r) => r.key === 'bachelors_pct_change'));
+
+	function makeTodScatterPanelState(yVar) {
+		return {
+			timePeriod: tractTimePeriod,
+			yVar,
+			transitDistanceMi: threshold,
+			sigDevMinPctStockIncrease: tractSigDevMin,
+			todFractionCutoff: tractTodFractionCutoff,
+			huChangeSource: 'massbuilds',
+			minPopulation: DEFAULT_MAIN_POC_UNIVERSE.minPopulation,
+			minPopDensity: DEFAULT_MAIN_POC_UNIVERSE.minPopDensity,
+			minStops: DEFAULT_MAIN_POC_UNIVERSE.minStops,
+			minUnitsPerProject: DEFAULT_MAIN_POC_DEV_OPTS.minUnitsPerProject,
+			minDevMultifamilyRatioPct: DEFAULT_MAIN_POC_DEV_OPTS.minDevMultifamilyRatioPct,
+			minDevAffordableRatioPct: DEFAULT_MAIN_POC_DEV_OPTS.minDevAffordableRatioPct,
+			includeRedevelopment: DEFAULT_MAIN_POC_DEV_OPTS.includeRedevelopment,
+			trimOutliers: true,
+			hoveredTract: null,
+			selectedTracts: new Set(),
+			setHovered(gisjoin) {
+				this.hoveredTract = gisjoin;
+			},
+			toggleTract(gisjoin) {
+				const next = new Set(this.selectedTracts);
+				if (next.has(gisjoin)) next.delete(gisjoin);
+				else next.add(gisjoin);
+				this.selectedTracts = next;
+			}
+		};
+	}
+
+	let incomePanelState = $state(makeTodScatterPanelState('median_income_change_pct'));
+	let eduPanelState = $state(makeTodScatterPanelState('bachelors_pct_change'));
+
+	$effect(() => {
+		void threshold;
+		incomePanelState = makeTodScatterPanelState('median_income_change_pct');
+		eduPanelState = makeTodScatterPanelState('bachelors_pct_change');
+	});
 </script>
 
 <div class="poc-root">
@@ -248,6 +334,7 @@
 			reduce car dependence, and create higher-density neighborhoods with closer access to jobs and services. 
 			However, debate remains about <strong>whether the benefits of TOD are being shared with lower-income residents</strong>, and <strong>whether this development contributes
 			to gentrification and displacement</strong>.<br><br>
+		</p>
 		<p class="subtitle">
 			To answer this question, we analyze the current geographic distribution of TOD across Massachusetts, and analyze
 			the correlations between increased TOD and demographic changes in TOD areas in the hope of identifying possible
@@ -578,14 +665,12 @@
 					<p>
 						We can get a sense of the socioeconomic distribution of people by looking at the median income
 						of a neighborhood.
-						<!-- {#if incomeRow}
+						{#if incomeRow}
 							In census tracts dominated by TOD, the median income changes by
 							<strong>{incomeRow.fmtTod}</strong>, while in non-TOD dominated tracts it changes by
 							<strong>{incomeRow.fmtCtrl}</strong>, and in minimal development tracts by
 							<strong>{incomeRow.fmtMinimal}</strong>.
-						{/if} -->
-						In census tracts dominated by TOD, the median income changes by <strong>84.92%</strong>, while in non-TOD dominated 
-						tracts it changes by <strong>62.58%</strong>, and in minimal development tracts by <strong>64.29%</strong>
+						{/if}
 						This is one proxy for neighborhood change and possible market pressure, though it should not be
 						read as direct evidence that TOD itself caused these shifts.
 					</p>
@@ -600,10 +685,10 @@
 					<p class="chart-note">
 						This plot shows that not only does TOD correspond to greater income jumps than non-TOD,
 						but also that higher TOD intensity is associated with larger income changes within the observed tract sample.
-						Each point is a tract; color = TOD share of new units; size = population.
+						Hover for tract details and click points if you want to hold onto a few comparisons.
 					</p>
 					<div class="scatter-container scatter-container--compact">
-						<img src={`${base}/tod-intensity-scatter.png`} alt="Scatter plot of median income change (%) vs. % housing stock increase, colored by TOD share and sized by population, with best-fit lines for TOD-dominated, non-TOD, and all significant tracts" class="tod-intensity-scatter-img" />
+						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} />
 					</div>
 				</section>
 			</div>
@@ -613,14 +698,12 @@
 					<h2>Education analysis</h2>
 					<p>
 						Another indicator of socioeconomic change is the percentage of people who are college-educated.
-						<!-- {#if eduRow}
+						{#if eduRow}
 							In TOD-dominated tracts, the bachelor's degree share changes by
 							<strong>{eduRow.fmtTod}</strong>, compared to
 							<strong>{eduRow.fmtCtrl}</strong> in non-TOD dominated tracts and
 							<strong>{eduRow.fmtMinimal}</strong> in minimal development tracts.
-						{/if} -->
-						In TOD-dominated tracts, the bachelor's degree share changes by <strong>15.71 pp</strong>, compared to <strong>11.39 pp</strong> 
-						in non-TOD dominated tracts and <strong>9.86 pp</strong> in minimal development tracts.
+						{/if}
 						This is another proxy for neighborhood change. Because most adults do not gain bachelor's degrees
 						rapidly within a decade, changes often reflect turnover, replacement, or selective in-migration.
 					</p>
@@ -630,10 +713,10 @@
 					<h3>TOD intensity vs bachelor's degree share change</h3>
 					<p class="chart-note">
 						The same pattern holds for education: tracts with more TOD see larger increases in the share
-						of residents with bachelor's degrees or higher — a useful proxy for neighborhood change, but not direct causal proof of displacement.
+						of residents with bachelor's degrees or higher. Hover for tract details and click points to keep a few in view.
 					</p>
 					<div class="scatter-container scatter-container--compact">
-						<img src={`${base}/tod-edu-scatter.png`} alt="Scatter plot of Bachelor's Degree Share Change (pp) vs % housing stock increase, coloured by TOD share and sized by population, with best-fit lines for TOD-dominated, non-TOD, and all significant tracts" class="scatter-img" />
+						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} />
 					</div>
 				</section>
 			</div>
@@ -684,6 +767,7 @@
 					that suggest increased displacement pressure, particularly for lower-income households. In order to mitigate
 					these issues, it is important to ensure that TOD projects include a substantial number of affordable housing units--
 					particularly in lower-income and more at-risk communities.
+				</p>
 			</section>
 		{/if}
 	</section>

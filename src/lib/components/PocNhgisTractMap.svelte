@@ -2565,6 +2565,29 @@
 	});
 
 	$effect(() => {
+		if (!guidedMode || !containerEl) return;
+		const clearGuidedPopupState = () => {
+			tooltip = { ...tooltip, visible: false, anchorX: null, anchorY: null };
+			pinnedTooltipStage = null;
+			activeGuidedDevelopmentKey = null;
+			panelState.setHovered(null);
+		};
+		const maybeCloseGuidedPopup = () => {
+			if (pinnedTooltipStage == null || !tooltip.visible) return;
+			const rect = containerEl.getBoundingClientRect();
+			const mapMostlyOutOfView = rect.bottom < 120 || rect.top > window.innerHeight - 120;
+			if (mapMostlyOutOfView) clearGuidedPopupState();
+		};
+		maybeCloseGuidedPopup();
+		window.addEventListener('scroll', maybeCloseGuidedPopup, { passive: true });
+		window.addEventListener('resize', maybeCloseGuidedPopup);
+		return () => {
+			window.removeEventListener('scroll', maybeCloseGuidedPopup);
+			window.removeEventListener('resize', maybeCloseGuidedPopup);
+		};
+	});
+
+	$effect(() => {
 		void overlayKey;
 		if (!containerEl || !svgRef) return;
 		updateOverlays();
