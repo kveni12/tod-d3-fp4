@@ -170,6 +170,11 @@
 	 * ~0.11 opacity ≈ 89% dimming vs full (≥50% reduction vs the previous 0.22 pass) so violet/lavender outlines read clearly.
 	 */
 	const NON_MISMATCH_DIM = 0.11;
+	/**
+	 * Group opacity for guided tracts outside the geographic focus — lower pushes them further
+	 * into the background so in-focus tracts read more clearly.
+	 */
+	const GUIDED_UNFOCUS_OPACITY = 0.28;
 	/** When “lower-income tracts” focus is on: use neutral tan for tracts at/above $125k median. */
 	const LOW_INCOME_FOCUS_INACTIVE_FILL = '#e7e0d5';
 
@@ -250,6 +255,30 @@
 		// Minimal/unclassified tracts when cohort outlines are active:
 		// visible thin boundary so all tract shapes are clear.
 		return 'rgba(60,64,67,0.35)';
+	}
+
+	/**
+	 * Green / orange TOD tiers and mismatch (purple) use clip-masked interior rims.
+	 * Neutral grey boundaries use a separate centered stroke (``tract-edge-plain``).
+	 *
+	 * Parameters
+	 * ----------
+	 * row : object | undefined
+	 * id : string | undefined
+	 *
+	 * Returns
+	 * -------
+	 * boolean
+	 */
+	function tractEdgeUsesInteriorClip(row, id) {
+		if (showMismatchOutlines() && id && effectiveMismatchIds.has(id)) return true;
+		if (!showCohortOutlines()) return false;
+		if (lowIncomeFocusOn && id) {
+			const li = mismatchFlagsByGj.get(id)?.isLowIncome;
+			if (li !== true) return false;
+		}
+		const dc = row?.devClass;
+		return dc === 'tod_dominated' || dc === 'nontod_dominated';
 	}
 
 	function cohortLabel(devClass) {
@@ -1013,12 +1042,10 @@
 			.style('paint-order', 'stroke')
 			.style('pointer-events', 'none');
 
-		// Per-tract <g>: choropleth fill, then clipped strokes (true **interior** rim).
-		// A clipPath duplicates the tract polygon; stroked paths use ``clip-path`` so only
-		// the half of the stroke that lies **inside** the polygon is drawn—no outward
-		// bleed into neighbors, and the rim stays visible when focused (white/purple on
-		// ``tract-interaction`` uses the same clip). Stroke widths stay 2× the desired
-		// **visible** rim (centered stroke, outer half removed by clip).
+		// Per-tract <g>: choropleth fill, then two edge paths — ``tract-edge-clip`` for
+		// TOD green/orange and mismatch purple (interior rim via clipPath); ``tract-edge-plain``
+		// for neutral grey boundaries (centered stroke, no clip — classic map shell).
+		// ``tract-interaction`` stays clipped for white hover / purple selection rings.
 		const tractGroup = zoomLayer.append('g').attr('class', 'tract-layer');
 
 		const tractGs = tractGroup
@@ -1053,10 +1080,19 @@
 			.style('pointer-events', 'none');
 
 		tractGs.append('path')
-			.attr('class', 'tract-stroke')
+			.attr('class', 'tract-edge-clip')
 			.attr('vector-effect', 'non-scaling-stroke')
 			.attr('d', path)
 			.attr('clip-path', tractClipUrl)
+			.attr('fill', 'none')
+			.attr('stroke', 'none')
+			.attr('stroke-width', 0)
+			.style('pointer-events', 'none');
+
+		tractGs.append('path')
+			.attr('class', 'tract-edge-plain')
+			.attr('vector-effect', 'non-scaling-stroke')
+			.attr('d', path)
 			.attr('fill', 'none')
 			.attr('stroke', 'var(--border)')
 			.attr('stroke-width', 1)
@@ -1199,9 +1235,7 @@
 			.clamp(true);
 		const guidedFocusIds = guidedGeographicFocusIds;
 
-		// Reusable fill function — the same fill is applied to both the
-		// stroke layer (so it shows through any transparent stroke) and the
-		// fill-mask layer on top (which covers the outer half of the stroke).
+		// Choropleth fill for ``path.tract-fill`` only.
 		const computeFill = (d) => {
 			const id = d.properties?.gisjoin;
 			const row = rowByGj.get(id);
@@ -1217,7 +1251,7 @@
 			let baseFill = Number.isFinite(v) ? color(v) : '#e7e0d5';
 			let fill = tintFill(baseFill, row);
 			if (guidedMode && guidedFocusIds.size && !guidedFocusIds.has(id) && !isSelHover) {
-				fill = desaturateFill(fill, 0.55);
+				fill = desaturateFill(fill, 0.72);
 			}
 			if (mismatchLayerOn) {
 				if (!effectiveMismatchIds.has(id)) {
@@ -1237,7 +1271,7 @@
 			const row = rowByGj.get(id);
 			if (id === panelState.hoveredTract || panelState.selectedTracts.has(id)) return 1;
 			if (guidedMode && guidedFocusIds.size) {
-				return guidedFocusIds.has(id) ? 1 : 0.5;
+				return guidedFocusIds.has(id) ? 1 : GUIDED_UNFOCUS_OPACITY;
 			}
 			if (spotlight && !isSpotlightMatch(row, spotlight)) return 0.2;
 			if (revealStage === 0) return 1;
@@ -1261,15 +1295,16 @@
 		// correctly even when the group is dimmed.
 		transitionSel(sel.selectAll('g.tract-g')).attr('opacity', computeOpacity);
 
-		// Choropleth fill only (strokes are clip-masked and use ``fill: none``).
+		// Choropleth fill only.
 		transitionSel(sel.selectAll('path.tract-fill')).attr('fill', computeFill);
 
-		// Cohort / mismatch strokes: clipped to tract interior so paint stays inside the boundary.
-		transitionSel(sel.selectAll('path.tract-stroke'))
+		// Interior rim: TOD green/orange + mismatch purple (clip removes outer half of stroke).
+		transitionSel(sel.selectAll('path.tract-edge-clip'))
 			.attr('fill', 'none')
 			.attr('stroke', (d) => {
 				const id = d.properties?.gisjoin;
 				const row = rowByGj.get(id);
+				if (!tractEdgeUsesInteriorClip(row, id)) return 'none';
 				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) {
 					return mismatchKind(id) === 'ha_lg' ? MISMATCH_STROKE_HA : MISMATCH_STROKE_HG;
 				}
@@ -1277,14 +1312,16 @@
 			})
 			.attr('stroke-dasharray', (d) => {
 				const id = d.properties?.gisjoin;
+				const row = rowByGj.get(id);
+				if (!tractEdgeUsesInteriorClip(row, id)) return 'none';
 				if (!showMismatchOutlines() || !effectiveMismatchIds.has(id)) return 'none';
 				return mismatchKind(id) === 'hg_la' ? '6 5' : 'none';
 			})
 			.attr('stroke-width', (d) => {
 				const id = d.properties?.gisjoin;
 				const row = rowByGj.get(id);
+				if (!tractEdgeUsesInteriorClip(row, id)) return 0;
 				const dc = row?.devClass;
-				// 2× desired visible rim: centered stroke, clip removes the outer half.
 				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) {
 					return (mismatchKind(id) === 'ha_lg' ? MISMATCH_W_HA : MISMATCH_W_HG) * 2;
 				}
@@ -1296,14 +1333,45 @@
 			})
 			.attr('stroke-opacity', (d) => {
 				const id = d.properties?.gisjoin;
+				const row = rowByGj.get(id);
+				if (!tractEdgeUsesInteriorClip(row, id)) return 0;
 				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) return MISMATCH_STROKE_OPACITY;
 				if (guidedMode && guidedFocusIds.size && !guidedFocusIds.has(id)) return 0.62;
 				if (mismatchLayerOn) {
-					const row = rowByGj.get(id);
 					const dc = row?.devClass;
-					// Was 0.38 — far too faint on choropleth fills; keep near-opaque for readability.
 					if (dc === 'tod_dominated' || dc === 'nontod_dominated') return 0.92;
 				}
+				return 1;
+			});
+
+		// Neutral grey shells: centered stroke, no clip (not interior-halved).
+		transitionSel(sel.selectAll('path.tract-edge-plain'))
+			.attr('clip-path', null)
+			.attr('fill', 'none')
+			.attr('stroke', (d) => {
+				const id = d.properties?.gisjoin;
+				const row = rowByGj.get(id);
+				if (tractEdgeUsesInteriorClip(row, id)) return 'none';
+				return visibleCohortStroke(row, id);
+			})
+			.attr('stroke-dasharray', 'none')
+			.attr('stroke-width', (d) => {
+				const id = d.properties?.gisjoin;
+				const row = rowByGj.get(id);
+				if (tractEdgeUsesInteriorClip(row, id)) return 0;
+				const dc = row?.devClass;
+				if (guidedMode && revealStage === 0) return 1;
+				if (!showCohortOutlines()) return 1.4;
+				if (dc !== 'tod_dominated' && dc !== 'nontod_dominated') return 1.4;
+				if (isSpotlightMatch(row, spotlight) && (dc === 'tod_dominated' || dc === 'nontod_dominated')) {
+					return 4.8;
+				}
+				return 1.4;
+			})
+			.attr('stroke-opacity', (d) => {
+				const id = d.properties?.gisjoin;
+				const row = rowByGj.get(id);
+				if (tractEdgeUsesInteriorClip(row, id)) return 0;
 				return 1;
 			});
 
@@ -1678,6 +1746,9 @@
 			const id = d.properties?.gisjoin;
 			const row = rowByGj?.get(id);
 			if (id === effectiveHoveredId || selectedSet.has(id)) return 1;
+			if (guidedMode && guidedGeographicFocusIds.size) {
+				return guidedGeographicFocusIds.has(id) ? 1 : GUIDED_UNFOCUS_OPACITY;
+			}
 			if (spotlight && !isSpotlightMatch(row, spotlight)) return 0.2;
 			if (revealStage === 0) return 1;
 			if (!mismatchLayerOn) return 1;
@@ -1695,8 +1766,8 @@
 		selRoot.selectAll('g.tract-g')
 			.attr('opacity', computeSelOpacity);
 
-		// Cohort / mismatch strokes on ``tract-stroke`` (clipped). Hover / selection rings on
-		// ``tract-interaction`` (same clip) so focused tracts still show TOD color below.
+		// Clipped TOD/mismatch strokes on ``tract-edge-clip``; grey on ``tract-edge-plain``.
+		// Hover / selection on ``tract-interaction`` (clipped).
 		selRoot.selectAll('path.tract-interaction')
 			.attr('stroke', (d) => {
 				const id = d.properties?.gisjoin;
