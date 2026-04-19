@@ -83,6 +83,10 @@
 	let pinnedTractId = $state(/** @type {string | null} */ (null));
 	/** Frozen tooltip snapshot while a tract is pinned. */
 	let pinnedTooltip = $state(/** @type {typeof tooltip | null} */ (null));
+	/** Development project key (``developmentKey``) pinned via click — tooltip stays until click-off. */
+	let pinnedDevKey = $state(/** @type {string | null} */ (null));
+	/** Frozen tooltip snapshot while a development is pinned. */
+	let pinnedDevTooltip = $state(/** @type {typeof tooltip | null} */ (null));
 	/** Timer handle for the 200ms hover-rest debounce. */
 	let hoverRestTimer = $state(/** @type {ReturnType<typeof setTimeout> | null} */ (null));
 	/** Last known mouse position (client coords) for debounced tooltip placement. */
@@ -91,8 +95,14 @@
 	let pendingHoverId = $state(/** @type {string | null} */ (null));
 	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 10 : focusLowIncomeTracts);
 
-	/** Use pinned tooltip when a tract is click-locked, otherwise live. */
-	const activeTooltip = $derived(pinnedTractId && pinnedTooltip ? pinnedTooltip : tooltip);
+	/** Use pinned tooltip when a tract or development is click-locked, otherwise live. */
+	const activeTooltip = $derived(
+		pinnedTractId && pinnedTooltip
+			? pinnedTooltip
+			: pinnedDevKey && pinnedDevTooltip
+				? pinnedDevTooltip
+				: tooltip
+	);
 
 	const tooltipPosition = $derived.by(() => {
 		const offset = 12;
@@ -151,8 +161,8 @@
 	const MISMATCH_STROKE_HA = '#8A78E0';
 	/** High growth + low access — lighter, dashed. */
 	const MISMATCH_STROKE_HG = '#C4B5F0';
-	/** Slightly transparent mismatch strokes so dense boundaries feel less “ink heavy”. */
-	const MISMATCH_STROKE_OPACITY = 0.88;
+	/** Mismatch outline opacity — high enough to read clearly on the choropleth. */
+	const MISMATCH_STROKE_OPACITY = 0.96;
 	const MISMATCH_W_HA = 2;
 	const MISMATCH_W_HG = 1.45;
 	/**
@@ -337,6 +347,23 @@
 	);
 
 	/**
+	 * Stable key for guided auto-zoom: stage + data sizes only. Listing ``tractList`` / ``tractGeo``
+	 * on the zoom ``$effect`` caused re-runs whenever parent passed new array references during
+	 * scroll, stacking D3 transitions and freezing the page.
+	 */
+	const guidedMapZoomDeps = $derived(
+		guidedMode
+			? `${revealStage}:${tractGeo?.features?.length ?? 0}:${tractList?.length ?? 0}:${nhgisRows?.length ?? 0}`
+			: ''
+	);
+
+	/** Computed once per stage/data change — avoid rebuilding in ``isTractDimmed`` (hot path). */
+	const guidedGeographicFocusIds = $derived.by(() => {
+		if (!guidedMode) return new Set();
+		return guidedRegionIdsForStage(revealStage);
+	});
+
+	/**
 	 * @param {string} id
 	 * @returns {'ha_lg' | 'hg_la' | null}
 	 */
@@ -504,7 +531,29 @@
 		return 0;
 	}
 
-	/** Re-append tract paths so stroke precedence follows ``tractTierRankFromRow`` after data updates. */
+	/**
+	 * Higher value = should paint later (on top). Pinned / selected / hovered tracts
+	 * render above others so dimmed polygons do not obscure focused geometry.
+	 *
+	 * Parameters
+	 * ----------
+	 * id : string | undefined
+	 *     Tract ``gisjoin``.
+	 *
+	 * Returns
+	 * -------
+	 * number
+	 *     Sort key 0–3.
+	 */
+	function tractFocusLiftRank(id) {
+		if (!id) return 0;
+		if (pinnedTractId === id) return 3;
+		if (panelState.selectedTracts.has(id)) return 2;
+		if (panelState.hoveredTract === id) return 1;
+		return 0;
+	}
+
+	/** Re-append tract paths: focus lift first, then cohort tier rank, then id. */
 	function reorderTractLayerPaths() {
 		if (!containerEl) return;
 		const rowByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
@@ -514,10 +563,15 @@
 		nodes.sort((na, nb) => {
 			const da = d3.select(na).datum();
 			const db = d3.select(nb).datum();
-			const ra = tractTierRankFromRow(rowByGj.get(da.properties?.gisjoin));
-			const rb = tractTierRankFromRow(rowByGj.get(db.properties?.gisjoin));
+			const ida = da.properties?.gisjoin;
+			const idb = db.properties?.gisjoin;
+			const fa = tractFocusLiftRank(ida);
+			const fb = tractFocusLiftRank(idb);
+			if (fa !== fb) return fa - fb;
+			const ra = tractTierRankFromRow(rowByGj.get(ida));
+			const rb = tractTierRankFromRow(rowByGj.get(idb));
 			if (ra !== rb) return ra - rb;
-			return String(da.properties?.gisjoin ?? '').localeCompare(String(db.properties?.gisjoin ?? ''));
+			return String(ida ?? '').localeCompare(String(idb ?? ''));
 		});
 		const parent = nodes[0].parentNode;
 		if (!parent) return;
@@ -594,6 +648,7 @@
 
 	function recenterMap() {
 		if (!svgRef || !zoomBehaviorRef) return;
+		svgRef.interrupt();
 		svgRef
 			.transition()
 			.duration(600)
@@ -630,6 +685,7 @@
 		const scale = Math.max(1, Math.min(10, 0.82 / Math.max(dx / mapW, dy / mapH)));
 		const tx = mapCanvasLeft + mapW / 2 - scale * (x0 + x1) / 2;
 		const ty = mapH / 2 - scale * (y0 + y1) / 2;
+		svgRef.interrupt();
 		svgRef
 			.transition()
 			.duration(500)
@@ -667,6 +723,7 @@
 
 	function zoomToFeatureGroup(features, scaleCap = 9) {
 		if (!features?.length || !svgRef || !zoomBehaviorRef || !projectionRef) return;
+		svgRef.interrupt();
 		const path = d3.geoPath(projectionRef);
 		let x0 = Infinity;
 		let y0 = Infinity;
@@ -695,6 +752,7 @@
 
 	function zoomToDevelopment(d) {
 		if (!d || !svgRef || !zoomBehaviorRef || !projectionRef) return;
+		svgRef.interrupt();
 		const lon = Number(d.longitude ?? d.lon);
 		const lat = Number(d.latitude ?? d.lat);
 		if (!Number.isFinite(lon) || !Number.isFinite(lat)) return;
@@ -710,11 +768,16 @@
 	}
 
 	function tractFeatureByGeoFilter(filterFn) {
-		return (tractGeo?.features ?? []).filter((f) => {
+		const feats = tractGeo?.features ?? [];
+		if (!feats.length || !tractList?.length) return [];
+		const byGj = new Map(tractList.map((t) => [t.gisjoin, t]));
+		const out = [];
+		for (const f of feats) {
 			const gj = f.properties?.gisjoin;
-			const tract = tractList.find((t) => t.gisjoin === gj);
-			return tract ? filterFn(tract) : false;
-		});
+			const tract = gj ? byGj.get(gj) : undefined;
+			if (tract && filterFn(tract)) out.push(f);
+		}
+		return out;
 	}
 
 	function guidedRegionFeaturesForStage(stage) {
@@ -950,12 +1013,12 @@
 			.style('paint-order', 'stroke')
 			.style('pointer-events', 'none');
 
-		// Per-tract <g> inside-stroke technique.  Each tract is a group
-		// containing a stroke path (bottom) and a fill-only path (top).
-		// The fill covers the outer half of the stroke, producing a true
-		// inside stroke.  Opacity is set on the <g> so both children
-		// composite at full opacity internally (the fill mask stays
-		// opaque within the group) even when the group is dimmed.
+		// Per-tract <g>: choropleth fill, then clipped strokes (true **interior** rim).
+		// A clipPath duplicates the tract polygon; stroked paths use ``clip-path`` so only
+		// the half of the stroke that lies **inside** the polygon is drawn—no outward
+		// bleed into neighbors, and the rim stays visible when focused (white/purple on
+		// ``tract-interaction`` uses the same clip). Stroke widths stay 2× the desired
+		// **visible** rim (centered stroke, outer half removed by clip).
 		const tractGroup = zoomLayer.append('g').attr('class', 'tract-layer');
 
 		const tractGs = tractGroup
@@ -964,22 +1027,59 @@
 			.join('g')
 			.attr('class', 'tract-g');
 
+		tractGs.each(function (d) {
+			const gid = d.properties?.gisjoin;
+			if (!gid) return;
+			const cid = `poc-tract-clip-${mapUid}-${gid}`;
+			d3.select(this)
+				.append('defs')
+				.append('clipPath')
+				.attr('id', cid)
+				.append('path')
+				.attr('d', path(d));
+		});
+
+		const tractClipUrl = (d) => {
+			const gid = d.properties?.gisjoin;
+			return gid ? `url(#poc-tract-clip-${mapUid}-${gid})` : null;
+		};
+
+		tractGs.append('path')
+			.attr('class', 'tract-fill')
+			.attr('vector-effect', 'non-scaling-stroke')
+			.attr('d', path)
+			.attr('fill', 'var(--bg-card)')
+			.attr('stroke', 'none')
+			.style('pointer-events', 'none');
+
 		tractGs.append('path')
 			.attr('class', 'tract-stroke')
 			.attr('vector-effect', 'non-scaling-stroke')
 			.attr('d', path)
-			.attr('fill', 'var(--bg-card)')
+			.attr('clip-path', tractClipUrl)
+			.attr('fill', 'none')
 			.attr('stroke', 'var(--border)')
 			.attr('stroke-width', 1)
 			.style('pointer-events', 'none');
 
 		tractGs.append('path')
-			.attr('class', 'tract-poly')
+			.attr('class', 'tract-interaction')
 			.attr('vector-effect', 'non-scaling-stroke')
 			.attr('d', path)
-			.attr('fill', 'var(--bg-card)')
+			.attr('clip-path', tractClipUrl)
+			.attr('fill', 'none')
 			.attr('stroke', 'none')
-			.style('cursor', 'pointer')
+			.attr('stroke-width', 0)
+			.style('pointer-events', 'none');
+
+		tractGs.append('path')
+			.attr('class', 'tract-hit')
+			.attr('vector-effect', 'non-scaling-stroke')
+			.attr('d', path)
+			.attr('fill', 'rgba(0,0,0,0)')
+			.attr('stroke', 'none')
+			.style('cursor', 'default')
+			.style('pointer-events', 'all')
 			.on('mouseenter', handleTractEnter)
 			.on('mousemove', handleMouseMove)
 			.on('mouseleave', handleTractLeave)
@@ -1065,7 +1165,18 @@
 		mapViewBox = { svgW, mapW, mapH };
 	}
 
-	function updateChoropleth() {
+	/**
+	 * Repaint tract fills and cohort strokes. Heavy legend work runs only when ``legend`` is true
+	 * so hover/selection updates do not rebuild gradients (avoids jank and map-wide transitions).
+	 *
+	 * Parameters
+	 * ----------
+	 * animate : boolean
+	 *     When false, skip D3 transitions (used for hover/selection-only repaints).
+	 * legend : boolean
+	 *     When false, skip colorbar / cache-only geometry updates still run.
+	 */
+	function updateChoropleth({ animate = true, legend = true } = {}) {
 		if (!containerEl || !svgRef) return;
 
 		refreshMetrics();
@@ -1086,7 +1197,7 @@
 			.domain([-maxAbs, 0, maxAbs])
 			.range([MBTA_RED, MBTA_MAP_NEUTRAL, MBTA_BLUE])
 			.clamp(true);
-		const guidedFocusIds = guidedRegionIdsForStage(revealStage);
+		const guidedFocusIds = guidedGeographicFocusIds;
 
 		// Reusable fill function — the same fill is applied to both the
 		// stroke layer (so it shows through any transparent stroke) and the
@@ -1143,20 +1254,19 @@
 
 		const sel = d3.select(containerEl);
 
+		const transitionSel = (s) =>
+			animate ? s.transition().duration(450).ease(d3.easeCubicInOut) : s;
+
 		// Opacity lives on the per-tract <g> so the fill-mask composites
 		// correctly even when the group is dimmed.
-		sel.selectAll('g.tract-g')
-			.transition()
-			.duration(450)
-			.ease(d3.easeCubicInOut)
-			.attr('opacity', computeOpacity);
+		transitionSel(sel.selectAll('g.tract-g')).attr('opacity', computeOpacity);
 
-		// Stroke sub-path (bottom of each group).
-		sel.selectAll('path.tract-stroke')
-			.transition()
-			.duration(450)
-			.ease(d3.easeCubicInOut)
-			.attr('fill', computeFill)
+		// Choropleth fill only (strokes are clip-masked and use ``fill: none``).
+		transitionSel(sel.selectAll('path.tract-fill')).attr('fill', computeFill);
+
+		// Cohort / mismatch strokes: clipped to tract interior so paint stays inside the boundary.
+		transitionSel(sel.selectAll('path.tract-stroke'))
+			.attr('fill', 'none')
 			.attr('stroke', (d) => {
 				const id = d.properties?.gisjoin;
 				const row = rowByGj.get(id);
@@ -1174,7 +1284,7 @@
 				const id = d.properties?.gisjoin;
 				const row = rowByGj.get(id);
 				const dc = row?.devClass;
-				// 2× desired visible width: the fill-mask covers the outer half.
+				// 2× desired visible rim: centered stroke, clip removes the outer half.
 				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) {
 					return (mismatchKind(id) === 'ha_lg' ? MISMATCH_W_HA : MISMATCH_W_HG) * 2;
 				}
@@ -1187,99 +1297,95 @@
 			.attr('stroke-opacity', (d) => {
 				const id = d.properties?.gisjoin;
 				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) return MISMATCH_STROKE_OPACITY;
-				if (guidedMode && guidedFocusIds.size && !guidedFocusIds.has(id)) return 0.45;
+				if (guidedMode && guidedFocusIds.size && !guidedFocusIds.has(id)) return 0.62;
 				if (mismatchLayerOn) {
 					const row = rowByGj.get(id);
 					const dc = row?.devClass;
-					if (dc === 'tod_dominated' || dc === 'nontod_dominated') return 0.38;
+					// Was 0.38 — far too faint on choropleth fills; keep near-opaque for readability.
+					if (dc === 'tod_dominated' || dc === 'nontod_dominated') return 0.92;
 				}
 				return 1;
 			});
 
-		// Fill-mask sub-path (top of each group).
-		sel.selectAll('path.tract-poly')
-			.transition()
-			.duration(450)
-			.ease(d3.easeCubicInOut)
-			.attr('fill', computeFill);
-
 		const svg = svgRef;
-		const legGroup = svg.select('.map-legend-group');
-		legGroup.selectAll('*').remove();
-		const mapRight = mapCanvasLeft + mapW;
-		legGroup.attr('transform', `translate(${mapRight + 6},0)`);
+		if (legend) {
+			const legGroup = svg.select('.map-legend-group');
+			legGroup.selectAll('*').remove();
+			const mapRight = mapCanvasLeft + mapW;
+			legGroup.attr('transform', `translate(${mapRight + 6},0)`);
 
-		const y0 = 10;
-		const legBarH = Math.max(120, mapH - y0 - 14);
-		const barW = 10;
-		const barRight = 58;
-		const barLeft = barRight - barW;
-		const fmtTick = (v) => {
-			const n = Number(v);
-			if (!Number.isFinite(n)) return '';
-			const ax = Math.abs(n);
-			if (ax >= 1000 || (ax > 0 && ax < 0.01)) return `${d3.format('.2~s')(n)}%`;
-			return `${d3.format('.1f')(n)}%`;
-		};
+			const y0 = 10;
+			const legBarH = Math.max(120, mapH - y0 - 14);
+			const barW = 10;
+			const barRight = 58;
+			const barLeft = barRight - barW;
+			const fmtTick = (v) => {
+				const n = Number(v);
+				if (!Number.isFinite(n)) return '';
+				const ax = Math.abs(n);
+				if (ax >= 1000 || (ax > 0 && ax < 0.01)) return `${d3.format('.2~s')(n)}%`;
+				return `${d3.format('.1f')(n)}%`;
+			};
 
-		const legendG = legGroup.append('g').attr('class', 'map-legend-inner');
-		const gradId = `poc-choro-grad-${mapUid}`;
-		svg.select('defs').selectAll(`#${gradId}`).remove();
-		const grad = svg
-			.select('defs')
-			.append('linearGradient')
-			.attr('id', gradId)
-			.attr('x1', '0%')
-			.attr('y1', '100%')
-			.attr('x2', '0%')
-			.attr('y2', '0%');
+			const legendG = legGroup.append('g').attr('class', 'map-legend-inner');
+			const gradId = `poc-choro-grad-${mapUid}`;
+			svg.select('defs').selectAll(`#${gradId}`).remove();
+			const grad = svg
+				.select('defs')
+				.append('linearGradient')
+				.attr('id', gradId)
+				.attr('x1', '0%')
+				.attr('y1', '100%')
+				.attr('x2', '0%')
+				.attr('y2', '0%');
 
-		const d0 = -maxAbs;
-		const d1 = maxAbs;
-		const nStops = 48;
-		for (let i = 0; i <= nStops; i++) {
-			const t = i / nStops;
-			const v = d0 + t * (d1 - d0);
-			grad.append('stop').attr('offset', `${t * 100}%`).attr('stop-color', color(v));
+			const d0 = -maxAbs;
+			const d1 = maxAbs;
+			const nStops = 48;
+			for (let i = 0; i <= nStops; i++) {
+				const t = i / nStops;
+				const v = d0 + t * (d1 - d0);
+				grad.append('stop').attr('offset', `${t * 100}%`).attr('stop-color', color(v));
+			}
+			legendG
+				.append('rect')
+				.attr('x', barLeft)
+				.attr('y', y0)
+				.attr('width', barW)
+				.attr('height', legBarH)
+				.attr('rx', 2)
+				.attr('fill', `url(#${gradId})`)
+				.attr('stroke', 'var(--border)')
+				.attr('stroke-width', 0.5);
+
+			const yScale = d3.scaleLinear().domain([d0, d1]).range([y0 + legBarH, y0]);
+			const choroAxisX = barLeft - 0.5;
+			legendG
+				.append('g')
+				.attr('transform', `translate(${choroAxisX},0)`)
+				.call(
+					d3
+						.axisLeft(yScale)
+						.ticks(5)
+						.tickFormat((v) => fmtTick(v))
+						.tickSize(3)
+				)
+				.call((g) => g.selectAll('path,line').attr('stroke', 'var(--border)'))
+				.call((g) => g.selectAll('text').attr('fill', 'var(--text-muted)').attr('font-size', '8px'));
+
+			legendG
+				.append('text')
+				.attr('transform', `translate(4, ${y0 + legBarH * 0.5}) rotate(-90)`)
+				.attr('text-anchor', 'middle')
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '7.5px')
+				.attr('font-weight', 600)
+				.text(`% housing growth (${periodDisplayLabel(panelState.timePeriod)})`);
 		}
-		legendG
-			.append('rect')
-			.attr('x', barLeft)
-			.attr('y', y0)
-			.attr('width', barW)
-			.attr('height', legBarH)
-			.attr('rx', 2)
-			.attr('fill', `url(#${gradId})`)
-			.attr('stroke', 'var(--border)')
-			.attr('stroke-width', 0.5);
-
-		const yScale = d3.scaleLinear().domain([d0, d1]).range([y0 + legBarH, y0]);
-		const choroAxisX = barLeft - 0.5;
-		legendG
-			.append('g')
-			.attr('transform', `translate(${choroAxisX},0)`)
-			.call(
-				d3
-					.axisLeft(yScale)
-					.ticks(5)
-					.tickFormat((v) => fmtTick(v))
-					.tickSize(3)
-			)
-			.call((g) => g.selectAll('path,line').attr('stroke', 'var(--border)'))
-			.call((g) => g.selectAll('text').attr('fill', 'var(--text-muted)').attr('font-size', '8px'));
-
-		legendG
-			.append('text')
-			.attr('transform', `translate(4, ${y0 + legBarH * 0.5}) rotate(-90)`)
-			.attr('text-anchor', 'middle')
-			.attr('fill', 'var(--text-muted)')
-			.attr('font-size', '7.5px')
-			.attr('font-weight', 600)
-			.text(`% housing growth (${periodDisplayLabel(panelState.timePeriod)})`);
 
 		containerEl.__pocChoroMaxAbs = maxAbs;
 		containerEl.__pocRowByGj = rowByGj;
-		reorderTractLayerPaths();
+		if (legend) reorderTractLayerPaths();
 	}
 
 	function updateDevelopments() {
@@ -1383,7 +1489,8 @@
 				return d.isFeatured ? 1 : 0.16;
 			})
 			.selection()
-			.style('pointer-events', 'auto');
+			.style('pointer-events', 'auto')
+			.on('click', handleDevClick);
 
 		// Set radius/stroke-width immediately from the *current* zoom
 		// transform rather than animating them. This avoids a stale invK
@@ -1515,6 +1622,20 @@
 		});
 	}
 
+	/**
+	 * Pointer / help cursor only where hover shows a tooltip (see ``handle*Enter`` early returns).
+	 * When a tract or dev tooltip is pinned, overlay hovers are inert — use the default arrow.
+	 */
+	function updateMapHoverCursors() {
+		if (!containerEl || !svgRef) return;
+		const hoverTooltips = !pinnedTractId && !pinnedDevKey;
+		const root = d3.select(containerEl);
+		root.selectAll('path.mbta-line').style('cursor', hoverTooltips ? 'pointer' : 'default');
+		root.selectAll('circle.mbta-stop').style('cursor', hoverTooltips ? 'pointer' : 'default');
+		root.selectAll('circle.dev-dot').style('cursor', hoverTooltips ? 'pointer' : 'default');
+		root.selectAll('g.insight-marker').style('cursor', hoverTooltips ? 'help' : 'default');
+	}
+
 	function updateOverlays() {
 		if (!containerEl || !svgRef) return;
 
@@ -1574,50 +1695,40 @@
 		selRoot.selectAll('g.tract-g')
 			.attr('opacity', computeSelOpacity);
 
-		// Stroke sub-path.
-		selRoot.selectAll('path.tract-stroke')
+		// Cohort / mismatch strokes on ``tract-stroke`` (clipped). Hover / selection rings on
+		// ``tract-interaction`` (same clip) so focused tracts still show TOD color below.
+		selRoot.selectAll('path.tract-interaction')
 			.attr('stroke', (d) => {
 				const id = d.properties?.gisjoin;
 				if (id === effectiveHoveredId) return '#ffffff';
 				if (selectedSet.has(id)) return 'var(--cat-a, #6366f1)';
-				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) {
-					return mismatchKind(id) === 'ha_lg' ? MISMATCH_STROKE_HA : MISMATCH_STROKE_HG;
-				}
-				const row = rowByGj?.get(id);
-				return visibleCohortStroke(row, id);
+				return 'none';
 			})
 			.attr('stroke-dasharray', (d) => {
 				const id = d.properties?.gisjoin;
 				if (id === effectiveHoveredId || selectedSet.has(id)) return 'none';
-				if (!showMismatchOutlines() || !effectiveMismatchIds.has(id)) return 'none';
-				return mismatchKind(id) === 'hg_la' ? '6 5' : 'none';
+				return 'none';
 			})
 			.attr('stroke-width', (d) => {
 				const id = d.properties?.gisjoin;
 				const row = rowByGj?.get(id);
 				const dc = row?.devClass;
-				// 2× desired visual width: the fill-mask covers the outer half.
 				if (id === effectiveHoveredId) return dc === 'minimal' ? 4 : 7.2;
 				if (selectedSet.has(id)) return dc === 'minimal' ? 3.4 : 6;
-				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) {
-					return (mismatchKind(id) === 'ha_lg' ? MISMATCH_W_HA : MISMATCH_W_HG) * 2;
-				}
-				if (!showCohortOutlines()) return 1.4;
-				if (dc !== 'tod_dominated' && dc !== 'nontod_dominated') return 1.4;
-				if (isSpotlightMatch(row, spotlight)) return 4.8;
-				return dc === 'tod_dominated' ? 3.6 : 2.8;
+				return 0;
 			})
 			.attr('stroke-opacity', (d) => {
 				const id = d.properties?.gisjoin;
 				if (id === effectiveHoveredId || selectedSet.has(id)) return 1;
-				if (showMismatchOutlines() && effectiveMismatchIds.has(id)) return MISMATCH_STROKE_OPACITY;
-				if (mismatchLayerOn) {
-					const row = rowByGj?.get(id);
-					const dc = row?.devClass;
-					if (dc === 'tod_dominated' || dc === 'nontod_dominated') return 0.38;
-				}
-				return 1;
+				return 0;
 			});
+
+		// Hand cursor only when this tract would show a hover tooltip (``handleTractEnter``).
+		selRoot.selectAll('path.tract-hit').style('cursor', (d) => {
+			const id = d.properties?.gisjoin;
+			if (!id || pinnedTractId || pinnedDevKey) return 'default';
+			return isTractDimmed(id) ? 'default' : 'pointer';
+		});
 	}
 
 	function showTractTooltip(id, x, y, anchor = null) {
@@ -1785,8 +1896,7 @@
 		if (!id) return false;
 		// Guided geographic focus (stages 5-7, 9).
 		if (guidedMode) {
-			const focusIds = guidedRegionIdsForStage(revealStage);
-			if (focusIds.size && !focusIds.has(id)) return true;
+			if (guidedGeographicFocusIds.size && !guidedGeographicFocusIds.has(id)) return true;
 		}
 		// Mismatch layer dims non-mismatch tracts.
 		if (mismatchLayerOn && !effectiveMismatchIds.has(id)) return true;
@@ -1811,7 +1921,7 @@
 	}
 
 	function commitHoverTooltip(id, x, y) {
-		if (!id || pinnedTractId) return;
+		if (!id || pinnedTractId || pinnedDevKey) return;
 		showTractTooltip(id, x, y);
 		// Set the mismatch-cluster highlight only now (not on enter)
 		// so the opposite group doesn't fade while the user is still
@@ -1826,7 +1936,7 @@
 	function handleTractEnter(event, d) {
 		const id = d.properties?.gisjoin;
 		if (isTractDimmed(id)) return;
-		if (pinnedTractId) return;
+		if (pinnedTractId || pinnedDevKey) return;
 		panelState.setHovered(id);
 		// Don't set hoveredMismatchCluster yet — wait for the debounce
 		// so the user sees the group-fade only after the tooltip appears.
@@ -1840,7 +1950,7 @@
 	}
 
 	function handleMouseMove(event) {
-		if (pinnedTractId) return;
+		if (pinnedTractId || pinnedDevKey) return;
 		if (pendingHoverId) {
 			pendingHoverPos = { x: event.clientX, y: event.clientY };
 			if (hoverRestTimer) clearTimeout(hoverRestTimer);
@@ -1858,7 +1968,7 @@
 	function handleTractLeave() {
 		cancelHoverRest();
 		// Don't clear pinned tooltip on mouse leave.
-		if (!pinnedTractId) {
+		if (!pinnedTractId && !pinnedDevKey) {
 			panelState.setHovered(null);
 			hoveredMismatchCluster = null;
 			pinnedTooltipStage = null;
@@ -1870,7 +1980,26 @@
 		event.stopPropagation();
 		const id = d.properties?.gisjoin;
 		if (!id) return;
-		if (isTractDimmed(id)) return;
+
+		// Dimmed tract: dismiss any pinned tooltip without selecting this tract.
+		if (isTractDimmed(id)) {
+			const hadPin = pinnedTractId || pinnedDevKey;
+			if (pinnedTractId) {
+				panelState.clearSelection();
+				pinnedTractId = null;
+				pinnedTooltip = null;
+				panelState.setHovered(null);
+			}
+			if (pinnedDevKey) {
+				pinnedDevKey = null;
+				pinnedDevTooltip = null;
+			}
+			if (hadPin) {
+				tooltip = { ...tooltip, visible: false };
+				cancelHoverRest();
+			}
+			return;
+		}
 
 		// If clicking the already-pinned tract, unpin.
 		if (pinnedTractId === id) {
@@ -1887,6 +2016,10 @@
 			pinnedTractId = null;
 			pinnedTooltip = null;
 		}
+		if (pinnedDevKey) {
+			pinnedDevKey = null;
+			pinnedDevTooltip = null;
+		}
 
 		// Pin this tract: freeze tooltip at current position.
 		cancelHoverRest();
@@ -1899,7 +2032,7 @@
 		if (event.shiftKey) panelState.toggleComparisonTract(id);
 	}
 
-	/** Click on map background (not on a tract) → deselect pinned tract. */
+	/** Click on map background (not on a tract) → deselect pinned tract or development. */
 	function handleBackgroundClick() {
 		if (pinnedTractId) {
 			pinnedTractId = null;
@@ -1908,10 +2041,15 @@
 			panelState.clearSelection();
 			tooltip = { ...tooltip, visible: false };
 		}
+		if (pinnedDevKey) {
+			pinnedDevKey = null;
+			pinnedDevTooltip = null;
+			tooltip = { ...tooltip, visible: false };
+		}
 	}
 
 	function handleStopEnter(event, d) {
-		if (pinnedTractId) return;
+		if (pinnedTractId || pinnedDevKey) return;
 		const routes = d.routes?.join(', ') || 'Unknown';
 		const modes = (d.modes ?? []).map((m) => transitModeUiLabel(m)).join(', ') || 'Unknown';
 		tooltip = {
@@ -1931,7 +2069,7 @@
 	}
 
 	function handleLineEnter(event, d) {
-		if (pinnedTractId) return;
+		if (pinnedTractId || pinnedDevKey) return;
 		const props = d.properties ?? {};
 		const name = props.route_long_name || props.route_short_name || props.route_id || 'MBTA Route';
 		tooltip = {
@@ -2010,13 +2148,37 @@
 	}
 
 	function handleDevEnter(event, d) {
-		if (pinnedTractId) return;
+		if (pinnedTractId || pinnedDevKey) return;
 		showDevelopmentTooltip(d, event.clientX, event.clientY);
+	}
+
+	function handleDevClick(event, d) {
+		event.stopPropagation();
+		const key = developmentKey(d);
+		if (!key) return;
+
+		if (pinnedDevKey === key) {
+			pinnedDevKey = null;
+			pinnedDevTooltip = null;
+			tooltip = { ...tooltip, visible: false };
+			return;
+		}
+
+		if (pinnedTractId) {
+			panelState.clearSelection();
+			pinnedTractId = null;
+			pinnedTooltip = null;
+			panelState.setHovered(null);
+		}
+		cancelHoverRest();
+		pinnedDevKey = key;
+		showDevelopmentTooltip(d, event.clientX, event.clientY);
+		pinnedDevTooltip = { ...tooltip };
 	}
 
 	function handleOverlayLeave() {
 		cancelHoverRest();
-		if (pinnedTractId) return;
+		if (pinnedTractId || pinnedDevKey) return;
 		panelState.setHovered(null);
 		hoveredMismatchCluster = null;
 		pinnedTooltipStage = null;
@@ -2025,7 +2187,7 @@
 	}
 
 	function handleInsightEnter(event, d) {
-		if (pinnedTractId) return;
+		if (pinnedTractId || pinnedDevKey) return;
 		const modeLabel =
 			d.type === HIGH_ACCESS_LOW_GROWTH
 				? 'High access + low growth'
@@ -2716,6 +2878,7 @@
 			updateDevelopments();
 			updateOverlays();
 			updateSelection();
+			updateMapHoverCursors();
 		}
 	});
 
@@ -2726,22 +2889,31 @@
 		void lowIncomeFocusOn;
 		void hoveredMismatchCluster;
 		void mismatchOutlineMode;
-		void panelState.hoveredTract;
-		void panelState.selectedTracts;
-		void panelState.selectedTracts.size;
 		if (!containerEl || !svgRef) return;
-		updateChoropleth();
+		updateChoropleth({ animate: true, legend: true });
 		updateFocusRegion();
 		updateDevelopments();
 		updateInsightMarkers();
 		updateSelection();
+		updateMapHoverCursors();
 	});
 
 	$effect(() => {
-		void revealStage;
+		void panelState.hoveredTract;
+		void panelState.selectedTracts;
+		void panelState.selectedTracts.size;
+		void pinnedTractId;
+		void pinnedDevKey;
+		if (!containerEl || !svgRef) return;
+		updateChoropleth({ animate: false, legend: false });
+		updateSelection();
+		reorderTractLayerPaths();
+		updateMapHoverCursors();
+	});
+
+	$effect(() => {
 		void guidedMode;
-		void tractList;
-		void tractGeo;
+		void guidedMapZoomDeps;
 		if (!guidedMode || !svgRef || !zoomBehaviorRef || !projectionRef) return;
 		if (revealStage === 0) {
 			if (guidedFocusDetail === 'core_access') {
@@ -2849,6 +3021,10 @@
 			pinnedTooltip = null;
 			panelState.clearSelection();
 		}
+		if (pinnedDevKey) {
+			pinnedDevKey = null;
+			pinnedDevTooltip = null;
+		}
 		if (pinnedTooltipStage != null) {
 			tooltip = { ...tooltip, visible: false, anchorX: null, anchorY: null };
 			pinnedTooltipStage = null;
@@ -2894,18 +3070,6 @@
 	});
 
 	$effect(() => {
-		void panelState.hoveredTract;
-		void panelState.selectedTracts;
-		void panelState.selectedTracts.size;
-		void lowIncomeFocusOn;
-		void hoveredMismatchCluster;
-		void mismatchOutlineMode;
-		if (!containerEl || !svgRef) return;
-		updateSelection();
-		updateInsightMarkers();
-	});
-
-	$effect(() => {
 		if (stepEls.filter(Boolean).length !== stepContent.length) return;
 		let frame = 0;
 		const updateStageFromScroll = () => {
@@ -2924,8 +3088,8 @@
 				const rect = item.node.getBoundingClientRect();
 				if (rect.top <= triggerY) nextFocus = item.key;
 			}
-			revealStage = next;
-			guidedFocusDetail = nextFocus;
+			if (next !== revealStage) revealStage = next;
+			if (nextFocus != guidedFocusDetail) guidedFocusDetail = nextFocus;
 		};
 		const scheduleUpdate = () => {
 			if (frame) return;
