@@ -1136,6 +1136,12 @@ export function aggregateTractTodMetrics(
 
 	const result = new Map();
 	const src = huChangeSource === 'census' ? 'census' : 'massbuilds';
+	// Fix D: tracts with almost no baseline housing stock produce huge,
+	// meaningless % increases from a single MassBuilds project (e.g. 1087%).
+	// Treat ``pctStockIncrease`` as unavailable when the denominator is too
+	// small to be reliable. 25 excludes obvious non-residential tracts while
+	// keeping legitimate small-residential tracts. Tweak centrally here.
+	const MIN_BASE_STOCK = 25;
 
 	for (const tract of universeTracts) {
 		const gj = tract.gisjoin;
@@ -1146,14 +1152,20 @@ export function aggregateTractTodMetrics(
 		const todUnits = row ? row.todUnits : 0;
 		const nonTodUnits = row ? row.nonTodUnits : 0;
 
-		let pctStockIncrease;
-		if (src === 'census') {
-			pctStockIncrease = censusPctStockIncrease(tract, timePeriod);
-		} else {
-			const baseStock = Number(tract[`total_hu_${startY}`]) || 0;
-			pctStockIncrease =
-				baseStock > 0 ? +((totalNewUnits / baseStock) * 100).toFixed(4) : null;
-		}
+		const baseStock = Number(tract[`total_hu_${startY}`]) || 0;
+		const massbuildsPctStockIncrease =
+			baseStock >= MIN_BASE_STOCK ? +((totalNewUnits / baseStock) * 100).toFixed(4) : null;
+		const rawCensusPct = censusPctStockIncrease(tract, timePeriod);
+		const censusPct =
+			rawCensusPct != null && Number.isFinite(rawCensusPct) && baseStock >= MIN_BASE_STOCK
+				? rawCensusPct
+				: null;
+
+		// ``pctStockIncrease`` follows the user-selected source for
+		// backwards-compatible charts / scatterplot axes;
+		// ``censusPctStockIncrease`` is always reported so the classifier can
+		// cross-check (see Fix C in ``classifyTractDevelopment``).
+		const pctStockIncrease = src === 'census' ? censusPct : massbuildsPctStockIncrease;
 
 		const tot = todUnits + nonTodUnits;
 		let todFraction = null;
@@ -1172,6 +1184,10 @@ export function aggregateTractTodMetrics(
 			totalNewUnits,
 			todFraction,
 			pctStockIncrease,
+			/** Census-derived stock growth (%), regardless of ``huChangeSource``. */
+			censusPctStockIncrease: censusPct,
+			/** MassBuilds-derived stock growth (%), regardless of ``huChangeSource``. */
+			massbuildsPctStockIncrease,
 			todAffordableUnits: row ? row.todAffordableUnits : 0,
 			todAffordableFraction
 		});
@@ -1183,9 +1199,18 @@ export function aggregateTractTodMetrics(
 /**
  * Classify a tract into minimal-development / TOD-dominated / non-TOD-dominated development.
  *
+ * Uses the selected ``pctStockIncrease`` source for the primary threshold,
+ * and (when available on the metrics object) also requires the Census-measured
+ * stock growth to be non-negative. This prevents the contradiction the tooltip
+ * reported before: a tract marked "TOD-dominated" while its Census housing
+ * stock had actually shrunk over the period (i.e. the MassBuilds additions
+ * were offset by larger demolitions / conversions the dataset is not aware
+ * of).
+ *
  * Parameters
  * ----------
- * metrics : {{ pctStockIncrease: number | null, todFraction: number | null }}
+ * metrics : {{ pctStockIncrease: number | null, todFraction: number | null,
+ *              censusPctStockIncrease?: number | null }}
  * sigDevThresholdPct : number
  * todFractionCutoff : number
  *
@@ -1200,6 +1225,14 @@ export function classifyTractDevelopment(metrics, sigDevThresholdPct, todFractio
 	const cut = Number.isFinite(cutRaw) ? Math.min(1, Math.max(0, cutRaw)) : 0.5;
 
 	if (p == null || !Number.isFinite(p) || p < thr) {
+		return 'minimal';
+	}
+	// Cross-check against Census-measured stock growth when it is available.
+	// Tracts whose Census stock shrank are demoted to "minimal" even when
+	// MassBuilds records additions, because the net effect on housing supply
+	// was negative. (Missing Census data falls through as before.)
+	const censusPct = metrics?.censusPctStockIncrease;
+	if (censusPct != null && Number.isFinite(censusPct) && censusPct < 0) {
 		return 'minimal';
 	}
 	const tf = metrics?.todFraction;

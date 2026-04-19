@@ -13,7 +13,7 @@
 		renderMuniGrowthCapture,
 		renderMuniAffordableTrend
 	} from '$lib/utils/municipalCharts.js';
-	import { tractData, developments, storyNhgisRows, meta } from '$lib/stores/data.svelte.js';
+	import { tractData, developments, meta } from '$lib/stores/data.svelte.js';
 	import { loadStoryData } from '$lib/stores/data.svelte.js';
 	import {
 		DEFAULT_MAIN_POC_DEV_OPTS,
@@ -182,7 +182,7 @@
 		pocMapPanel.showRailLines = true;
 		pocMapPanel.showRailStops = true;
 		pocMapPanel.showCommuterRailLines = true;
-		pocMapPanel.showCommuterRailStops = false;
+		pocMapPanel.showCommuterRailStops = true;
 		pocMapPanel.showBusLines = false;
 		pocMapPanel.showBusStops = false;
 	});
@@ -239,10 +239,14 @@
 		)
 	);
 
-	const nhgisLikeRows = $derived.by(() => {
-		if (storyNhgisRows.length) return storyNhgisRows;
-		return buildNhgisLikeRows(tractListFiltered, tractDevClassByGj, tractTimePeriod);
-	});
+	// Always rebuild ``nhgisRows`` live from the current panel parameters so
+	// the home-page map uses the same ``devClass`` definition as the playground.
+	// (Previously a precomputed ``tract_story_rows.json`` was preferred here,
+	// which was a static artifact that could diverge from the live classifier
+	// and caused "TOD-dominated" badges on tracts showing 0% live TOD share.)
+	const nhgisLikeRows = $derived.by(() =>
+		buildNhgisLikeRows(tractListFiltered, tractDevClassByGj, tractTimePeriod)
+	);
 
 	const tractPanelConfig = $derived({
 		timePeriod: tractTimePeriod,

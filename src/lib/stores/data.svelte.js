@@ -17,7 +17,8 @@ const MISSING_NEAREST_STOP =
 
 export const tractData = $state([]);
 export const tractGeo = $state({ type: 'FeatureCollection', features: [] });
-export const storyNhgisRows = $state([]);
+/** Full state tracts GeoJSON — loaded as background context for the map. */
+export const allTractsGeo = $state({ type: 'FeatureCollection', features: [] });
 export const developments = $state([]);
 export const mbtaStops = $state([]);
 export const mbtaLines = $state({ type: 'FeatureCollection', features: [] });
@@ -82,23 +83,36 @@ export async function loadGuidedDevelopments() {
  * Fetch the smaller data bundle needed for the guided home-page tract story.
  *
  * This avoids blocking the initial narrative on the full explorer dataset.
+ *
+ * Notes
+ * -----
+ * Developments are now loaded *before* this resolves so any consumer that reads
+ * ``tractData`` after ``await loadStoryData()`` sees consistent dev-derived
+ * fields (``devClass``, ``todFraction``, ``pctStockIncrease``) without waiting
+ * for a second, unobserved network round-trip. Previously the unawaited
+ * ``loadGuidedDevelopments`` call caused a race where the home-page map
+ * rendered its choropleth and tooltips against empty developments, producing
+ * "TOD-dominated" badges on tracts whose live TOD share was 0%.
+ *
+ * The precomputed ``tract_story_rows.json`` is no longer fetched: it was a
+ * static artifact that could diverge from the live classifier. The home page
+ * now rebuilds tract rows live via ``buildNhgisLikeRows`` so it shares one
+ * source of truth with the playground.
  */
 export async function loadStoryData() {
 	if (loadStoryDataPromise) return loadStoryDataPromise;
 	loadStoryDataPromise = (async () => {
 		const p = (/** @type {string} */ path) => `${base}${path}`;
-		const [tractDataRes, tractGeoRes, storyRowsRes, mbtaStopsRes, mbtaLinesRes] = await Promise.all([
+		const [tractDataRes, tractGeoRes, mbtaStopsRes, mbtaLinesRes] = await Promise.all([
 			fetch(p('/data/tract_story_list.json')),
 			fetch(p('/data/tract_story_geo.json')),
-			fetch(p('/data/tract_story_rows.json')),
 			fetch(p('/data/mbta_story_stops.json')),
 			fetch(p('/data/mbta_story_lines.geojson'))
 		]);
 
-		const [tractDataJson, tractGeoJson, storyRowsJson, mbtaStopsJson, mbtaLinesJson] = await Promise.all([
+		const [tractDataJson, tractGeoJson, mbtaStopsJson, mbtaLinesJson] = await Promise.all([
 			tractDataRes.json(),
 			tractGeoRes.json(),
-			storyRowsRes.json(),
 			mbtaStopsRes.json(),
 			mbtaLinesRes.json()
 		]);
@@ -106,17 +120,41 @@ export async function loadStoryData() {
 		tractData.length = 0;
 		tractData.push(...tractDataJson);
 		replaceObjectProps(tractGeo, tractGeoJson);
-		storyNhgisRows.length = 0;
-		storyNhgisRows.push(...storyRowsJson);
 		mbtaStops.length = 0;
 		mbtaStops.push(...mbtaStopsJson);
 		replaceObjectProps(mbtaLines, mbtaLinesJson);
-		void loadGuidedDevelopments().catch(() => {});
+
+		// Await developments so downstream classifiers see the full MassBuilds
+		// set before ``loadStoryData`` resolves (prevents the badge/TOD-share
+		// race on the home-page map).
+		await loadGuidedDevelopments();
+
+		// Non-blocking: load the full-state tracts GeoJSON so the map can show
+		// excluded tracts as a background context layer (shape of MA).
+		void loadFullTractsGeo().catch(() => {});
 	})().catch((e) => {
 		loadStoryDataPromise = null;
 		throw e;
 	});
 	return loadStoryDataPromise;
+}
+
+/** @type {Promise<void> | null} */
+let loadFullTractsGeoPromise = null;
+
+async function loadFullTractsGeo() {
+	if (allTractsGeo.features.length) return;
+	if (loadFullTractsGeoPromise) return loadFullTractsGeoPromise;
+	loadFullTractsGeoPromise = (async () => {
+		const p = (/** @type {string} */ path) => `${base}${path}`;
+		const res = await fetch(p('/data/tracts.geojson'));
+		const json = await res.json();
+		replaceObjectProps(allTractsGeo, json);
+	})().catch((e) => {
+		loadFullTractsGeoPromise = null;
+		throw e;
+	});
+	return loadFullTractsGeoPromise;
 }
 
 /**
