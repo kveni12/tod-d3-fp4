@@ -165,6 +165,8 @@
 	const MISMATCH_STROKE_OPACITY = 0.96;
 	const MISMATCH_W_HA = 2;
 	const MISMATCH_W_HG = 1.45;
+	const CHORO_COLOR_STEPS = ['#d73027', '#f46d43', '#f7d8cf', '#f2ede3', '#d5e3f5', '#7ea6da', '#2f6eb5'];
+	const CHORO_BIN_LABELS = ['<= -66%', '-66 to -33%', '-33 to -8%', '-8 to +8%', '+8 to +33%', '+33 to +66%', '>= +66%'];
 	/**
 	 * Non–mismatch tracts when the mismatch layer is on (revealStage ≥2).
 	 * ~0.11 opacity ≈ 89% dimming vs full (≥50% reduction vs the previous 0.22 pass) so violet/lavender outlines read clearly.
@@ -661,6 +663,11 @@
 			if (entry.count === 1 || entry.counties.size > 1) coordinates.push(entry.segment);
 		}
 		return { type: 'MultiLineString', coordinates };
+	}
+
+	function buildChoroplethThresholds(maxAbs) {
+		const abs = Math.max(1, Number(maxAbs) || 1);
+		return [-0.66 * abs, -0.33 * abs, -0.08 * abs, 0.08 * abs, 0.33 * abs, 0.66 * abs];
 	}
 
 	let mapCanvasLeft = 0;
@@ -1187,8 +1194,8 @@
 				.attr('class', 'county-boundary-path')
 				.attr('d', path(countyBoundaryGeometry))
 				.attr('fill', 'none')
-				.attr('stroke', 'rgba(58, 70, 92, 0.58)')
-				.attr('stroke-width', 1.35)
+				.attr('stroke', '#5f6f86')
+				.attr('stroke-width', 1.55)
 				.attr('stroke-linecap', 'round')
 				.attr('stroke-linejoin', 'round')
 				.attr('vector-effect', 'non-scaling-stroke')
@@ -1306,11 +1313,11 @@
 		const sd = values.length > 1 ? d3.deviation(values) : 1;
 		const clipBound = Math.max(1, Math.abs(mean) + 5 * (sd || 1));
 		const maxAbs = Math.min(clipBound, Math.max(1, d3.max(values, (d) => Math.abs(d)) || 1));
+		const choroThresholds = buildChoroplethThresholds(maxAbs);
 		const color = d3
-			.scaleLinear()
-			.domain([-maxAbs, 0, maxAbs])
-			.range([MBTA_RED, MBTA_MAP_NEUTRAL, MBTA_BLUE])
-			.clamp(true);
+			.scaleThreshold()
+			.domain(choroThresholds)
+			.range(CHORO_COLOR_STEPS);
 		const guidedFocusIds = guidedGeographicFocusIds;
 
 		// Choropleth fill for ``path.tract-fill`` only.
@@ -1474,35 +1481,24 @@
 			};
 
 			const legendG = legGroup.append('g').attr('class', 'map-legend-inner');
-			const gradId = `poc-choro-grad-${mapUid}`;
-			svg.select('defs').selectAll(`#${gradId}`).remove();
-			const grad = svg
-				.select('defs')
-				.append('linearGradient')
-				.attr('id', gradId)
-				.attr('x1', '0%')
-				.attr('y1', '100%')
-				.attr('x2', '0%')
-				.attr('y2', '0%');
-
 			const d0 = -maxAbs;
 			const d1 = maxAbs;
-			const nStops = 48;
-			for (let i = 0; i <= nStops; i++) {
-				const t = i / nStops;
-				const v = d0 + t * (d1 - d0);
-				grad.append('stop').attr('offset', `${t * 100}%`).attr('stop-color', color(v));
+			const binEdges = [d0, ...choroThresholds, d1];
+			for (let i = 0; i < CHORO_COLOR_STEPS.length; i += 1) {
+				const topVal = binEdges[i + 1];
+				const bottomVal = binEdges[i];
+				const yTop = y0 + ((d1 - topVal) / (d1 - d0)) * legBarH;
+				const yBottom = y0 + ((d1 - bottomVal) / (d1 - d0)) * legBarH;
+				legendG
+					.append('rect')
+					.attr('x', barLeft)
+					.attr('y', yTop)
+					.attr('width', barW)
+					.attr('height', Math.max(1, yBottom - yTop))
+					.attr('fill', CHORO_COLOR_STEPS[i])
+					.attr('stroke', 'var(--border)')
+					.attr('stroke-width', 0.35);
 			}
-			legendG
-				.append('rect')
-				.attr('x', barLeft)
-				.attr('y', y0)
-				.attr('width', barW)
-				.attr('height', legBarH)
-				.attr('rx', 2)
-				.attr('fill', `url(#${gradId})`)
-				.attr('stroke', 'var(--border)')
-				.attr('stroke-width', 0.5);
 
 			const yScale = d3.scaleLinear().domain([d0, d1]).range([y0 + legBarH, y0]);
 			const choroAxisX = barLeft - 0.5;
@@ -3664,17 +3660,15 @@
 									<strong>Tract fill</strong>
 									<span class="poc-key-tract-fill-body">
 										<span class="poc-key-tract-fill-line">
-											Census % housing growth ({periodDisplayLabel(panelState.timePeriod)}), vs housing stock at period start. Full scale on map colorbar.
+											Census % housing growth ({periodDisplayLabel(panelState.timePeriod)}), vs housing stock at period start, shown in discrete bins.
 										</span>
-										<span
-											class="poc-key-tract-bar"
-											style="background: linear-gradient(to right, {MBTA_RED}, {MBTA_MAP_NEUTRAL}, {MBTA_BLUE});"
-											role="img"
-											aria-label="Percent housing growth scale: more negative toward red, more positive toward blue"
-										></span>
-										<span class="poc-key-tract-bar-labels" aria-hidden="true">
-											<span class="poc-key-tract-bar-label">- lower growth</span>
-											<span class="poc-key-tract-bar-label">+ higher growth</span>
+										<span class="poc-key-tract-swatches" role="img" aria-label="Percent housing growth scale in discrete bins from lower growth in red to higher growth in blue">
+											{#each CHORO_COLOR_STEPS as color, i}
+												<span class="poc-key-tract-swatch-chip">
+													<span class="poc-key-tract-swatch" style:background={color}></span>
+													<span class="poc-key-tract-swatch-label">{CHORO_BIN_LABELS[i]}</span>
+												</span>
+											{/each}
 										</span>
 									</span>
 								</p>
@@ -5273,30 +5267,34 @@
 		display: block;
 	}
 
-	.poc-key-tract-bar {
-		display: block;
-		width: 100%;
-		max-width: 8rem;
-		height: 5px;
-		border-radius: 2px;
-		border: 1px solid var(--border);
+	.poc-key-tract-swatches {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.28rem 0.5rem;
+		align-items: center;
+	}
+
+	.poc-key-tract-swatch-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.28rem;
+	}
+
+	.poc-key-tract-swatch {
+		display: inline-block;
+		width: 0.78rem;
+		height: 0.78rem;
+		border-radius: 999px;
+		border: 1px solid rgba(15, 23, 42, 0.18);
 		flex-shrink: 0;
 	}
 
-	.poc-key-tract-bar-labels {
-		display: flex;
-		justify-content: space-between;
-		width: 100%;
-		max-width: 8rem;
-		gap: 8px;
-		font-size: 0.58rem;
-		font-weight: 700;
-		line-height: 1.2;
+	.poc-key-tract-swatch-label {
+		font-size: 0.56rem;
+		font-weight: 600;
+		line-height: 1.15;
 		color: var(--text-muted);
-	}
-
-	.poc-key-tract-bar-label:last-child {
-		text-align: right;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.poc-key-one strong {
