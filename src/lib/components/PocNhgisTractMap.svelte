@@ -607,6 +607,61 @@
 		for (const n of nodes) parent.appendChild(n);
 	}
 
+	function buildCountyBoundaryGeometry(features) {
+		/** @type {Map<string, { count: number, counties: Set<string>, segment: [[number, number], [number, number]] }>} */
+		const segmentMap = new Map();
+		const roundCoord = (value) => Number(value).toFixed(6);
+		const coordKey = ([x, y]) => `${roundCoord(x)},${roundCoord(y)}`;
+		const canonicalKey = (a, b) => {
+			const ak = coordKey(a);
+			const bk = coordKey(b);
+			return ak <= bk ? `${ak}|${bk}` : `${bk}|${ak}`;
+		};
+		const addRingSegments = (ring, county) => {
+			for (let i = 0; i < ring.length - 1; i += 1) {
+				const a = ring[i];
+				const b = ring[i + 1];
+				if (!Array.isArray(a) || !Array.isArray(b) || a.length < 2 || b.length < 2) continue;
+				const key = canonicalKey(a, b);
+				const existing = segmentMap.get(key);
+				if (existing) {
+					existing.count += 1;
+					existing.counties.add(county);
+				} else {
+					segmentMap.set(key, {
+						count: 1,
+						counties: new Set([county]),
+						segment: [
+							[Number(a[0]), Number(a[1])],
+							[Number(b[0]), Number(b[1])]
+						]
+					});
+				}
+			}
+		};
+
+		for (const feature of features ?? []) {
+			const countyRaw = feature?.properties?.county;
+			const county =
+				countyRaw && String(countyRaw) !== 'County Name' ? String(countyRaw) : '__unknown__';
+			const geometry = feature?.geometry;
+			if (!geometry) continue;
+			if (geometry.type === 'Polygon') {
+				for (const ring of geometry.coordinates ?? []) addRingSegments(ring, county);
+			} else if (geometry.type === 'MultiPolygon') {
+				for (const polygon of geometry.coordinates ?? []) {
+					for (const ring of polygon ?? []) addRingSegments(ring, county);
+				}
+			}
+		}
+
+		const coordinates = [];
+		for (const entry of segmentMap.values()) {
+			if (entry.count === 1 || entry.counties.size > 1) coordinates.push(entry.segment);
+		}
+		return { type: 'MultiLineString', coordinates };
+	}
+
 	let mapCanvasLeft = 0;
 	let mapW = 520;
 	const mapH = 430;
@@ -978,6 +1033,7 @@
 		mapCanvasLeft = 0;
 		const svgW = mapCanvasLeft + mapW + CHORO_LEGEND_COL_W;
 		const svgH = mapH;
+		const countyBoundaryGeometry = buildCountyBoundaryGeometry(sortedFeatures);
 
 		// Fit projection to the full-state GeoJSON when available so excluded
 		// background tracts render correctly; fall back to the story subset.
@@ -1121,6 +1177,22 @@
 			.on('mouseleave', handleTractLeave)
 			.on('click', handleTractClick);
 
+		if (countyBoundaryGeometry.coordinates.length > 0) {
+			zoomLayer
+				.append('g')
+				.attr('class', 'county-boundary-layer')
+				.append('path')
+				.attr('class', 'county-boundary-path')
+				.attr('d', path(countyBoundaryGeometry))
+				.attr('fill', 'none')
+				.attr('stroke', 'rgba(58, 70, 92, 0.42)')
+				.attr('stroke-width', 1.2)
+				.attr('stroke-linecap', 'round')
+				.attr('stroke-linejoin', 'round')
+				.attr('vector-effect', 'non-scaling-stroke')
+				.style('pointer-events', 'none');
+		}
+
 		zoomLayer
 			.append('g')
 			.attr('class', 'mbta-lines-layer')
@@ -1163,6 +1235,10 @@
 		const zoom = d3
 			.zoom()
 			.scaleExtent([1, 28])
+			.filter((event) => {
+				if (guidedMode) return false;
+				return (!event.ctrlKey || event.type === 'wheel') && !event.button;
+			})
 			.on('zoom', (event) => {
 				zoomLayer.attr('transform', event.transform);
 				const k = event.transform.k;
@@ -3686,11 +3762,13 @@
 						onmouseleave={handleOverlayLeave}
 					>
 						<div class="map-widget">
+							{#if !guidedMode}
 							<div class="map-widget__controls" role="group" aria-label="Map zoom and reset controls">
 								<button class="poc-map-control" type="button" onclick={zoomInMap} aria-label="Zoom in">+</button>
 								<button class="poc-map-control" type="button" onclick={zoomOutMap} aria-label="Zoom out">−</button>
 								<button class="poc-map-control poc-map-control--wide" type="button" onclick={recenterMap}>Recenter</button>
 							</div>
+							{/if}
 							<div class="map-root" bind:this={containerEl}></div>
 						</div>
 					{#if activeTooltip.visible}
