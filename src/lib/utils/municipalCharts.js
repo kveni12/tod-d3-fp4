@@ -1010,7 +1010,7 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 
 	const width = root.node().clientWidth || 520;
 	const height = 320;
-	const margin = { top: 18, right: 18, bottom: 34, left: 52 };
+	const margin = { top: 18, right: 18, bottom: 34, left: 58 };
 	const innerW = width - margin.left - margin.right;
 	const innerH = height - margin.top - margin.bottom;
 	const svg = root.append('svg').attr('viewBox', `0 0 ${width} ${height}`);
@@ -1021,7 +1021,7 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		.range([0, innerW])
 		.paddingInner(0.14)
 		.paddingOuter(0.04);
-	const yScale = d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
+	const yScale = d3.scaleLinear().domain([-0.5, 0.5]).range([innerH, 0]);
 
 	g.append('g')
 		.attr('transform', `translate(0,${innerH})`)
@@ -1036,13 +1036,18 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 				)
 				.tickFormat((d) => d)
 		);
-	g.append('g').call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format('.0%')));
+	g.append('g')
+		.call(
+			d3.axisLeft(yScale)
+				.tickValues([-0.5, -0.25, 0, 0.25, 0.5])
+				.tickFormat((d) => d3.format('.0%')(Math.abs(d)))
+		);
 
 	g.append('line')
 		.attr('x1', 0)
 		.attr('x2', innerW)
-		.attr('y1', yScale(0.5))
-		.attr('y2', yScale(0.5))
+		.attr('y1', yScale(0))
+		.attr('y2', yScale(0))
 		.attr('stroke', '#b7b0a3')
 		.attr('stroke-dasharray', '4 4');
 
@@ -1056,22 +1061,22 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	groups
 		.append('rect')
 		.attr('x', 0)
-		.attr('y', (d) => yScale(d.highShare))
+		.attr('y', (d) => yScale(Math.max(0, d.highShare - 0.5)))
 		.attr('width', x.bandwidth())
-		.attr('height', (d) => innerH - yScale(d.highShare))
+		.attr('height', (d) => Math.abs(yScale(d.highShare - 0.5) - yScale(0)))
 		.attr('rx', 3)
 		.attr('fill', 'var(--accent)')
-		.attr('opacity', 0.92);
+		.attr('opacity', (d) => (d.highShare >= 0.5 ? 0.92 : 0.18));
 
 	groups
 		.append('rect')
 		.attr('x', 0)
-		.attr('y', 0)
+		.attr('y', yScale(Math.min(0, 0.5 - d.lowShare)))
 		.attr('width', x.bandwidth())
-		.attr('height', (d) => yScale(d.highShare))
+		.attr('height', (d) => Math.abs(yScale(0.5 - d.lowShare) - yScale(0)))
 		.attr('rx', 3)
 		.attr('fill', 'var(--blue-5)')
-		.attr('opacity', 0.9);
+		.attr('opacity', (d) => (d.lowShare > 0.5 ? 0.9 : 0.18));
 
 	groups
 		.append('title')
@@ -1084,11 +1089,33 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		const latestX = (x(String(latest.year)) ?? 0) + x.bandwidth() / 2;
 		g.append('text')
 			.attr('x', latestX)
-			.attr('y', yScale(latest.highShare) - 10)
+			.attr('y', latest.highShare >= 0.5 ? yScale(latest.highShare - 0.5) - 10 : yScale(0.5 - latest.lowShare) + 22)
 			.attr('text-anchor', 'middle')
 			.attr('fill', '#1f2430')
 			.attr('font-size', 11)
 			.attr('font-weight', 700)
-			.text(fmtPct(latest.highShare));
+			.text(
+				latest.highShare >= 0.5
+					? `${fmtPct(latest.highShare)} high`
+					: `${fmtPct(latest.lowShare)} low`
+			);
 	}
+
+	g.append('text')
+		.attr('x', innerW - 4)
+		.attr('y', yScale(0.38))
+		.attr('text-anchor', 'end')
+		.attr('fill', 'var(--accent)')
+		.attr('font-size', 11)
+		.attr('font-weight', 700)
+		.text('Higher-vulnerability majority');
+
+	g.append('text')
+		.attr('x', innerW - 4)
+		.attr('y', yScale(-0.38))
+		.attr('text-anchor', 'end')
+		.attr('fill', 'var(--blue-5)')
+		.attr('font-size', 11)
+		.attr('font-weight', 700)
+		.text('Lower-vulnerability majority');
 }
