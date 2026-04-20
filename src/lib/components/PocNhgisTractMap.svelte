@@ -3878,6 +3878,7 @@
 								class="poc-stepper-card"
 								class:poc-stepper-card--active={revealStage === i}
 								class:poc-stepper-card--dense={guidedMode && (i === 2 || i === 3 || i === 8 || i === 9 || i === 10)}
+								class:poc-stepper-card--runway-after={guidedMode && i === 3}
 								data-step-index={i}
 							>
 								<div class="poc-stepper-card-top">
@@ -4222,6 +4223,10 @@
 	.poc-stepper-card--dense {
 		align-content: start;
 		padding-top: 14px;
+	}
+
+	.poc-stepper-card--runway-after {
+		margin-bottom: 18vh;
 	}
 
 	.poc-stepper-card-top {
