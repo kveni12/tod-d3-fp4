@@ -591,6 +591,9 @@
 					The full exploration interface comes afterward, once that argument has been established more clearly. You can also
 					hover over tracts and development dots throughout the map to see tooltips with more detail.
 				</p>
+				<p class="chart-note">
+					For readability, tract tooltips and example cards use short labels like <strong>“Tract in Suffolk County”</strong> rather than full census tract identifiers. Those labels are there to help orient the viewer quickly, not to imply that the analysis itself is only happening at the county level.
+				</p>
 				<div class="chart-wrap chart-tall chart-wrap--poc-map">
 					<PocNhgisTractMap
 						panelState={pocMapPanel}

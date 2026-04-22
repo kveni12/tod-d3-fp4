@@ -165,7 +165,7 @@
 	const MISMATCH_STROKE_OPACITY = 0.96;
 	const MISMATCH_W_HA = 2;
 	const MISMATCH_W_HG = 1.45;
-	const CHORO_COLOR_STEPS = ['#d73027', '#f46d43', '#f7d8cf', '#f2ede3', '#d5e3f5', '#7ea6da', '#2f6eb5'];
+	const CHORO_COLOR_STEPS = ['#d73027', '#f46d43', '#f7d8cf', '#ffffff', '#d5e3f5', '#7ea6da', '#2f6eb5'];
 	const CHORO_BIN_LABELS = ['<= -66%', '-66 to -33%', '-33 to -8%', '-8 to +8%', '+8 to +33%', '+33 to +66%', '>= +66%'];
 	/**
 	 * Non–mismatch tracts when the mismatch layer is on (revealStage ≥2).
@@ -609,62 +609,6 @@
 		for (const n of nodes) parent.appendChild(n);
 	}
 
-	function buildCountyBoundaryGeometry(features, countyByGj) {
-		/** @type {Map<string, { count: number, counties: Set<string>, segment: [[number, number], [number, number]] }>} */
-		const segmentMap = new Map();
-		const roundCoord = (value) => Number(value).toFixed(6);
-		const coordKey = ([x, y]) => `${roundCoord(x)},${roundCoord(y)}`;
-		const canonicalKey = (a, b) => {
-			const ak = coordKey(a);
-			const bk = coordKey(b);
-			return ak <= bk ? `${ak}|${bk}` : `${bk}|${ak}`;
-		};
-		const addRingSegments = (ring, county) => {
-			for (let i = 0; i < ring.length - 1; i += 1) {
-				const a = ring[i];
-				const b = ring[i + 1];
-				if (!Array.isArray(a) || !Array.isArray(b) || a.length < 2 || b.length < 2) continue;
-				const key = canonicalKey(a, b);
-				const existing = segmentMap.get(key);
-				if (existing) {
-					existing.count += 1;
-					existing.counties.add(county);
-				} else {
-					segmentMap.set(key, {
-						count: 1,
-						counties: new Set([county]),
-						segment: [
-							[Number(a[0]), Number(a[1])],
-							[Number(b[0]), Number(b[1])]
-						]
-					});
-				}
-			}
-		};
-
-		for (const feature of features ?? []) {
-			const gisjoin = feature?.properties?.gisjoin;
-			const countyRaw = gisjoin ? countyByGj?.get(gisjoin) : null;
-			const county =
-				countyRaw && String(countyRaw) !== 'County Name' ? String(countyRaw) : '__unknown__';
-			const geometry = feature?.geometry;
-			if (!geometry) continue;
-			if (geometry.type === 'Polygon') {
-				for (const ring of geometry.coordinates ?? []) addRingSegments(ring, county);
-			} else if (geometry.type === 'MultiPolygon') {
-				for (const polygon of geometry.coordinates ?? []) {
-					for (const ring of polygon ?? []) addRingSegments(ring, county);
-				}
-			}
-		}
-
-		const coordinates = [];
-		for (const entry of segmentMap.values()) {
-			if (entry.count === 1 || entry.counties.size > 1) coordinates.push(entry.segment);
-		}
-		return { type: 'MultiLineString', coordinates };
-	}
-
 	function buildChoroplethThresholds(maxAbs) {
 		const abs = Math.max(1, Number(maxAbs) || 1);
 		return [-0.66 * abs, -0.33 * abs, -0.08 * abs, 0.08 * abs, 0.33 * abs, 0.66 * abs];
@@ -1041,9 +985,6 @@
 		mapCanvasLeft = 0;
 		const svgW = mapCanvasLeft + mapW + CHORO_LEGEND_COL_W;
 		const svgH = mapH;
-		const countyByGj = new Map((tractList ?? []).map((t) => [t.gisjoin, t.county]));
-		const countyBoundaryGeometry = buildCountyBoundaryGeometry(sortedFeatures, countyByGj);
-
 		// Fit projection to the full-state GeoJSON when available so excluded
 		// background tracts render correctly; fall back to the story subset.
 		const fitGeo = allTractsGeo?.features?.length ? allTractsGeo : tractGeo;
@@ -1185,22 +1126,6 @@
 			.on('mousemove', handleMouseMove)
 			.on('mouseleave', handleTractLeave)
 			.on('click', handleTractClick);
-
-		if (countyBoundaryGeometry.coordinates.length > 0) {
-			zoomLayer
-				.append('g')
-				.attr('class', 'county-boundary-layer')
-				.append('path')
-				.attr('class', 'county-boundary-path')
-				.attr('d', path(countyBoundaryGeometry))
-				.attr('fill', 'none')
-				.attr('stroke', '#5f6f86')
-				.attr('stroke-width', 1.55)
-				.attr('stroke-linecap', 'round')
-				.attr('stroke-linejoin', 'round')
-				.attr('vector-effect', 'non-scaling-stroke')
-				.style('pointer-events', 'none');
-		}
 
 		zoomLayer
 			.append('g')
