@@ -367,6 +367,8 @@ def load_standardized():
         (1990, 2000, "90_00"),
         (2000, 2010, "00_10"),
         (2010, 2020, "10_20"),
+        # 20-year decennial window (matches default dashboard ``timePeriod`` ``00_20``).
+        (2000, 2020, "00_20"),
         (1990, 2020, "90_20"),
     ]:
         S, E = str(s), str(e)

@@ -203,7 +203,12 @@
       "transit_pct_change_00_20": 0.08,
       "drove_alone_pct_change_00_20": -2.98,
       "avg_travel_time_change_00_20": 2.4,
-      "median_income_change_pct_00_20": 60.12
+      "median_income_change_pct_00_20": 60.12,
+      "pop_change_pct_00_20": 79.1,
+      "minority_pct_change_00_20": 13.52,
+      "owner_pct_change_00_20": -1.35,
+      "vacancy_rate_change_00_20": 1.14,
+      "minority_owner_pct_change_00_20": 10.04
     }
   }
 }

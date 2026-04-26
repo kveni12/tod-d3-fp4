@@ -3746,25 +3746,21 @@
 						<span class="poc-methods__label">Tract groupings:</span>
 						<ul style="padding-left: 1.5em;">
 							<li>
-								Minimal Development: All tracts with less than
+								Minimal Development: All tracts w/ &lt;
 								<strong> {d3.format('.1f')(panelState.sigDevMinPctStockIncrease ?? 2)}%</strong> housing stock increase.
 							</li>
 							<li>
-								TOD-Dominated: Remaining tracts with more than
+								TOD-Dominated: Remaining tracts w/ &ge;
 								<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> of new units being TOD.
 							</li>
 							<li>
-								Non-TOD-Dominated: Remaining tracts with less than
+								Non-TOD-Dominated: Remaining tracts w/ &lt;
 								<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> of new units being TOD.
 							</li>
 							<li>
 								Ignored: Tan tracts mark places where data is missing or unreliable.
 							</li>
 						</ul>
-
-						<!-- Tracts are grouped using
-						<strong> {d3.format('.1f')(panelState.sigDevMinPctStockIncrease ?? 2)}%</strong> housing stock increase as the significant-development floor and
-						<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> TOD share as the TOD-dominated cutoff. -->
 					</li>
 					<li>
 						<span class="poc-methods__label">Aggregation averages:</span>
@@ -3775,8 +3771,7 @@
 			<div class="poc-compare card-key" role="region" aria-label="Selected tract comparison chart">
 					<div class="poc-compare__head">
 						<div>
-							<p class="poc-detail__kicker">Selection chart</p>
-							<p class="poc-detail__title">{selectionComparison.title}</p>
+							<p class="poc-detail__kicker">{selectionComparison.title}</p>
 						</div>
 						<div class="poc-compare__metric-tabs">
 							<button
@@ -5246,6 +5241,50 @@
 		align-items: flex-start;
 		gap: 6px;
 		cursor: pointer;
+	}
+
+	/* Aligns with FilterPanel “Time & Axis Variables” (Development / Demographic axis dropdowns). */
+	.poc-sandbox-choro-block {
+		margin-top: 10px;
+		width: 90%;
+		min-width: 0;
+	}
+
+	.poc-sandbox-choro-field {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+		width: 100%;
+	}
+
+	.poc-sandbox-choro-label {
+		font-size: 0.625rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--text-muted);
+		line-height: 1.2;
+	}
+
+	.poc-sandbox-choro-select {
+		font-size: 0.6875rem;
+		line-height: 1.25;
+		padding: 2px 1.5rem 2px 5px;
+		min-height: 22px;
+		border-radius: var(--radius-sm);
+		border: 1px solid var(--border);
+		background: var(--bg-panel);
+		color: var(--text);
+		width: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
+		cursor: pointer;
+	}
+
+	.poc-sandbox-choro-select:focus-visible {
+		outline: 2px solid color-mix(in srgb, var(--accent) 60%, white 40%);
+		outline-offset: 2px;
 	}
 
 	.poc-spotlight {
