@@ -522,7 +522,7 @@
 					For many residents, a primary concern with TOD is the gap between housing supply and genuine affordability.
 					Although TOD projects often increase the total number of housing units, if these units are
 					market-rate, they are usually significantly more expensive than existing units in the neighborhood.
-					This does not mean that low-to-moderate income households cannot afford to move into these homes,
+					This does mean that low-to-moderate income households often cannot afford to move into these homes,
 					and more importantly, it often raises rents for those already living in the area.
 				</p>
 
@@ -549,7 +549,7 @@
 				<h2>Where is development most concentrated?</h2>
 				<p>
 					Although lower-income residents are the most at risk of displacement,
-					municipalities with more lower income households (&lt; $125k/year) are often the ones seeing the most new development.
+					municipalities with more lower income households (&lt; $125k/year) are also often the ones seeing the most new development.
 					This suggests that equitable implementation matters most in the places already under the most pressure.
 				</p>
 				<p>
@@ -668,7 +668,7 @@
 					<p>
 						<strong>TOD-dominated tracts</strong> are tracts where at least <strong>50%</strong> of filtered new units come from TOD developments and
 						housing stock increases by at least <strong>2.0%</strong>. <strong>Non-TOD-dominated tracts</strong> meet the same growth threshold but fall
-						below that TOD share cutoff. <strong>Minimal-development tracts</strong> stay below the stock-growth threshold.
+						below that TOD stock share cutoff. <strong>Minimal-development tracts</strong> stay below the stock-growth threshold.
 					</p>
 				</div>
 				<div class="framing-block">
