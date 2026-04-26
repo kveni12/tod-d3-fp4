@@ -633,6 +633,71 @@ export function cohortYMeansForPanel(tracts, panelState, developments, yVarOverr
 }
 
 /**
+ * Population-weighted Y means for **TOD-dominated** tracts split by affordable share of
+ * TOD new units (``todAffordableFraction`` from the same dev aggregation as
+ * ``TodAffordabilityScatter``).
+ *
+ * Low: ``aff < affShareCutoff``; high: ``aff >= affShareCutoff``. Tracts without a finite
+ * affordable share are excluded from both groups.
+ *
+ * Parameters
+ * ----------
+ * tracts : Array<object>
+ * panelState : object
+ * developments : Array<object>
+ * yKey : string
+ *     Full tract column, e.g. ``median_income_change_pct_00_20``.
+ * affShareCutoff : number
+ *     Split threshold on ``[0, 1]`` (default ``0.5`` for 50% affordable TOD share).
+ * weightKey : string | null
+ *     Tract field for weights; default is population at period start (``popWeightKey``).
+ *
+ * Returns
+ * -------
+ * object | null
+ *     ``{ meanLo, meanHi, nLo, nHi, nLoWithY, nHiWithY }`` or null when data cannot be built.
+ */
+export function todAffordabilitySplitYMeans(
+	tracts,
+	panelState,
+	developments,
+	yKey,
+	affShareCutoff = 0.5,
+	weightKey = null
+) {
+	if (!tracts?.length || !panelState?.timePeriod) return null;
+	const { filteredTracts, tractTodMetrics } = buildTodAnalysisData(
+		tracts,
+		developments ?? [],
+		panelState
+	);
+	const sig = panelState.sigDevMinPctStockIncrease ?? 2;
+	const cut = panelState.todFractionCutoff ?? 0.5;
+	const thr = Number(affShareCutoff);
+	if (!Number.isFinite(thr)) return null;
+	const lo = [];
+	const hi = [];
+	for (const t of filteredTracts) {
+		const m = tractTodMetrics.get(t.gisjoin);
+		if (!m) continue;
+		if (classifyTractDevelopment(m, sig, cut) !== 'tod_dominated') continue;
+		const aff = m.todAffordableFraction;
+		if (aff == null || !Number.isFinite(aff)) continue;
+		if (aff < thr) lo.push(t);
+		else hi.push(t);
+	}
+	const wk = weightKey ?? popWeightKey(panelState.timePeriod);
+	return {
+		meanLo: computeGroupMean(lo, yKey, wk),
+		meanHi: computeGroupMean(hi, yKey, wk),
+		nLo: lo.length,
+		nHi: hi.length,
+		nLoWithY: lo.filter((t) => t[yKey] != null && Number.isFinite(Number(t[yKey]))).length,
+		nHiWithY: hi.filter((t) => t[yKey] != null && Number.isFinite(Number(t[yKey]))).length
+	};
+}
+
+/**
  * Population-weighted mean of the active Y for a user-chosen tract subset (same weights as
  * ``cohortYMeansForPanel`` / binned bar chart).
  *

@@ -30,6 +30,16 @@ export const MBTA_RED = '#DA291C';
 /** Commuter Rail / Blue */
 export const MBTA_BLUE = '#003DA5';
 
+/**
+ * Commuter Rail purple (digital hex used in MBTA route / brand materials).
+ */
+export const MBTA_PURPLE = '#80276C';
+
+/**
+ * Lighter purple tint for chart fills (~42% white blended into ``MBTA_PURPLE``).
+ */
+export const MBTA_PURPLE_LIGHT = '#c9a3be';
+
 /** Bus / warning yellow (fit lines) */
 export const MBTA_YELLOW = '#FFC72C';
 

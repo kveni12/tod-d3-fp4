@@ -30,14 +30,20 @@
 	import {
 		buildCohortDevelopmentSplit,
 		cohortYMeansForYKey,
+		todAffordabilitySplitYMeans,
 		popWeightKey,
 		yMetricDisplayKind,
 		formatYMetricSummary
 	} from '$lib/utils/derived.js';
-	import { MBTA_GREEN, MBTA_ORANGE } from '$lib/utils/mbtaColors.js';
+	import { MBTA_GREEN, MBTA_ORANGE, MBTA_PURPLE, MBTA_PURPLE_LIGHT } from '$lib/utils/mbtaColors.js';
+	import TodAffordabilityScatter from '$lib/components/TodAffordabilityScatter.svelte';
 
 	/** Minimal-cohort swatch: aligned with ``TodIntensityScatter`` / TOD map greys. */
 	const GREY_MINIMAL = '#a8908c';
+
+	/** Affordable TOD share split mini-bars: light purple (<50%) vs MBTA purple (≥50%). */
+	const AFFORD_BAR_LO = MBTA_PURPLE_LIGHT;
+	const AFFORD_BAR_HI = MBTA_PURPLE;
 
 	/* ═══════════════════════════════════════════════════════
 	   MUNICIPAL STATE (Part 1)
@@ -316,6 +322,37 @@
 	const eduRow = $derived(buildStoryCohortRow('bachelors_pct_change'));
 
 	/**
+	 * Population-weighted means for TOD tracts with low vs high affordable share of TOD units
+	 * (same dev metrics as ``TodAffordabilityScatter``; split at 50%).
+	 *
+	 * @param {string} vKey
+	 */
+	function buildAffordSplitStoryRow(vKey) {
+		if (!tractData.length || !developments.length) return null;
+		const weightKey = popWeightKey(tractTimePeriod);
+		const yKey = `${vKey}_${tractTimePeriod}`;
+		const raw = todAffordabilitySplitYMeans(
+			tractData,
+			tractPanelConfig,
+			developments,
+			yKey,
+			0.5,
+			weightKey
+		);
+		if (!raw) return null;
+		const kind = yKindForStoryKey(vKey);
+		return {
+			...raw,
+			kind,
+			fmtLo: formatYMetricSummary(raw.meanLo, kind),
+			fmtHi: formatYMetricSummary(raw.meanHi, kind)
+		};
+	}
+
+	const affIncomeSplit = $derived(buildAffordSplitStoryRow('median_income_change_pct'));
+	const affEduSplit = $derived(buildAffordSplitStoryRow('bachelors_pct_change'));
+
+	/**
 	 * Layout for a three-cohort bar chart (same population-weighted means as body copy / scatter Y).
 	 * Category axis (TOD / non-TOD / minimal) along the top; value scale increases downward. Default
 	 * size and type from ``COHORT_MINI_BAR``.
@@ -430,6 +467,114 @@
 	const incomeMiniBar = $derived(cohortMiniBarLayout(incomeRow));
 	const eduMiniBar = $derived(cohortMiniBarLayout(eduRow));
 
+	/** Skinnier two-cohort bar chart: low vs high affordable TOD share (matches ``cohortMiniBarLayout`` geometry). */
+	/* Slightly narrower than the old 168px so bar cells sit tighter next to the wider scatter columns. */
+	const AFFORD_SPLIT_MINI = { W: 140, H: 248, fs: 11, tickPad: 6, rx: 1.5 };
+
+	/**
+	 * @param { { kind: 'pp' | 'pct' | 'min', meanLo: number, meanHi: number } | null | undefined } row
+	 * @param {{ w?: number, h?: number }} [opts]
+	 */
+	function affordSplitMiniBarLayout(row, opts) {
+		if (!row) return null;
+		const W = opts?.w ?? AFFORD_SPLIT_MINI.W;
+		const H = opts?.h ?? AFFORD_SPLIT_MINI.H;
+		const m = { b: 24, r: 8, l: 44 };
+		const categoryLabelY = 16;
+		const valuePlotTop = 28;
+		const ih = H - valuePlotTop - m.b;
+		const items = [
+			{ id: 'lo', shortLabel: '<50%', v: row.meanLo, fill: AFFORD_BAR_LO },
+			{ id: 'hi', shortLabel: '≥50%', v: row.meanHi, fill: AFFORD_BAR_HI }
+		];
+		const finite = items.filter((d) => Number.isFinite(d.v));
+		if (finite.length === 0) return null;
+		const minV = d3.min(finite, (d) => d.v) ?? 0;
+		const maxV = d3.max(finite, (d) => d.v) ?? 0;
+		const y0 = Math.min(0, minV);
+		const y1 = Math.max(0, maxV);
+		const span = y1 - y0;
+		const pad = span > 0 ? span * 0.08 : 0.5;
+		const yDomain = [y0 - pad, y1 + pad];
+		const iw = W - m.l - m.r;
+		const yScale = d3.scaleLinear().domain(yDomain).range([0, ih]);
+		/** @param {number} v */
+		const toPlotY = (v) => valuePlotTop + yScale(v);
+		const y0px = toPlotY(0);
+		const x = d3.scaleBand().domain(items.map((d) => d.id)).range([0, iw]).padding(0.28);
+		const tickFmt =
+			row.kind === 'pp'
+				? d3.format('.1f')
+				: row.kind === 'min'
+					? d3.format('.1f')
+					: d3.format('.0f');
+		const yTicks = d3
+			.ticks(yDomain[0], yDomain[1], 3)
+			.filter((t) => t >= yDomain[0] - 1e-9 && t <= yDomain[1] + 1e-9);
+		const bars = items.map((d) => {
+			if (!Number.isFinite(d.v)) {
+				return {
+					...d,
+					xPx: (x(d.id) ?? 0) + m.l,
+					yPx: y0px,
+					wPx: x.bandwidth(),
+					hPx: 0,
+					valueLabel: '—',
+					valueLabelY: y0px + 5,
+					valueLabelBaseline: /** @type {'middle'} */ ('middle')
+				};
+			}
+			const yV = toPlotY(d.v);
+			const top = Math.min(y0px, yV);
+			const hPx = Math.abs(yV - y0px);
+			const valueLabel = formatYMetricSummary(d.v, row.kind);
+			/** @type {'hanging' | 'alphabetic'} */
+			const valueLabelBaseline = yV > y0px ? 'hanging' : 'alphabetic';
+			const valueLabelY = yV > y0px ? yV + 2 : yV - 1;
+			return {
+				...d,
+				xPx: (x(d.id) ?? 0) + m.l,
+				yPx: top,
+				wPx: x.bandwidth(),
+				hPx,
+				valueLabel,
+				valueLabelY,
+				valueLabelBaseline
+			};
+		});
+		const yAxisTicks = yTicks.map((t) => ({
+			t,
+			yPx: toPlotY(t),
+			label:
+				row.kind === 'pp'
+					? `${tickFmt(t)}`
+					: row.kind === 'min'
+						? `${tickFmt(t)}`
+						: `${tickFmt(t)}%`
+		}));
+		return {
+			W,
+			H,
+			m,
+			mInner: iw,
+			ih,
+			valuePlotTop,
+			plotBottom: valuePlotTop + ih,
+			y0px,
+			bars,
+			yDomain,
+			yAxisTicks,
+			unitKind: row.kind,
+			fontSize: AFFORD_SPLIT_MINI.fs,
+			tickTextPad: AFFORD_SPLIT_MINI.tickPad,
+			categoryLabelY,
+			barRectRx: AFFORD_SPLIT_MINI.rx
+		};
+	}
+
+	const affIncomeSplitBar = $derived(affordSplitMiniBarLayout(affIncomeSplit));
+	const affEduSplitBar = $derived(affordSplitMiniBarLayout(affEduSplit));
+
 	function makeTodScatterPanelState(yVar) {
 		return {
 			timePeriod: tractTimePeriod,
@@ -462,6 +607,8 @@
 
 	let incomePanelState = $state(makeTodScatterPanelState('median_income_change_pct'));
 	let eduPanelState = $state(makeTodScatterPanelState('bachelors_pct_change'));
+	let affIncomePanelState = $state(makeTodScatterPanelState('median_income_change_pct'));
+	let affEduPanelState = $state(makeTodScatterPanelState('bachelors_pct_change'));
 
 	/**
 	 * Keep transit distance in sync with the municipal slider (``threshold``) without
@@ -473,6 +620,8 @@
 		const t = threshold;
 		incomePanelState.transitDistanceMi = t;
 		eduPanelState.transitDistanceMi = t;
+		affIncomePanelState.transitDistanceMi = t;
+		affEduPanelState.transitDistanceMi = t;
 	});
 </script>
 
@@ -750,6 +899,7 @@
 						nhgisRows={nhgisLikeRows}
 						metricsDevelopments={tractWindowDevs}
 						guidedMode={true}
+						showMbtaOverlayControls={false}
 					/>
 				</div>
 			</section>
@@ -1075,34 +1225,240 @@
 				<div class="chart-wrap chart-wrap--tract-edu" bind:this={elTractEdu}></div>
 			</section> -->
 
-			<section class="story card full-width">
+			<section class="story card full-width afford-compare">
 				<h2>How affordability could help</h2>
-				<!-- <p>
-					Among TOD-dominated tracts, we can compare those where <strong>at least half</strong> of new
-					development is affordable (≥{(affSplitCohorts.affSplitThreshold * 100).toFixed(0)}% affordable share)
-					to those where <strong>less than half</strong> is affordable.
-					Comparing these two groups reveals whether affordability moderates
-					the demographic changes associated with TOD.
+				<p>
+					Among <strong>TOD-dominated tracts</strong>, we split tracts by whether at least half of
+					<strong>new TOD units</strong> in MassBuilds are affordable (≥50% affordable TOD share) or not (&lt;50%).
+					Comparing these two groups shows how affordability lines up with the same income and education
+					indicators as above (scatter plots match the playground &ldquo;Affordable TOD share&rdquo; view; bars
+					are population-weighted tract means within each group).
 				</p>
-				{#if affIncomeRow && affEduRow}
+				{#if affIncomeSplit && affEduSplit}
 					<p>
-						In TOD tracts with a higher affordable share, median income changes by
-						<strong>{affIncomeRow.fmtHi}</strong> (vs. <strong>{affIncomeRow.fmtLo}</strong> in
-						low-affordable TOD tracts). For education, the bachelor's share changes by
-						<strong>{affEduRow.fmtHi}</strong> vs. <strong>{affEduRow.fmtLo}</strong>.
-						This suggests that TOD tracts with more affordability may experience smaller socioeconomic shifts
-						on average, though the comparison is still descriptive rather than causal.
+						In the high&ndash;affordable TOD group, median income changes by <strong>{affIncomeSplit.fmtHi}</strong>
+						on average (vs. <strong>{affIncomeSplit.fmtLo}</strong> where the affordable TOD share is below
+						50%). For education, the bachelor&rsquo;s share changes by <strong>{affEduSplit.fmtHi}</strong> vs.
+						<strong>{affEduSplit.fmtLo}</strong>. This pattern is consistent with smaller socioeconomic shifts
+						where more of the TOD pipeline is affordable, though the comparison remains descriptive, not
+						causal.
 					</p>
-				{/if} -->
-				<p>
-					Among TOD-dominated tracts, we compare those where at least half of new development is affordable (≥50% affordable share) to those where less than half is affordable. Comparing these two groups reveals whether affordability moderates the demographic changes associated with TOD.
-				</p>
-				<p>
-					In TOD tracts with a higher affordable share, median income changes by <strong>69.33%</strong> (vs. <strong>88.11%</strong> in low-affordable TOD tracts). For education, the bachelor's share changes by <strong>12.56 pp</strong> vs. <strong>16.36 pp</strong>. This suggests that TOD tracts with more affordability may experience smaller socioeconomic shifts on average, though the comparison is still descriptive rather than causal.
-				</p>
-				<p>
-					More figures will be added soon.
-				</p>
+				{/if}
+
+				<div class="afford-four-grid" role="group" aria-label="Affordable TOD share: income and education scatters and cohort bars">
+					<div class="afford-four-cell">
+						<h3 class="afford-four-cell__title">Income Change vs Affordability</h3>
+						<figure class="afford-scatter-embed-figure">
+							<div class="scatter-container scatter-container--afford-embed">
+								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} />
+							</div>
+							<figcaption class="cohort-mini-bar__cap">Tracts with greater affordability trend towards smaller income increases.</figcaption>
+						</figure>
+					</div>
+					<div class="afford-four-cell afford-four-cell--bar">
+						<h3 class="afford-four-cell__title">Income Change Averages</h3>
+						{#if affIncomeSplitBar && affIncomeSplit}
+							<figure class="afford-split-mini-bar cohort-mini-bar">
+								<svg
+									width={affIncomeSplitBar.W}
+									height={affIncomeSplitBar.H}
+									viewBox="0 0 {affIncomeSplitBar.W} {affIncomeSplitBar.H}"
+									role="img"
+									aria-label="Bar chart: population-weighted mean income change in TOD tracts with below 50% vs at least 50% affordable TOD share."
+								>
+									<line
+										x1={affIncomeSplitBar.m.l - 0.5}
+										y1={affIncomeSplitBar.valuePlotTop}
+										x2={affIncomeSplitBar.m.l - 0.5}
+										y2={affIncomeSplitBar.plotBottom}
+										stroke="#cbd5e1"
+										stroke-width="1"
+									/>
+									{#each affIncomeSplitBar.yAxisTicks as tick (tick.t)}
+										<line
+											x1={affIncomeSplitBar.m.l}
+											y1={tick.yPx}
+											x2={affIncomeSplitBar.m.l + affIncomeSplitBar.mInner}
+											y2={tick.yPx}
+											stroke="#f1f5f9"
+											stroke-width="1"
+										/>
+										<text
+											x={affIncomeSplitBar.m.l - affIncomeSplitBar.tickTextPad}
+											y={tick.yPx}
+											text-anchor="end"
+											dominant-baseline="middle"
+											fill="var(--muted, #5e6573)"
+											font-size={affIncomeSplitBar.fontSize}
+										>
+											{tick.label}
+										</text>
+									{/each}
+									<line
+										x1={affIncomeSplitBar.m.l}
+										y1={affIncomeSplitBar.y0px}
+										x2={affIncomeSplitBar.m.l + affIncomeSplitBar.mInner}
+										y2={affIncomeSplitBar.y0px}
+										stroke="#94a3b8"
+										stroke-width="1"
+										stroke-dasharray="3 2"
+										opacity="0.85"
+									/>
+									{#each affIncomeSplitBar.bars as b (b.id)}
+										<rect
+											x={b.xPx}
+											y={b.yPx}
+											width={b.wPx}
+											height={b.hPx}
+											fill={b.fill}
+											rx={affIncomeSplitBar.barRectRx}
+										>
+											<title
+												>{b.shortLabel} affordable TOD share: {formatYMetricSummary(b.v, affIncomeSplit.kind)} (population-weighted mean)</title
+											>
+										</rect>
+										<text
+											x={b.xPx + b.wPx / 2}
+											y={b.valueLabelY}
+											text-anchor="middle"
+											dominant-baseline={b.valueLabelBaseline}
+											font-size={affIncomeSplitBar.fontSize}
+											font-weight="600"
+											fill="var(--ink, #1f2430)"
+										>
+											{b.valueLabel}
+										</text>
+									{/each}
+									{#each affIncomeSplitBar.bars as b (b.id)}
+										<text
+											x={b.xPx + b.wPx / 2}
+											y={affIncomeSplitBar.categoryLabelY}
+											text-anchor="middle"
+											dominant-baseline="middle"
+											fill="var(--ink, #1f2430)"
+											font-size={affIncomeSplitBar.fontSize}
+										>
+											{b.shortLabel}
+										</text>
+									{/each}
+								</svg>
+								<figcaption class="cohort-mini-bar__cap">
+									Tracts w/ &lt;50% affordable units see larger avg. income increases.
+								</figcaption>
+							</figure>
+						{:else}
+							<figure class="cohort-mini-bar cohort-mini-bar--empty">
+								<p class="cohort-mini-bar__cap">Bars appear when enough TOD tracts have affordable-share data.</p>
+							</figure>
+						{/if}
+					</div>
+					<div class="afford-four-cell">
+						<h3 class="afford-four-cell__title">Education Change vs Affordability</h3>
+						<figure class="afford-scatter-embed-figure">
+							<div class="scatter-container scatter-container--afford-embed">
+								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} />
+							</div>
+							<figcaption class="cohort-mini-bar__cap">Tracts with greater affordability trend towards smaller education changes.</figcaption>
+						</figure>
+					</div>
+					<div class="afford-four-cell afford-four-cell--bar">
+						<h3 class="afford-four-cell__title">Education Change Averages</h3>
+						{#if affEduSplitBar && affEduSplit}
+							<figure class="afford-split-mini-bar cohort-mini-bar">
+								<svg
+									width={affEduSplitBar.W}
+									height={affEduSplitBar.H}
+									viewBox="0 0 {affEduSplitBar.W} {affEduSplitBar.H}"
+									role="img"
+									aria-label="Bar chart: population-weighted mean bachelors share change in TOD tracts with below 50% vs at least 50% affordable TOD share."
+								>
+									<line
+										x1={affEduSplitBar.m.l - 0.5}
+										y1={affEduSplitBar.valuePlotTop}
+										x2={affEduSplitBar.m.l - 0.5}
+										y2={affEduSplitBar.plotBottom}
+										stroke="#cbd5e1"
+										stroke-width="1"
+									/>
+									{#each affEduSplitBar.yAxisTicks as tick (tick.t)}
+										<line
+											x1={affEduSplitBar.m.l}
+											y1={tick.yPx}
+											x2={affEduSplitBar.m.l + affEduSplitBar.mInner}
+											y2={tick.yPx}
+											stroke="#f1f5f9"
+											stroke-width="1"
+										/>
+										<text
+											x={affEduSplitBar.m.l - affEduSplitBar.tickTextPad}
+											y={tick.yPx}
+											text-anchor="end"
+											dominant-baseline="middle"
+											fill="var(--muted, #5e6573)"
+											font-size={affEduSplitBar.fontSize}
+										>
+											{tick.label}
+										</text>
+									{/each}
+									<line
+										x1={affEduSplitBar.m.l}
+										y1={affEduSplitBar.y0px}
+										x2={affEduSplitBar.m.l + affEduSplitBar.mInner}
+										y2={affEduSplitBar.y0px}
+										stroke="#94a3b8"
+										stroke-width="1"
+										stroke-dasharray="3 2"
+										opacity="0.85"
+									/>
+									{#each affEduSplitBar.bars as b (b.id)}
+										<rect
+											x={b.xPx}
+											y={b.yPx}
+											width={b.wPx}
+											height={b.hPx}
+											fill={b.fill}
+											rx={affEduSplitBar.barRectRx}
+										>
+											<title
+												>{b.shortLabel} affordable TOD share: {formatYMetricSummary(b.v, affEduSplit.kind)} (population-weighted mean)</title
+											>
+										</rect>
+										<text
+											x={b.xPx + b.wPx / 2}
+											y={b.valueLabelY}
+											text-anchor="middle"
+											dominant-baseline={b.valueLabelBaseline}
+											font-size={affEduSplitBar.fontSize}
+											font-weight="600"
+											fill="var(--ink, #1f2430)"
+										>
+											{b.valueLabel}
+										</text>
+									{/each}
+									{#each affEduSplitBar.bars as b (b.id)}
+										<text
+											x={b.xPx + b.wPx / 2}
+											y={affEduSplitBar.categoryLabelY}
+											text-anchor="middle"
+											dominant-baseline="middle"
+											fill="var(--ink, #1f2430)"
+											font-size={affEduSplitBar.fontSize}
+										>
+											{b.shortLabel}
+										</text>
+									{/each}
+								</svg>
+								<figcaption class="cohort-mini-bar__cap">
+									Tracts with &lt;50% affordable units see larger avg. education change.
+								</figcaption>
+							</figure>
+						{:else}
+							<figure class="cohort-mini-bar cohort-mini-bar--empty">
+								<p class="cohort-mini-bar__cap">Bars appear when enough TOD tracts have affordable-share data.</p>
+							</figure>
+						{/if}
+					</div>
+				</div>
 			</section>
 
 			<section class="story card">
@@ -2391,6 +2747,79 @@
 
 	.framing-block p + p {
 		margin-top: 10px;
+	}
+
+	/* Affordability: four charts in one row (scatters from playground + skinny compare bars) */
+	.afford-compare {
+		margin-top: 8px;
+	}
+
+	.afford-four-grid {
+		display: grid;
+		/* 3:2 fr gives scatter columns ~20% more width than equal 4-col split (30% vs 25% each). */
+		grid-template-columns: 3fr 2fr 3fr 2fr;
+		gap: 10px 12px;
+		align-items: start;
+		margin-top: 14px;
+	}
+
+	.afford-four-cell {
+		min-width: 0;
+	}
+
+	.afford-four-cell--bar {
+		justify-self: center;
+	}
+
+	.afford-four-cell__title {
+		margin: 0 0 6px;
+		font-size: 0.78rem;
+		font-weight: 700;
+		line-height: 1.25;
+		color: var(--muted);
+		text-align: center;
+	}
+
+	.afford-scatter-embed-figure {
+		margin: 0;
+		min-width: 0;
+	}
+
+	.scatter-container--afford-embed {
+		justify-content: center;
+		width: 100%;
+	}
+
+	.afford-four-grid :global(.tod-aff-wrap) {
+		width: 100%;
+	}
+
+	.afford-four-grid :global(.tod-aff-chart svg) {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.afford-split-mini-bar {
+		margin-top: 2px;
+		max-width: 100%;
+	}
+
+	.afford-split-mini-bar.cohort-mini-bar {
+		max-width: 168px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	@media (max-width: 1320px) {
+		.afford-four-grid {
+			grid-template-columns: 3fr 2fr;
+		}
+	}
+
+	@media (max-width: 700px) {
+		.afford-four-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	/* ── Conclusion ───────────────────────────────────── */

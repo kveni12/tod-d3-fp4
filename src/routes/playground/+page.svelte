@@ -92,7 +92,7 @@
 	<div class="playground-grid">
 		<aside class="playground-side">
 			<div class="card playground-panel">
-				<h3>Controls</h3>
+				<h4>Controls</h4>
 				<p class="playground-note">
 					Dynamically control all plots.
 				</p>
@@ -100,7 +100,7 @@
 			</div>
 
 			<div class="card playground-panel">
-				<h3>Selected tract detail</h3>
+				<h4>Selected tract detail</h4>
 				<p class="playground-note">
 					Click one or more tracts on the map to pin.
 				</p>
@@ -252,8 +252,8 @@
 	}
 
 	.playground-note {
-		margin-bottom: 14px;
-		font-size: 0.94rem;
+		margin-bottom: 10px;
+		font-size: 0.7rem;
 	}
 
 	.playground-map-card {

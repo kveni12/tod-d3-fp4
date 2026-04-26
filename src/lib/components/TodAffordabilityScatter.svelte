@@ -12,16 +12,16 @@
 	import { periodCensusBounds } from '$lib/utils/periods.js';
 	import { splitChartTitle } from '$lib/utils/chartTitles.js';
 	import { niceHousingUnitsLabel } from '$lib/utils/chartFormat.js';
-	import {
-		MBTA_BLUE,
-		MBTA_CHART_NEUTRAL,
-		MBTA_GREEN,
-		MBTA_RED
-	} from '$lib/utils/mbtaColors.js';
+	import { MBTA_BLUE, MBTA_GREEN } from '$lib/utils/mbtaColors.js';
+
+	/** Stock-Δ colour ramp low end: white → ``MBTA_BLUE`` (sequential). */
+	const STOCK_COLOR_LO = '#ffffff';
 
 	let {
 		panelState,
 		domainOverride = null,
+		/** When false, hide the trim/selection toolbar (compact embeds, e.g. main story). */
+		showTrimControl = true,
 		/**
 		 * If set, use this Y metric key instead of ``panelState.yVar`` (e.g. playground shows a
 		 * single affordability plot while the choropleth uses another Y from the same panel).
@@ -193,18 +193,32 @@
 		}
 
 		const stockVals = points.map((d) => d.stockPct);
-		const cMin = d3.min(stockVals) ?? 0;
-		const cMax = d3.max(stockVals) ?? 1;
-		const cHi = cMax === cMin ? cMin + 1e-6 : cMax;
-		const midVal = (() => {
-			const m = d3.median(stockVals);
-			if (Number.isFinite(m) && m >= cMin && m <= cHi) return m;
-			return (cMin + cHi) / 2;
-		})();
-		// Stock-% diverging: red (lower) → neutral → blue (higher), aligned with map choropleth.
+		// Colorbar uses a trimmed quantile range so a few extreme stock-Δ tracts do not flatten
+		// the ramp; fills clamp to the ends (true values stay in the tooltip).
+		const sortedStock = Float64Array.from(stockVals).sort();
+		const nStock = sortedStock.length;
+		let cDomLo = sortedStock[0] ?? 0;
+		let cDomHi = sortedStock[Math.max(0, nStock - 1)] ?? 1;
+		if (nStock >= 5) {
+			const qLo = d3.quantileSorted(sortedStock, 0.05);
+			const qHi = d3.quantileSorted(sortedStock, 0.95);
+			if (Number.isFinite(qLo) && Number.isFinite(qHi) && qLo < qHi) {
+				cDomLo = qLo;
+				cDomHi = qHi;
+			}
+		}
+		if (!Number.isFinite(cDomLo) || !Number.isFinite(cDomHi) || cDomLo >= cDomHi) {
+			const cMin = d3.min(stockVals) ?? 0;
+			const cMax = d3.max(stockVals) ?? 1;
+			cDomLo = cMin;
+			cDomHi = cMax === cMin ? cMin + 1e-6 : cMax;
+		}
+		const cHi = cDomHi === cDomLo ? cDomLo + 1e-6 : cDomHi;
+		// Sequential white (low stock Δ) → MBTA blue (high).
 		const colorScale = d3
-			.scaleDiverging(d3.piecewise(d3.interpolateRgb, [MBTA_RED, MBTA_CHART_NEUTRAL, MBTA_BLUE]))
-			.domain([cMin, midVal, cHi]);
+			.scaleSequential(d3.interpolateRgb(STOCK_COLOR_LO, MBTA_BLUE))
+			.domain([cDomLo, cHi]);
+		const colorForStock = (v) => colorScale(Math.min(cHi, Math.max(cDomLo, v)));
 
 		const xScale = d3
 			.scaleLinear()
@@ -236,7 +250,7 @@
 			.attr('preserveAspectRatio', 'xMidYMid meet')
 			.style('display', 'block');
 
-		const stockSpan = Math.max(1e-9, cHi - cMin);
+		const stockSpan = Math.max(1e-9, cHi - cDomLo);
 		const gradId = `aff-stock-grad-${plotUid}`;
 		const defs = svg.append('defs');
 		const lg = defs
@@ -249,7 +263,7 @@
 		const nGradStops = 14;
 		for (let i = 0; i <= nGradStops; i++) {
 			const u = i / nGradStops;
-			const v = cMin + u * stockSpan;
+			const v = cDomLo + u * stockSpan;
 			lg.append('stop')
 				.attr('offset', `${u * 100}%`)
 				.attr('stop-color', colorScale(v));
@@ -442,7 +456,7 @@
 			.attr('cx', (d) => xScale(d.x))
 			.attr('cy', (d) => yScale(d.y))
 			.attr('r', (d) => d.dotR ?? 4)
-			.attr('fill', (d) => colorScale(d.stockPct))
+			.attr('fill', (d) => colorForStock(d.stockPct))
 			.attr('opacity', 0.92)
 			.attr('stroke', (d) => (selectedSet.has(d.tract.gisjoin) ? LINE_SELECTED : '#1e293b'))
 			.attr('stroke-width', (d) => (selectedSet.has(d.tract.gisjoin) ? 2 : 0.35))
@@ -505,7 +519,7 @@
 			.attr('stroke', 'var(--border)')
 			.attr('stroke-width', 0.5);
 
-		const stockAxis = d3.scaleLinear().domain([cMin, cHi]).range([innerHeight, 0]);
+		const stockAxis = d3.scaleLinear().domain([cDomLo, cHi]).range([innerHeight, 0]);
 		cbG
 			.append('g')
 			.attr('transform', `translate(${cbW + 4}, 0)`)
@@ -602,21 +616,23 @@
 </script>
 
 <div class="tod-aff-wrap">
-	<div class="tod-aff-toolbar">
-		<label class="trim-check">
-			<input type="checkbox" bind:checked={panelState.trimOutliers} />
-			<span>Trim axes (exclude &gt;10σ)</span>
-		</label>
-		<button
-			type="button"
-			class="scatter-clear-sel"
-			disabled={panelState.selectedTracts.size === 0}
-			onclick={clearTractSelection}
-			aria-label="Clear selected tracts from the map and charts"
-		>
-			Clear selection
-		</button>
-	</div>
+	{#if showTrimControl}
+		<div class="tod-aff-toolbar">
+			<label class="trim-check">
+				<input type="checkbox" bind:checked={panelState.trimOutliers} />
+				<span>Trim axes (exclude &gt;10σ)</span>
+			</label>
+			<button
+				type="button"
+				class="scatter-clear-sel"
+				disabled={panelState.selectedTracts.size === 0}
+				onclick={clearTractSelection}
+				aria-label="Clear selected tracts from the map and charts"
+			>
+				Clear selection
+			</button>
+		</div>
+	{/if}
 	<div bind:this={containerEl} class="tod-aff-chart"></div>
 	{#if tooltip.visible}
 		<div
