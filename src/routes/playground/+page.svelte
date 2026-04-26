@@ -69,6 +69,10 @@
 	const nhgisRows = $derived.by(() =>
 		buildNhgisLikeRows(filteredTracts, devClassByGj, playgroundPanel.timePeriod)
 	);
+
+	/** Bound from ``PocNhgisTractMap`` for the choropleth summary in ``TractDetail``. */
+	let mapFocusedTractDetail = $state(null);
+	let mapViewActions = $state(null);
 </script>
 
 <section class="playground-root">
@@ -104,6 +108,8 @@
 					sidebarMode="compact"
 					hideBulkActions
 					allowedXAxisKeys={ALLOWED_X_KEYS}
+					mapChoroplethDetail={mapFocusedTractDetail}
+					onChoroplethZoom={(gisjoin) => mapViewActions?.zoomToTract?.(gisjoin)}
 				/>
 			</div>
 		</aside>
@@ -126,6 +132,8 @@
 					tractList={filteredTracts}
 					nhgisRows={nhgisRows}
 					metricsDevelopments={filteredDevs}
+					bind:mapFocusedTractDetail
+					bind:mapViewActions
 				/>
 			</div>
 		</div>

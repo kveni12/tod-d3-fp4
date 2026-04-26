@@ -48,8 +48,20 @@
 	 * metricsDevelopments : Array<object> | null | undefined
 	 *     Optional MassBuilds rows for TOD / stock tooltips — use the same window as ``buildTractDevClassMap``
 	 *     (e.g. 1990–2026 on the main POC). When omitted, uses ``buildFilteredData`` (panel period only).
+	 * mapFocusedTractDetail : object | null | undefined
+	 *     When bound, mirrors the focused tract’s choropleth summary (for sidebars, e.g. ``TractDetail``).
+	 * mapViewActions : { zoomToTract: (gisjoin: string) => void } | null | undefined
+	 *     When bound, exposes map zoom for that sidebar.
 	 */
-	let { panelState, tractList, nhgisRows, metricsDevelopments = null, guidedMode = false } = $props();
+	let {
+		panelState,
+		tractList,
+		nhgisRows,
+		metricsDevelopments = null,
+		guidedMode = false,
+		mapFocusedTractDetail = $bindable(null),
+		mapViewActions = $bindable(null)
+	} = $props();
 
 	let containerEl = $state(null);
 	let tooltipEl = $state(null);
@@ -150,9 +162,6 @@
 	/** Nice unit ticks + pixel radii for HTML dot-size legend (same sqrt scale as map dots). */
 	let devSizeLegendTicks = $state(/** @type {{ units: number; rPx: number }[] | null} */ (null));
 
-	/** Reserved width per map colorbar (ticks + bar + vertical title, inset from map). */
-	const CHORO_LEGEND_COL_W = 70;
-	const DEV_LEGEND_COL_W = 70;
 	const mapUid = Math.random().toString(36).slice(2, 11);
 
 	/** Lighter grey for minimal-development tract outline (half stroke vs TOD tiers); legend ring matches. */
@@ -172,7 +181,6 @@
 	const MISMATCH_W_HA = 2;
 	const MISMATCH_W_HG = 1.45;
 	const CHORO_COLOR_STEPS = ['#d73027', '#f46d43', '#f7d8cf', '#ffffff', '#d5e3f5', '#7ea6da', '#2f6eb5'];
-	const CHORO_BIN_LABELS = ['<= -66%', '-66 to -33%', '-33 to -8%', '-8 to +8%', '+8 to +33%', '+33 to +66%', '>= +66%'];
 	/**
 	 * Non–mismatch tracts when the mismatch layer is on (revealStage ≥2).
 	 * ~0.11 opacity ≈ 89% dimming vs full (≥50% reduction vs the previous 0.22 pass) so violet/lavender outlines read clearly.
@@ -243,7 +251,7 @@
 
 	function showDevelopmentDots() {
 		if (guidedMode) return revealStage >= 8 && revealStage <= 9;
-		return revealStage === 3;
+		return panelState.showDevelopments;
 	}
 
 	function visibleCohortStroke(row, id) {
@@ -625,7 +633,7 @@
 	const mapH = 430;
 	/** ViewBox dimensions for anchoring HTML callouts to projection coordinates. */
 	let mapViewBox = $state(/** @type {{ svgW: number; mapW: number; mapH: number }} */ ({
-		svgW: 520 + CHORO_LEGEND_COL_W,
+		svgW: 520,
 		mapW: 520,
 		mapH: 470
 	}));
@@ -1020,10 +1028,10 @@
 		});
 
 		const cw = containerEl.clientWidth || 900;
-		mapW = Math.max(400, Math.min(1100, cw - CHORO_LEGEND_COL_W - DEV_LEGEND_COL_W - 16));
+		mapW = Math.max(400, Math.min(1100, cw - 16));
 
 		mapCanvasLeft = 0;
-		const svgW = mapCanvasLeft + mapW + CHORO_LEGEND_COL_W;
+		const svgW = mapCanvasLeft + mapW;
 		const svgH = mapH;
 		// Fit projection to the full-state GeoJSON when available so excluded
 		// background tracts render correctly; fall back to the story subset.
@@ -1430,14 +1438,17 @@
 		if (legend) {
 			const legGroup = svg.select('.map-legend-group');
 			legGroup.selectAll('*').remove();
-			const mapRight = mapCanvasLeft + mapW;
-			legGroup.attr('transform', `translate(${mapRight + 6},0)`);
+			// Bottom-left of the map canvas: inset so axis labels + rotated title do not clip at x=0.
+			const leftInset = 34;
+			legGroup.attr('transform', `translate(${mapCanvasLeft + leftInset},0)`);
 
-			const y0 = 10;
-			const legBarH = Math.max(120, mapH - y0 - 14);
 			const barW = 10;
 			const barRight = 58;
 			const barLeft = barRight - barW;
+			const bottomPad = 3;
+			const tanH = 11;
+			const legBarH = Math.min(132, Math.max(88, mapH * 0.31));
+			const y0 = mapH - bottomPad - tanH - legBarH;
 			const fmtTick = (v) => {
 				const n = Number(v);
 				if (!Number.isFinite(n)) return '';
@@ -1489,6 +1500,16 @@
 				.attr('font-size', '7.5px')
 				.attr('font-weight', 600)
 				.text(`% housing growth (${periodDisplayLabel(panelState.timePeriod)})`);
+
+			// Tan tracts: explain under the in-map colorbar (HTML duplicate removed from the key card).
+			legendG
+				.append('text')
+				.attr('x', 0)
+				.attr('y', y0 + legBarH + 9)
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '6.5px')
+				.attr('font-weight', 500)
+				.text('Tan = limited or unreliable data');
 		}
 
 		containerEl.__pocChoroMaxAbs = maxAbs;
@@ -2422,6 +2443,25 @@
 		};
 	});
 
+	// Expose focused-tract summary + zoom to sidebars (TractDetail) when the parent binds these props.
+	$effect(() => {
+		mapFocusedTractDetail = selectedTractDetail;
+	});
+	$effect(() => {
+		mapViewActions = { zoomToTract };
+	});
+
+	// Clearing selection from the sidebar (not via map click) should drop the pinned tooltip/ring, too.
+	$effect(() => {
+		const n = panelState.selectedTracts.size;
+		if (n === 0 && pinnedTractId) {
+			pinnedTractId = null;
+			pinnedTooltip = null;
+			panelState.setHovered(null);
+			tooltip = { ...tooltip, visible: false };
+		}
+	});
+
 	const selectionComparison = $derived.by(() => {
 		const selectedIds = [...panelState.selectedTracts];
 		const weightKey = popWeightKey(panelState.timePeriod);
@@ -3263,6 +3303,7 @@
 	<div class="poc-scrolly">
 		<div class="poc-scrolly-map">
 			{#if !guidedMode}
+			<div class="poc-top-row">
 			<!-- <div class="poc-methods poc-methods--lead card-key" role="note" aria-label="TOD definitions">
 				<p class="poc-methods__title">Key definitions</p>
 				<p class="poc-methods__text">
@@ -3334,6 +3375,57 @@
 						Cohort summaries and comparison bars use population-weighted means.
 					</li>
 				</ul>
+			</div>
+			<div class="poc-compare card-key" role="region" aria-label="Selected tract comparison chart">
+					<div class="poc-compare__head">
+						<div>
+							<p class="poc-detail__kicker">Selection chart</p>
+							<p class="poc-detail__title">{selectionComparison.title}</p>
+						</div>
+						<div class="poc-compare__metric-tabs">
+							<button
+								type="button"
+								class="poc-compare__tab"
+								class:poc-compare__tab--active={comparisonMetric === 'hu_growth'}
+								onclick={() => (comparisonMetric = 'hu_growth')}
+							>
+								Growth
+							</button>
+							<button
+								type="button"
+								class="poc-compare__tab"
+								class:poc-compare__tab--active={comparisonMetric === 'tod_share'}
+								onclick={() => (comparisonMetric = 'tod_share')}
+							>
+								TOD share
+							</button>
+							<button
+								type="button"
+								class="poc-compare__tab"
+								class:poc-compare__tab--active={comparisonMetric === 'stock_increase'}
+								onclick={() => (comparisonMetric = 'stock_increase')}
+							>
+								Housing stock increase
+							</button>
+						</div>
+					</div>
+					<p class="poc-detail__summary">
+						{selectionComparison.copy}
+					</p>
+					<div class="poc-compare__bars" aria-label={comparisonMetricMeta.label}>
+						{#each selectionComparison.rows as row (row.key)}
+								<div class="poc-compare__row" data-tone={row.key}>
+								<span class="poc-compare__label">{row.label}</span>
+								<span class="poc-compare__track">
+									<span class="poc-compare__bar" style:width={`${row.widthPct}%`}></span>
+								</span>
+								<span class="poc-compare__value">
+									{row.value == null ? '—' : `${comparisonMetricMeta.formatter(row.value)}${comparisonMetricMeta.suffix}`}
+								</span>
+								</div>
+						{/each}
+					</div>
+			</div>
 			</div>
 			{/if}
 
@@ -3431,134 +3523,6 @@
 						</div>
 					{/if}
 				</div>
-
-					{#if selectedTractDetail}
-						<div class="poc-detail card-key" role="region" aria-label="Selected tract detail">
-							<div class="poc-detail__head">
-								<div>
-									<p class="poc-detail__kicker">Selected tract</p>
-									<p class="poc-detail__title">{selectedTractDetail.title}</p>
-								</div>
-							<div class="poc-detail__actions">
-								<button
-									type="button"
-									class="poc-detail__btn"
-									onclick={() => zoomToTract(selectedTractDetail.gisjoin)}
-								>
-									Zoom to tract
-								</button>
-								<button
-									type="button"
-									class="poc-detail__btn poc-detail__btn--ghost"
-									onclick={() => {
-										panelState.clearSelection();
-										pinnedTractId = null;
-										pinnedTooltip = null;
-										panelState.setHovered(null);
-										tooltip = { ...tooltip, visible: false };
-									}}
-								>
-									Clear
-									</button>
-								</div>
-							</div>
-							<div class="poc-detail__topline">
-								<span class="poc-detail__cohort">{selectedTractDetail.cohortLabel}</span>
-								{#if selectedTractDetail.description}
-									<span class="poc-detail__summary">{selectedTractDetail.description}</span>
-								{/if}
-							</div>
-							<div class="poc-detail__primary">
-								<div class="poc-detail__hero">
-									<span class="poc-detail__stat-label">Housing growth</span>
-									<span class="poc-detail__hero-value">
-										{selectedTractDetail.huGrowth == null ? '—' : `${d3.format('.1f')(selectedTractDetail.huGrowth)}%`}
-									</span>
-								</div>
-								<div class="poc-detail__hero">
-									<span class="poc-detail__stat-label">Cohort avg.</span>
-									<span class="poc-detail__hero-value">
-										{selectedTractDetail.cohortAvgHu == null ? '—' : `${d3.format('.1f')(selectedTractDetail.cohortAvgHu)}%`}
-									</span>
-								</div>
-							</div>
-							<div class="poc-detail__stats">
-								<div>
-									<span class="poc-detail__stat-label">TOD share</span>
-									<span class="poc-detail__stat-value">
-										{selectedTractDetail.todShare == null ? '—' : `${d3.format('.1f')(selectedTractDetail.todShare * 100)}%`}
-									</span>
-								</div>
-								<div>
-									<span class="poc-detail__stat-label">Housing stock increase</span>
-									<span class="poc-detail__stat-value">
-										{selectedTractDetail.stockIncrease == null ? '—' : `${d3.format('.1f')(selectedTractDetail.stockIncrease)}%`}
-									</span>
-								</div>
-								<div>
-									<span class="poc-detail__stat-label">New units</span>
-									<span class="poc-detail__stat-value">
-										{selectedTractDetail.newUnits == null ? '—' : d3.format(',.0f')(selectedTractDetail.newUnits)}
-									</span>
-								</div>
-								<div>
-									<span class="poc-detail__stat-label">Selected tracts</span>
-									<span class="poc-detail__stat-value">{selectedTractDetail.countSelected}</span>
-								</div>
-							</div>
-						</div>
-					{/if}
-				</div>
-
-				<div class="poc-compare card-key" role="region" aria-label="Selected tract comparison chart">
-					<div class="poc-compare__head">
-						<div>
-							<p class="poc-detail__kicker">Selection chart</p>
-							<p class="poc-detail__title">{selectionComparison.title}</p>
-						</div>
-						<div class="poc-compare__metric-tabs">
-							<button
-								type="button"
-								class="poc-compare__tab"
-								class:poc-compare__tab--active={comparisonMetric === 'hu_growth'}
-								onclick={() => (comparisonMetric = 'hu_growth')}
-							>
-								Growth
-							</button>
-							<button
-								type="button"
-								class="poc-compare__tab"
-								class:poc-compare__tab--active={comparisonMetric === 'tod_share'}
-								onclick={() => (comparisonMetric = 'tod_share')}
-							>
-								TOD share
-							</button>
-							<button
-								type="button"
-								class="poc-compare__tab"
-								class:poc-compare__tab--active={comparisonMetric === 'stock_increase'}
-								onclick={() => (comparisonMetric = 'stock_increase')}
-							>
-								Housing stock increase
-							</button>
-						</div>
-					</div>
-					<p class="poc-detail__summary">
-						{selectionComparison.copy}
-					</p>
-					<div class="poc-compare__bars" aria-label={comparisonMetricMeta.label}>
-						{#each selectionComparison.rows as row (row.key)}
-								<div class="poc-compare__row" data-tone={row.key}>
-								<span class="poc-compare__label">{row.label}</span>
-								<span class="poc-compare__track">
-									<span class="poc-compare__bar" style:width={`${row.widthPct}%`}></span>
-								</span>
-								<span class="poc-compare__value">
-									{row.value == null ? '—' : `${comparisonMetricMeta.formatter(row.value)}${comparisonMetricMeta.suffix}`}
-								</span>
-								</div>
-						{/each}
-					</div>
 				</div>
 
 				<div class="poc-insight card-key" role="group" aria-label="Mismatch focus">
@@ -3669,105 +3633,6 @@
 						</div>
 					</fieldset>
 					{/if}
-
-					<div class="poc-map-key card-key" role="region" aria-label="Map legend">
-						<div
-							class="poc-map-key-compact"
-							class:poc-map-key-compact--split={revealStage === 1}
-						>
-							<div class="poc-map-key-col poc-map-key-col--tract">
-								<p class="poc-key-one poc-key-tract-fill">
-									<strong>Tract fill</strong>
-									<span class="poc-key-tract-fill-body">
-										<span class="poc-key-tract-fill-line">
-											Census % housing growth ({periodDisplayLabel(panelState.timePeriod)}), vs housing stock at period start, shown in discrete bins.
-										</span>
-										<span class="poc-key-tract-swatches" role="img" aria-label="Percent housing growth scale in discrete bins from lower growth in red to higher growth in blue">
-											{#each CHORO_COLOR_STEPS as color, i}
-												<span class="poc-key-tract-swatch-chip">
-													<span class="poc-key-tract-swatch" style:background={color}></span>
-													<span class="poc-key-tract-swatch-label">{CHORO_BIN_LABELS[i]}</span>
-												</span>
-											{/each}
-										</span>
-									</span>
-								</p>
-								<p class="poc-key-no-data">
-									<span
-										class="poc-key-fill-swatch poc-key-fill-swatch--no-data"
-										style="background: #e7e0d5;"
-										role="img"
-										aria-hidden="true"
-									></span>
-									<span class="poc-key-no-data-text">Tan fill: excluded due to limited data (missing or unreliable % change).</span>
-								</p>
-							{#if showCohortOutlines()}
-								<ul class="poc-key-rings">
-									<li><span class="poc-k-ring poc-k-ring--tod"></span> TOD-dominated (significant development)</li>
-									<li><span class="poc-k-ring poc-k-ring--nontod"></span> Non-TOD-dominated (significant development)</li>
-								</ul>
-							{/if}
-							{#if showMismatchOutlines()}
-								<p class="poc-key-mismatch-sub">
-									Mismatch outlines (quartiles): transit access vs housing growth are not always aligned—see charts below for income context.
-								</p>
-									<ul class="poc-key-rings">
-										<li>
-											<span class="poc-k-ring poc-k-ring--mismatch-ha"></span> High access, low growth (solid purple)
-										</li>
-										<li>
-											<span class="poc-k-ring poc-k-ring--mismatch-hg"></span> High growth, low access (dashed lavender)
-										</li>
-									</ul>
-								{/if}
-							</div>
-							{#if showDevelopmentDots()}
-								<div class="poc-map-key-col poc-map-key-col--dev">
-									<p class="poc-key-one poc-key-dev">
-										<strong>Developments</strong>
-										<span class="poc-key-tract-fill-body">
-											<span class="poc-key-tract-fill-line">
-												Fill = share of new units that are multi-family. Darker purple fill means a higher multi-family share.
-											</span>
-											<span
-												class="poc-key-tract-bar"
-												style="background: linear-gradient(to right, #ffffff, #7c3f98);"
-												role="img"
-												aria-label="Share of new units that are multi-family: lower toward white, higher toward purple"
-											></span>
-										</span>
-									</p>
-									{#if devSizeLegendTicks && devSizeLegendTicks.length > 0}
-										<div class="poc-key-dev-sizes" aria-label="Development dot size by unit count">
-											<p class="poc-key-dev-sizes-title">Units (radius ∝ √units, same as map)</p>
-											<ul class="poc-key-dev-sizes-list">
-												{#each devSizeLegendTicks as t, i (i)}
-													<li class="poc-key-dev-size-item">
-														<span class="poc-key-dev-size-dot-wrap">
-															<span
-																class="poc-key-dev-size-dot"
-																style:width="{2 * t.rPx}px"
-																style:height="{2 * t.rPx}px"
-															></span>
-														</span>
-														<span class="poc-key-dev-size-num">{formatDevUnitsLegend(t.units)}</span>
-													</li>
-												{/each}
-											</ul>
-										</div>
-									{/if}
-									<ul class="poc-key-rings" aria-label="Development dot outlines">
-										<li>
-											<span class="poc-k-ring poc-k-ring--dev-access"></span> Transit-accessible
-										</li>
-										<li>
-											<span class="poc-k-ring poc-k-ring--dev-noaccess"></span> Not transit-accessible
-										</li>
-									</ul>
-								</div>
-							{/if}
-						</div>
-					</div>
 					</div>
 					</div>
 
@@ -3787,6 +3652,87 @@
 							{/if}
 							<div class="map-root" bind:this={containerEl}></div>
 						</div>
+					{#if !guidedMode && (showCohortOutlines() || showMismatchOutlines() || showDevelopmentDots())}
+						<div class="poc-map-key-overlay" role="region" aria-label="Map legend">
+							<div
+								class="poc-map-key card-key"
+							>
+								<div
+									class="poc-map-key-compact"
+									class:poc-map-key-compact--split={revealStage === 1 && showDevelopmentDots() && (showCohortOutlines() || showMismatchOutlines())}
+								>
+									{#if showCohortOutlines() || showMismatchOutlines()}
+										<div class="poc-map-key-col poc-map-key-col--tract">
+										{#if showCohortOutlines()}
+											<ul class="poc-key-rings">
+												<li><span class="poc-k-ring poc-k-ring--tod"></span> TOD-dominated (significant development)</li>
+												<li><span class="poc-k-ring poc-k-ring--nontod"></span> Non-TOD-dominated (significant development)</li>
+											</ul>
+										{/if}
+										{#if showMismatchOutlines()}
+											<p class="poc-key-mismatch-sub">
+												Mismatch outlines (quartiles): transit access vs housing growth are not always aligned—see charts below for income context.
+											</p>
+											<ul class="poc-key-rings">
+												<li>
+													<span class="poc-k-ring poc-k-ring--mismatch-ha"></span> High access, low growth (solid purple)
+												</li>
+												<li>
+													<span class="poc-k-ring poc-k-ring--mismatch-hg"></span> High growth, low access (dashed lavender)
+												</li>
+											</ul>
+										{/if}
+										</div>
+									{/if}
+									{#if showDevelopmentDots()}
+										<div class="poc-map-key-col poc-map-key-col--dev">
+											<p class="poc-key-one poc-key-dev">
+												<strong>Developments</strong>
+												<span class="poc-key-tract-fill-body">
+													<span class="poc-key-tract-fill-line">
+														Fill = share of new units that are multi-family. Darker purple fill means a higher multi-family share.
+													</span>
+													<span
+														class="poc-key-tract-bar"
+														style="background: linear-gradient(to right, #ffffff, #7c3f98);"
+														role="img"
+														aria-label="Share of new units that are multi-family: lower toward white, higher toward purple"
+													></span>
+												</span>
+											</p>
+											{#if devSizeLegendTicks && devSizeLegendTicks.length > 0}
+												<div class="poc-key-dev-sizes" aria-label="Development dot size by unit count">
+													<p class="poc-key-dev-sizes-title">Units (radius ∝ √units, same as map)</p>
+													<ul class="poc-key-dev-sizes-list">
+														{#each devSizeLegendTicks as t, i (i)}
+															<li class="poc-key-dev-size-item">
+																<span class="poc-key-dev-size-dot-wrap">
+																	<span
+																		class="poc-key-dev-size-dot"
+																		style:width="{2 * t.rPx}px"
+																		style:height="{2 * t.rPx}px"
+																	></span>
+																</span>
+																<span class="poc-key-dev-size-num">{formatDevUnitsLegend(t.units)}</span>
+															</li>
+														{/each}
+													</ul>
+												</div>
+											{/if}
+											<ul class="poc-key-rings" aria-label="Development dot outlines">
+												<li>
+													<span class="poc-k-ring poc-k-ring--dev-access"></span> Transit-accessible
+												</li>
+												<li>
+													<span class="poc-k-ring poc-k-ring--dev-noaccess"></span> Not transit-accessible
+												</li>
+											</ul>
+										</div>
+									{/if}
+								</div>
+							</div>
+						</div>
+					{/if}
 					{#if activeTooltip.visible}
 						<div
 							class="map-tooltip"
@@ -4106,6 +4052,28 @@
 		flex-direction: column;
 		gap: 6px;
 		min-height: 0;
+	}
+
+	/* Key definitions (left) + selection chart (right) above the scrolly shell to save vertical space. */
+	.poc-top-row {
+		display: grid;
+		gap: 8px 14px;
+		align-items: start;
+		min-width: 0;
+	}
+
+	@media (min-width: 640px) {
+		.poc-top-row {
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+		}
+	}
+
+	.poc-top-row .poc-methods--assumptions {
+		margin-bottom: 0;
+	}
+
+	.poc-top-row .poc-compare {
+		min-width: 0;
 	}
 
 	.poc-scrolly-shell {
@@ -4577,28 +4545,10 @@
 			min-width: min-content;
 		}
 
-		.poc-map-key {
-			flex: 1 1 0;
-			min-width: 0;
-		}
-
 		.poc-control-stack {
-			grid-template-columns: minmax(320px, 1fr) minmax(340px, 1.08fr);
+			/* Single column: selection chart now lives in ``poc-top-row`` with key definitions. */
+			grid-template-columns: 1fr;
 			align-items: start;
-		}
-
-		.poc-side-cards {
-			grid-column: 1;
-		}
-
-		.poc-compare {
-			grid-column: 2;
-			grid-row: 1;
-		}
-
-		.poc-insight {
-			grid-column: 1;
-			grid-row: 2;
 		}
 
 	}
@@ -4669,7 +4619,7 @@
 		border: 1px solid var(--border);
 		border-radius: var(--radius-sm);
 		background: var(--bg-card);
-		padding: 1px 3px 2px;
+		padding: 0 2px 1px;
 		margin: 0;
 	}
 
@@ -4860,12 +4810,6 @@
 		color: var(--text);
 	}
 
-	.poc-detail {
-		display: grid;
-		gap: 4px;
-		align-content: start;
-	}
-
 	.poc-detail__head {
 		display: flex;
 		justify-content: space-between;
@@ -4889,13 +4833,6 @@
 		color: var(--text);
 	}
 
-	.poc-detail__actions {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: flex-end;
-		gap: 5px;
-	}
-
 	.poc-detail__btn {
 		border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
 		border-radius: 999px;
@@ -4916,68 +4853,6 @@
 		font-size: 0.63rem;
 		line-height: 1.22;
 		color: var(--text-muted);
-	}
-
-	.poc-detail__cohort {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.18rem 0.5rem;
-		border-radius: 999px;
-		background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
-		font-weight: 700;
-		color: var(--text);
-	}
-
-	.poc-detail__topline {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 6px;
-	}
-
-	.poc-detail__primary {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 6px;
-	}
-
-	.poc-detail__hero {
-		display: grid;
-		gap: 2px;
-		padding: 5px 7px;
-		border-radius: 10px;
-		background: color-mix(in srgb, var(--accent) 7%, var(--bg-card));
-		border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
-	}
-
-	.poc-detail__hero-value {
-		font-size: 0.92rem;
-		font-weight: 800;
-		line-height: 1.1;
-		color: var(--text);
-	}
-
-	.poc-detail__stats {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 6px 8px;
-	}
-
-	.poc-detail__stat-label {
-		display: block;
-		font-size: 0.58rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		color: var(--text-muted);
-	}
-
-	.poc-detail__stat-value {
-		display: block;
-		margin-top: 2px;
-		font-size: 0.76rem;
-		font-weight: 700;
-		color: var(--text);
 	}
 
 	.poc-compare {
@@ -5145,12 +5020,14 @@
 
 
 	.poc-transit-legend {
-		padding: 0 2px;
-		font-size: 0.58rem;
+		padding: 0;
+		margin-bottom: 0.06rem;
+		font-size: 0.55rem;
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		color: var(--text-muted);
+		line-height: 1.1;
 	}
 
 	.poc-transit-compact {
@@ -5163,29 +5040,31 @@
 	/* auto label column + fixed narrow checkbox columns keeps rows on one line with less dead space */
 	.poc-t-row {
 		display: grid;
-		grid-template-columns: auto 1.575rem 1.575rem;
-		column-gap: 0.525rem;
-		row-gap: 2px;
+		grid-template-columns: auto 1.5rem 1.5rem;
+		column-gap: 0.45rem;
+		row-gap: 0;
 		align-items: center;
-		font-size: 0.6rem;
-		line-height: 1.2;
+		font-size: 0.58rem;
+		line-height: 1.05;
 		color: var(--text-muted);
 	}
 
 	.poc-t-h {
 		text-align: center;
 		font-weight: 700;
-		font-size: 0.52rem;
+		font-size: 0.5rem;
 		text-transform: uppercase;
 		letter-spacing: 0.02em;
 		color: var(--text-muted);
+		line-height: 1.05;
 	}
 
 	.poc-t-l {
 		font-weight: 500;
 		color: var(--text);
-		padding-right: 0.15rem;
+		padding-right: 0.1rem;
 		white-space: nowrap;
+		line-height: 1.05;
 	}
 
 	.poc-t-cell {
@@ -5193,7 +5072,7 @@
 		justify-content: center;
 		align-items: center;
 		cursor: pointer;
-		min-height: 23px;
+		min-height: 1rem;
 		margin: 0;
 		padding: 0;
 	}
@@ -5236,15 +5115,6 @@
 			grid-column: auto;
 		}
 
-		.poc-detail__topline {
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
-		.poc-detail__primary {
-			grid-template-columns: 1fr;
-		}
-
 		.poc-compare__row {
 			grid-template-columns: 1fr;
 			gap: 4px;
@@ -5259,10 +5129,6 @@
 			grid-template-columns: 1fr;
 		}
 
-		.poc-detail__stats {
-			grid-template-columns: 1fr 1fr;
-		}
-
 		.poc-map-key-compact--split {
 			grid-template-columns: 1fr;
 		}
@@ -5272,6 +5138,12 @@
 			padding-left: 0;
 			border-top: 1px dashed var(--border);
 			padding-top: 8px;
+		}
+
+		.poc-map-key-overlay {
+			left: 0;
+			max-width: 100%;
+			max-height: 42%;
 		}
 	}
 
@@ -5287,34 +5159,14 @@
 		padding-left: 10px;
 	}
 
+	.poc-map-key-col--dev:only-child {
+		border-left: none;
+		padding-left: 0;
+	}
+
 	.poc-map-key-col--dev .poc-key-dev {
 		padding-top: 0;
 		border-top: none;
-	}
-
-	.poc-key-no-data {
-		display: flex;
-		align-items: flex-start;
-		gap: 5px;
-		margin: 0;
-		font-size: 0.56rem;
-		line-height: 1.25;
-		color: var(--text-muted);
-	}
-
-	.poc-key-fill-swatch {
-		display: inline-block;
-		width: 14px;
-		height: 14px;
-		border-radius: 3px;
-		border: 1px solid var(--border);
-		flex-shrink: 0;
-		margin-top: 0.1rem;
-		box-sizing: border-box;
-	}
-
-	.poc-key-no-data-text {
-		color: var(--text-muted);
 	}
 
 	.poc-key-one {
@@ -5322,11 +5174,6 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 4px;
-	}
-
-	.poc-key-tract-fill {
-		flex-wrap: wrap;
-		align-items: center;
 	}
 
 	.poc-key-tract-fill-body {
@@ -5342,34 +5189,13 @@
 		display: block;
 	}
 
-	.poc-key-tract-swatches {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.28rem 0.5rem;
-		align-items: center;
-	}
-
-	.poc-key-tract-swatch-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.28rem;
-	}
-
-	.poc-key-tract-swatch {
-		display: inline-block;
-		width: 0.78rem;
-		height: 0.78rem;
-		border-radius: 999px;
-		border: 1px solid rgba(15, 23, 42, 0.18);
-		flex-shrink: 0;
-	}
-
-	.poc-key-tract-swatch-label {
-		font-size: 0.56rem;
-		font-weight: 600;
-		line-height: 1.15;
-		color: var(--text-muted);
-		font-variant-numeric: tabular-nums;
+	.poc-key-tract-bar {
+		display: block;
+		width: 100%;
+		min-width: 7rem;
+		height: 0.5rem;
+		border-radius: 4px;
+		border: 1px solid color-mix(in srgb, var(--border) 80%, var(--text-muted));
 	}
 
 	.poc-key-one strong {
@@ -5595,6 +5421,24 @@
 		display: grid;
 		gap: 3px;
 		margin-bottom: clamp(4px, 1.25vh, 10px);
+	}
+
+	/* Cohort / mismatch / dev keys sit bottom-left on the choropleth, to the right of the in-SVG colorbar. */
+	.poc-map-key-overlay {
+		position: absolute;
+		left: 5.75rem;
+		bottom: 0;
+		z-index: 3;
+		max-width: min(420px, calc(100% - 5.75rem - 0.5rem));
+		max-height: min(52%, 320px);
+		overflow: hidden auto;
+		padding: 0 0 1px 0;
+		/* Clicks in this box stop here so the scrollable legend does not move the map. */
+	}
+
+	.poc-map-key-overlay .poc-map-key {
+		background: color-mix(in srgb, var(--bg-card) 90%, transparent);
+		backdrop-filter: blur(4px);
 	}
 
 	.poc-map-callouts {

@@ -23,7 +23,14 @@
 		/** When true, hide “Select all” (avoid huge selections in compact sidebars). */
 		hideBulkActions = false,
 		/** If set, aggregate / tract X-axis inspection tables only list these ``meta.xVariables`` keys. */
-		allowedXAxisKeys = null
+		allowedXAxisKeys = null,
+		/**
+		 * Focused tract summary from ``PocNhgisTractMap`` (parent binds ``mapFocusedTractDetail``).
+		 * Shown above tract cards when present.
+		 */
+		mapChoroplethDetail = null,
+		/** ``(gisjoin) => void`` from bound ``mapViewActions.zoomToTract`` on the map. */
+		onChoroplethZoom = undefined
 	} = $props();
 
 	/** @type {'aggregate' | 'latest'} */
@@ -467,6 +474,88 @@
 		</div>
 	</div>
 
+	{#if mapChoroplethDetail}
+		<div class="map-choropleth-pin" role="region" aria-label="Map selection summary">
+			<div class="map-choropleth-pin__head">
+				<div>
+					<p class="map-choropleth-pin__kicker">Selected tract</p>
+					<p class="map-choropleth-pin__title">{mapChoroplethDetail.title}</p>
+				</div>
+				<div class="map-choropleth-pin__actions">
+					<button
+						type="button"
+						class="map-choropleth-pin__btn"
+						disabled={!onChoroplethZoom}
+						onclick={() => onChoroplethZoom?.(mapChoroplethDetail.gisjoin)}
+					>
+						Zoom to tract
+					</button>
+					<button
+						type="button"
+						class="map-choropleth-pin__btn map-choropleth-pin__btn--ghost"
+						onclick={() => panelState.clearSelection()}
+					>
+						Clear
+					</button>
+				</div>
+			</div>
+			<div class="map-choropleth-pin__topline">
+				<span class="map-choropleth-pin__cohort">{mapChoroplethDetail.cohortLabel}</span>
+				{#if mapChoroplethDetail.description}
+					<span class="map-choropleth-pin__desc">{mapChoroplethDetail.description}</span>
+				{/if}
+			</div>
+			<div class="map-choropleth-pin__primary">
+				<div class="map-choropleth-pin__hero">
+					<span class="map-choropleth-pin__lbl">Housing growth</span>
+					<span class="map-choropleth-pin__hero-val">
+						{mapChoroplethDetail.huGrowth == null
+							? '—'
+							: `${d3.format('.1f')(mapChoroplethDetail.huGrowth)}%`}
+					</span>
+				</div>
+				<div class="map-choropleth-pin__hero">
+					<span class="map-choropleth-pin__lbl">Cohort avg.</span>
+					<span class="map-choropleth-pin__hero-val">
+						{mapChoroplethDetail.cohortAvgHu == null
+							? '—'
+							: `${d3.format('.1f')(mapChoroplethDetail.cohortAvgHu)}%`}
+					</span>
+				</div>
+			</div>
+			<div class="map-choropleth-pin__stats">
+				<div>
+					<span class="map-choropleth-pin__lbl">TOD share</span>
+					<span class="map-choropleth-pin__stat-val">
+						{mapChoroplethDetail.todShare == null
+							? '—'
+							: `${d3.format('.1f')(mapChoroplethDetail.todShare * 100)}%`}
+					</span>
+				</div>
+				<div>
+					<span class="map-choropleth-pin__lbl">Housing stock increase</span>
+					<span class="map-choropleth-pin__stat-val">
+						{mapChoroplethDetail.stockIncrease == null
+							? '—'
+							: `${d3.format('.1f')(mapChoroplethDetail.stockIncrease)}%`}
+					</span>
+				</div>
+				<div>
+					<span class="map-choropleth-pin__lbl">New units</span>
+					<span class="map-choropleth-pin__stat-val">
+						{mapChoroplethDetail.newUnits == null
+							? '—'
+							: d3.format(',.0f')(mapChoroplethDetail.newUnits)}
+					</span>
+				</div>
+				<div>
+					<span class="map-choropleth-pin__lbl">Selected tracts</span>
+					<span class="map-choropleth-pin__stat-val">{mapChoroplethDetail.countSelected}</span>
+				</div>
+			</div>
+		</div>
+	{/if}
+
 	{#if selectedList.length === 0}
 		<p class="empty">Click tracts on the map or points on the scatter plot to see details here.</p>
 	{:else if sidebarMode === 'compact'}
@@ -801,6 +890,138 @@
 		justify-content: space-between;
 		gap: 8px;
 		margin-bottom: 8px;
+	}
+
+	/* Mirrors PocNhgisTractMap ``poc-detail`` styling for the choropleth summary moved into this sidebar. */
+	.map-choropleth-pin {
+		display: grid;
+		gap: 6px;
+		margin-bottom: 10px;
+		padding: 8px 10px;
+		border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+		background: color-mix(in srgb, var(--accent) 5%, var(--bg-card));
+		border-radius: var(--radius-sm);
+	}
+
+	.map-choropleth-pin__head {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 10px;
+	}
+
+	.map-choropleth-pin__kicker {
+		margin: 0 0 2px;
+		font-size: 0.68rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--accent);
+	}
+
+	.map-choropleth-pin__title {
+		margin: 0;
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: var(--text);
+	}
+
+	.map-choropleth-pin__actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 5px;
+	}
+
+	.map-choropleth-pin__btn {
+		border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+		color: var(--text);
+		padding: 0.26rem 0.52rem;
+		font-size: 0.64rem;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.map-choropleth-pin__btn:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	.map-choropleth-pin__btn--ghost {
+		border-color: var(--border);
+		background: var(--bg-card);
+	}
+
+	.map-choropleth-pin__desc {
+		margin: 0;
+		font-size: 0.63rem;
+		line-height: 1.22;
+		color: var(--text-muted);
+	}
+
+	.map-choropleth-pin__cohort {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.18rem 0.5rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+		font-weight: 700;
+		color: var(--text);
+	}
+
+	.map-choropleth-pin__topline {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.map-choropleth-pin__primary {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 6px;
+	}
+
+	.map-choropleth-pin__hero {
+		display: grid;
+		gap: 2px;
+		padding: 5px 7px;
+		border-radius: 10px;
+		background: color-mix(in srgb, var(--accent) 7%, var(--bg-card));
+		border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+	}
+
+	.map-choropleth-pin__lbl {
+		display: block;
+		font-size: 0.58rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--text-muted);
+	}
+
+	.map-choropleth-pin__hero-val {
+		font-size: 0.92rem;
+		font-weight: 800;
+		line-height: 1.1;
+		color: var(--text);
+	}
+
+	.map-choropleth-pin__stats {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 6px 8px;
+	}
+
+	.map-choropleth-pin__stat-val {
+		display: block;
+		margin-top: 2px;
+		font-size: 0.76rem;
+		font-weight: 700;
+		color: var(--text);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.head-actions {

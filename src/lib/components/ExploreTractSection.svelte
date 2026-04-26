@@ -113,6 +113,10 @@
 	const exploreNhgisRows = $derived.by(() =>
 		buildNhgisLikeRows(exploreTractList, exploreDevClassByGj, explorePanel.timePeriod)
 	);
+
+	/** Bound from ``PocNhgisTractMap`` for the choropleth summary in ``TractDetail``. */
+	let mapFocusedTractDetail = $state(null);
+	let mapViewActions = $state(null);
 </script>
 
 <section class="explore-root card full-width" aria-labelledby="explore-tract-heading">
@@ -204,6 +208,8 @@
 						tractList={exploreTractList}
 						nhgisRows={exploreNhgisRows}
 						metricsDevelopments={exploreFilteredDevs}
+						bind:mapFocusedTractDetail
+						bind:mapViewActions
 					/>
 				</div>
 			</div>
@@ -253,6 +259,8 @@
 					sidebarMode="compact"
 					hideBulkActions
 					allowedXAxisKeys={EXPLORE_X_AXIS_KEYS}
+					mapChoroplethDetail={mapFocusedTractDetail}
+					onChoroplethZoom={(gisjoin) => mapViewActions?.zoomToTract?.(gisjoin)}
 				/>
 			</div>
 			<div class="explore-method">
