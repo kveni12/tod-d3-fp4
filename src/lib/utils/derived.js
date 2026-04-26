@@ -1323,6 +1323,7 @@ export function buildTodAnalysisData(tracts, developments, panelState) {
  * number | null
  */
 export function getXValue(gisjoin, xBase, devAgg) {
+	if (!devAgg) return null;
 	const agg = devAgg.get(gisjoin);
 	if (!agg) return null;
 	return agg[xBase] ?? null;

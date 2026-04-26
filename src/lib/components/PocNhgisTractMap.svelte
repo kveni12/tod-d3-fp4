@@ -6,7 +6,8 @@
 		allTractsGeo,
 		developments,
 		mbtaStops,
-		mbtaLines
+		mbtaLines,
+		meta
 	} from '$lib/stores/data.svelte.js';
 	import {
 		aggregateDevsByTract,
@@ -22,7 +23,6 @@
 		transitDistanceMiToMetres,
 		transitModeUiLabel
 	} from '$lib/utils/derived.js';
-	import { meta } from '$lib/stores/data.svelte.js';
 	import { periodCensusBounds, periodDisplayLabel } from '$lib/utils/periods.js';
 	import { LOW_INCOME_MEDIAN_THRESHOLD } from '$lib/utils/incomeTract.js';
 	import { computeTodMismatchClusters } from '$lib/utils/todMismatchClusters.js';
@@ -99,7 +99,9 @@
 	let playgroundSandboxDevs = $state(true);
 	let hoveredSpotlight = $state(/** @type {'tod_dominated' | 'nontod_dominated' | 'minimal' | null} */ (null));
 	let pinnedSpotlight = $state(/** @type {'tod_dominated' | 'nontod_dominated' | 'minimal' | null} */ (null));
-	let comparisonMetric = $state(/** @type {'hu_growth' | 'tod_share' | 'stock_increase'} */ ('hu_growth'));
+	let comparisonMetric = $state(
+		/** @type {'hu_growth' | 'tod_share' | 'stock_increase' | 'tract_count'} */ ('hu_growth')
+	);
 	/** Optional: emphasize tracts with median household income below the lower-income threshold. */
 	let focusLowIncomeTracts = $state(false);
 	/** Hover-linked cluster highlight: all tracts in this category read as one pattern. */
@@ -549,21 +551,23 @@
 		}
 	];
 
-	const stepContent = guidedMode ? GUIDED_NARRATIVE_STEPS : PLAYGROUND_MINI_STEPS;
+	const stepContent = $derived(guidedMode ? GUIDED_NARRATIVE_STEPS : PLAYGROUND_MINI_STEPS);
 
-	const keyFindings = guidedMode
-		? [
-			'Transit access and housing growth are not aligned evenly across Greater Boston.',
-			'Some transit-rich tracts still show weak housing growth, while some faster-growing tracts sit farther from strong transit access.',
-			'The mismatch layer is the main takeaway: access and growth do not automatically arrive together.',
-			'Lower-income tracts make that mismatch more consequential because access to transit and access to housing are both at stake.'
-		]
-		: [
-			'Housing growth is uneven across the region, and the strongest growth does not simply track the transit network.',
-			'TOD-dominated and non-TOD-dominated tracts both show up across the map, so transit-oriented development is only one part of the bigger pattern.',
-			'Several transit-rich tracts still show relatively weak housing growth, which points to a clear access-growth mismatch.',
-			'Project dots build up to a configurable sandbox: pick any development-axis metric for the fill and add overlays on demand, including the MBTA network.'
-		];
+	const keyFindings = $derived(
+		guidedMode
+			? [
+					'Transit access and housing growth are not aligned evenly across Greater Boston.',
+					'Some transit-rich tracts still show weak housing growth, while some faster-growing tracts sit farther from strong transit access.',
+					'The mismatch layer is the main takeaway: access and growth do not automatically arrive together.',
+					'Lower-income tracts make that mismatch more consequential because access to transit and access to housing are both at stake.'
+				]
+			: [
+					'Housing growth is uneven across the region, and the strongest growth does not simply track the transit network.',
+					'TOD-dominated and non-TOD-dominated tracts both show up across the map, so transit-oriented development is only one part of the bigger pattern.',
+					'Several transit-rich tracts still show relatively weak housing growth, which points to a clear access-growth mismatch.',
+					'Project dots build up to a configurable sandbox: pick any development-axis metric for the fill and add overlays on demand, including the MBTA network.'
+				]
+	);
 
 	function stepRef(node, index) {
 		stepEls[index] = node;
@@ -1466,7 +1470,8 @@
 				}
 				return row ? Number(row.census_hu_pct_change) : NaN;
 			})();
-			let baseFill = Number.isFinite(v) ? color(v) : '#e7e0d5';
+			const rawChoro = Number.isFinite(v) ? color(v) : undefined;
+			let baseFill = rawChoro ?? '#e7e0d5';
 			let fill = tintFill(baseFill, row);
 			if (guidedMode && guidedFocusIds.size && !guidedFocusIds.has(id) && !isSelHover) {
 				fill = desaturateFill(fill, 0.72);
@@ -1621,11 +1626,12 @@
 
 			const legendG = legGroup.append('g').attr('class', 'map-legend-inner');
 			const binEdges = [d0, ...choroThresholds, d1];
+			const legSpan = Math.max(1e-9, d1 - d0);
 			for (let i = 0; i < CHORO_COLOR_STEPS.length; i += 1) {
 				const topVal = binEdges[i + 1];
 				const bottomVal = binEdges[i];
-				const yTop = y0 + ((d1 - topVal) / (d1 - d0)) * legBarH;
-				const yBottom = y0 + ((d1 - bottomVal) / (d1 - d0)) * legBarH;
+				const yTop = y0 + ((d1 - topVal) / legSpan) * legBarH;
+				const yBottom = y0 + ((d1 - bottomVal) / legSpan) * legBarH;
 				legendG
 					.append('rect')
 					.attr('x', barLeft)
@@ -1637,7 +1643,10 @@
 					.attr('stroke-width', 0.35);
 			}
 
-			const yScale = d3.scaleLinear().domain([d0, d1]).range([y0 + legBarH, y0]);
+			const yScale = d3
+				.scaleLinear()
+				.domain(d1 === d0 ? [d0, d0 + 1e-6] : [d0, d1])
+				.range([y0 + legBarH, y0]);
 			const choroAxisX = barLeft - 0.5;
 			legendG
 				.append('g')
@@ -2651,6 +2660,9 @@
 		const weightKey = popWeightKey(panelState.timePeriod);
 		const tractByGj = new Map((tractList ?? []).map((t) => [t.gisjoin, t]));
 		const metricValue = (rows) => {
+			if (comparisonMetric === 'tract_count') {
+				return rows.length;
+			}
 			if (comparisonMetric === 'hu_growth') {
 				return popWeightedMeanForRows(rows, tractByGj, weightKey, (row) =>
 					Number(row.census_hu_pct_change)
@@ -2705,7 +2717,10 @@
 				}
 			];
 			title = 'Compare your map selection';
-			copy = 'The bars update from the tracts you click on the map and compare them to the matching cohort and full analyzed set.';
+			copy =
+				comparisonMetric === 'tract_count'
+					? 'The bars show how many tracts are in the selection, the matching cohort, and the full analyzed set (raw counts, not population-weighted).'
+					: 'The bars update from the tracts you click on the map and compare them to the matching cohort and full analyzed set.';
 		} else {
 			/** @type {Array<'tod_dominated' | 'nontod_dominated' | 'minimal'>} */
 			const order = ['tod_dominated', 'nontod_dominated', 'minimal'];
@@ -2721,20 +2736,37 @@
 				};
 			});
 			title = 'Compare the tract groups';
-			copy = 'Once you click map tracts, this chart will switch to a selection-based comparison.';
+			copy =
+				comparisonMetric === 'tract_count'
+					? 'Tract counts for each development cohort. Click map tracts to compare selection-based counts.'
+					: 'Once you click map tracts, this chart will switch to a selection-based comparison.';
 		}
-		const maxValue = d3.max(rows, (row) => Math.abs(Number(row.value) || 0)) || 1;
+		const maxValue =
+			comparisonMetric === 'tract_count'
+				? Math.max(1, d3.max(rows, (row) => Number(row.value) || 0) ?? 1)
+				: d3.max(rows, (row) => Math.abs(Number(row.value) || 0)) || 1;
 		return {
 			title,
 			copy,
 			rows: rows.map((row) => ({
 				...row,
-				widthPct: row.value == null ? 0 : Math.max(6, (Math.abs(row.value) / maxValue) * 100)
+				widthPct:
+					row.value == null
+						? 0
+						: Math.max(
+								6,
+								comparisonMetric === 'tract_count'
+									? (Number(row.value) / maxValue) * 100
+									: (Math.abs(row.value) / maxValue) * 100
+							)
 			}))
 		};
 	});
 
 	const comparisonMetricMeta = $derived.by(() => {
+		if (comparisonMetric === 'tract_count') {
+			return { label: 'Tract count', suffix: '', formatter: d3.format(',.0f') };
+		}
 		if (comparisonMetric === 'tod_share') {
 			return { label: 'Avg. TOD share', suffix: '%', formatter: d3.format('.1f') };
 		}
@@ -3552,11 +3584,11 @@
 								<strong> {d3.format('.1f')(panelState.sigDevMinPctStockIncrease ?? 2)}%</strong> housing stock increase.
 							</li>
 							<li>
-								TOD-Dominated: Remaining tracts with more than
+								TOD-Dominated: Remaining tracts with &ge;
 								<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> of new units being TOD.
 							</li>
 							<li>
-								Non-TOD-Dominated: Remaining tracts with less than
+								Non-TOD-Dominated: Remaining tracts with &lt;
 								<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> of new units being TOD.
 							</li>
 							<li>
@@ -3587,7 +3619,7 @@
 								class:poc-compare__tab--active={comparisonMetric === 'hu_growth'}
 								onclick={() => (comparisonMetric = 'hu_growth')}
 							>
-								Growth
+								Housing Growth
 							</button>
 							<button
 								type="button"
@@ -3604,6 +3636,14 @@
 								onclick={() => (comparisonMetric = 'stock_increase')}
 							>
 								Housing stock increase
+							</button>
+							<button
+								type="button"
+								class="poc-compare__tab"
+								class:poc-compare__tab--active={comparisonMetric === 'tract_count'}
+								onclick={() => (comparisonMetric = 'tract_count')}
+							>
+								Tracts
 							</button>
 						</div>
 					</div>
