@@ -1386,6 +1386,29 @@ export function getScatterXValue(tract, gisjoin, xBase, devAgg, timePeriod) {
 }
 
 /**
+ * Scatter / map choropleth Y value: period-suffixed field on the tract row
+ * (e.g. ``median_income_change_pct_10_20``), matching ``TodIntensityScatter`` and cohort tables.
+ *
+ * Parameters
+ * ----------
+ * tract : object | null | undefined
+ * yBase : string
+ *     Key from ``meta.yVariables`` (no period suffix).
+ * timePeriod : string
+ *     Panel period tag (e.g. ``'10_20'``).
+ *
+ * Returns
+ * -------
+ * number | null
+ */
+export function getScatterYValue(tract, yBase, timePeriod) {
+	if (!tract || !yBase) return null;
+	const yKey = `${yBase}_${timePeriod}`;
+	const v = Number(tract[yKey]);
+	return Number.isFinite(v) ? v : null;
+}
+
+/**
  * Drop points outside ``±k`` marginal standard deviations on X and on Y (means
  * and SDs from the full set). Intended to limit OLS leverage from extreme coordinates.
  *

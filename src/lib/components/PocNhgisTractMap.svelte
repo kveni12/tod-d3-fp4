@@ -18,6 +18,7 @@
 		developmentMultifamilyShare,
 		developmentMbtaProximity,
 		getScatterXValue,
+		getScatterYValue,
 		isDevelopmentTransitAccessible,
 		popWeightKey,
 		transitDistanceMiToMetres,
@@ -97,6 +98,11 @@
 	 * Playground step 5 only: show MassBuilds project dots.
 	 */
 	let playgroundSandboxDevs = $state(true);
+	/**
+	 * Playground step 5 choropleth only: which metric paints tract fills, independent of
+	 * FilterPanel X/Y axes. Values: ``'x:…'`` (development / MassBuilds / census HU) or ``'y:…'`` (demographic change).
+	 */
+	let playgroundSandboxChoroId = $state('x:census_hu_change');
 	let hoveredSpotlight = $state(/** @type {'tod_dominated' | 'nontod_dominated' | 'minimal' | null} */ (null));
 	let pinnedSpotlight = $state(/** @type {'tod_dominated' | 'nontod_dominated' | 'minimal' | null} */ (null));
 	let comparisonMetric = $state(
@@ -547,7 +553,7 @@
 		{
 			kicker: 'Step 5',
 			title: 'Sandbox map',
-			body: 'Choropleth fill tracks the X-axis (development) variable from the controls. Toggle developments, TOD / non-TOD outlines, and MBTA layers independently.'
+			body: 'Use the menu below to choose any development or demographic-change metric for the choropleth. Toggle developments, TOD / non-TOD outlines, and MBTA layers independently.'
 		}
 	];
 
@@ -568,7 +574,7 @@
 					'Housing growth is uneven across the region, and the strongest growth does not simply track the transit network.',
 					'TOD-dominated and non-TOD-dominated tracts both show up across the map, so transit-oriented development is only one part of the bigger pattern.',
 					'Several transit-rich tracts still show relatively weak housing growth, which points to a clear access-growth mismatch.',
-					'Project dots build up to a configurable sandbox: pick any development-axis metric for the fill and add overlays on demand, including the MBTA network.'
+					'The sandbox step lets you pick any development or demographic metric for the choropleth and add overlays on demand, including the MBTA network.'
 				]
 	);
 
@@ -757,6 +763,43 @@
 	);
 
 
+	/** X-axis options for the playground sandbox choropleth (all ``meta.xVariables``; same groupings as FilterPanel). */
+	const groupedSandboxXVars = $derived.by(() => {
+		const bySrc = new Map();
+		const order = [];
+		for (const v of meta.xVariables ?? []) {
+			const src = v.source ?? 'other';
+			if (!bySrc.has(src)) {
+				bySrc.set(src, {
+					source: src,
+					sourceLabel: v.sourceLabel ?? src,
+					vars: []
+				});
+				order.push(src);
+			}
+			bySrc.get(src).vars.push(v);
+		}
+		order.sort((a, b) => {
+			const rank = (s) => (s === 'census' ? 0 : s === 'massbuilds' ? 1 : 2);
+			return rank(a) - rank(b);
+		});
+		return order.map((s) => bySrc.get(s));
+	});
+
+	/** Y-axis options for the playground sandbox choropleth (``meta.yVariables`` by category). */
+	const groupedSandboxYVars = $derived.by(() => {
+		const groups = [];
+		const seen = new Set();
+		for (const v of meta.yVariables ?? []) {
+			if (!seen.has(v.cat)) {
+				seen.add(v.cat);
+				groups.push({ cat: v.cat, catLabel: v.catLabel, vars: [] });
+			}
+			groups.find((g) => g.cat === v.cat)?.vars.push(v);
+		}
+		return groups;
+	});
+
 	const dataKey = $derived(
 		JSON.stringify({
 			tp: panelState.timePeriod,
@@ -775,8 +818,8 @@
 			nr: nhgisRows?.length ?? 0,
 			md: metricsDevelopments?.length ?? -1,
 			showDev: panelState.showDevelopments,
-			// xVar affects sandbox (step 5) choropleth; must re-run metrics when the development axis changes.
-			xVar: panelState.xVar
+			// Playground step 5 choropleth variable (not ``panelState.xVar``).
+			sandChoro: playgroundStoryCarousel ? playgroundSandboxChoroId : ''
 		})
 	);
 
@@ -1043,11 +1086,19 @@
 		return m;
 	}
 
+	/**
+	 * Recompute MassBuilds / TOD maps for the current panel filters. Returns fresh map references
+	 * for immediate use in the same call stack (avoids a stale read of ``$state`` before Svelte flushes).
+	 *
+	 * Returns
+	 * -------
+	 * {{ tractTodMetricsMap: Map | null, devAggMap: Map | null }}
+	 */
 	function refreshMetrics() {
 		if (!tractList.length) {
 			tractTodMetricsMap = null;
 			devAggMap = null;
-			return;
+			return { tractTodMetricsMap: null, devAggMap: null };
 		}
 		const tractMap = new Map();
 		for (const t of tractList) {
@@ -1062,7 +1113,7 @@
 		} else {
 			devsForMetrics = buildFilteredData(tractList, developments, panelState).filteredDevs;
 		}
-		tractTodMetricsMap = aggregateTractTodMetrics(
+		const tm = aggregateTractTodMetrics(
 			devsForMetrics,
 			tractMap,
 			tractList,
@@ -1071,7 +1122,23 @@
 			panelState.huChangeSource ?? 'massbuilds',
 			minMf
 		);
-		devAggMap = aggregateDevsByTract(devsForMetrics, tractMap, panelState.timePeriod, panelState);
+		const dm = aggregateDevsByTract(devsForMetrics, tractMap, panelState.timePeriod, panelState);
+		tractTodMetricsMap = tm;
+		devAggMap = dm;
+		return { tractTodMetricsMap: tm, devAggMap: dm };
+	}
+
+	/**
+	 * @param {string} id
+	 * @returns {{ axis: 'x' | 'y', key: string }}
+	 */
+	function parsePlaygroundChoroId(id) {
+		if (typeof id !== 'string' || !id.includes(':')) return { axis: 'x', key: 'census_hu_change' };
+		const idx = id.indexOf(':');
+		const prefix = id.slice(0, idx);
+		const key = id.slice(idx + 1) || 'census_hu_change';
+		if (prefix === 'y') return { axis: 'y', key };
+		return { axis: 'x', key };
 	}
 
 	/**
@@ -1376,9 +1443,12 @@
 	function updateChoropleth({ animate = true, legend = true } = {}) {
 		if (!containerEl || !svgRef) return;
 
+		/** MassBuilds aggregates for this paint; use return value from ``refreshMetrics`` when it runs. */
+		let devMetricsMap = tractTodMetricsMap;
 		if (dataKey !== lastMetricsDataKey) {
 			lastMetricsDataKey = dataKey;
-			refreshMetrics();
+			const refreshed = refreshMetrics();
+			devMetricsMap = refreshed.tractTodMetricsMap;
 		}
 
 		const rowByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
@@ -1388,16 +1458,22 @@
 			playgroundStoryCarousel &&
 			Number.isFinite(revealStage) &&
 			Math.trunc(revealStage) === 4;
-		const xVarKey = panelState.xVar;
-		const xVarMeta = meta.xVariables?.find((v) => v.key === xVarKey);
+		const choroParsed = parsePlaygroundChoroId(playgroundSandboxChoroId);
+		const yVarMeta = meta.yVariables?.find((v) => v.key === choroParsed.key);
+		const xVarMeta = meta.xVariables?.find((v) => v.key === choroParsed.key);
 		const defaultGrowthTitle = `% housing growth (${periodDisplayLabel(panelState.timePeriod)})`;
 		const legendTitle = isPlaygroundSandboxX
-			? (xVarMeta?.label ? String(xVarMeta.label) : xVarKey)
+			? (choroParsed.axis === 'y'
+					? (yVarMeta?.label ? String(yVarMeta.label) : choroParsed.key)
+					: (xVarMeta?.label ? String(xVarMeta.label) : choroParsed.key))
 			: defaultGrowthTitle;
 		/** @type {number[]} */
 		let values;
 		/** @type {'sym' | 'affshare'} */
-		const choroKind = isPlaygroundSandboxX && xVarKey === 'affordable_share' ? 'affshare' : 'sym';
+		const choroKind =
+			isPlaygroundSandboxX && choroParsed.axis === 'x' && choroParsed.key === 'affordable_share'
+				? 'affshare'
+				: 'sym';
 		/** @type {Map<string, number>} */
 		const sandboxXByGj = new Map();
 		if (isPlaygroundSandboxX) {
@@ -1406,13 +1482,17 @@
 				const gj = r?.gisjoin;
 				if (!gj) continue;
 				const t = tractByGjX.get(gj);
-				const xv = getScatterXValue(
-					t,
-					gj,
-					xVarKey,
-					tractTodMetricsMap,
-					panelState.timePeriod
-				);
+				/** @type {number | null} */
+				let xv =
+					choroParsed.axis === 'y'
+						? getScatterYValue(t, choroParsed.key, panelState.timePeriod)
+						: getScatterXValue(
+								t,
+								gj,
+								choroParsed.key,
+								devMetricsMap,
+								panelState.timePeriod
+							);
 				if (choroKind === 'affshare') {
 					const n = xv == null ? NaN : Number(xv);
 					sandboxXByGj.set(gj, Number.isFinite(n) ? n : Number.NaN);
@@ -1541,7 +1621,13 @@
 		// Choropleth fill only. Do not run fills through d3-transition: tweening from CSS
 		// variables (pre-fix) or large batch transitions can break ``fill``; apply immediately
 		// and interrupt any in-flight transition so the layer always has valid hex values.
-		sel.selectAll('path.tract-fill').interrupt().attr('fill', computeFill);
+		sel
+			.selectAll('path.tract-fill')
+			.interrupt()
+			.each(function (d) {
+				const c = computeFill(d);
+				d3.select(this).attr('fill', c).style('fill', c);
+			});
 
 		// Interior rim: TOD green/orange + mismatch purple (clip removes outer half of stroke).
 		transitionSel(sel.selectAll('path.tract-edge-clip'))
@@ -2112,24 +2198,24 @@
 						: 'neutral';
 		const primaryRows = [];
 		if (playgroundStoryCarousel && revealStage === 4) {
-			const xk = panelState.xVar;
-			const xLab = meta.xVariables?.find((v) => v.key === xk)?.label ?? xk;
-			const xRaw = getScatterXValue(
-				t,
-				id,
-				xk,
-				tractTodMetricsMap,
-				panelState.timePeriod
-			);
-			const xNum = xRaw == null ? NaN : Number(xRaw);
+			const p = parsePlaygroundChoroId(playgroundSandboxChoroId);
+			const fillLab =
+				p.axis === 'y'
+					? (meta.yVariables?.find((v) => v.key === p.key)?.label ?? p.key)
+					: (meta.xVariables?.find((v) => v.key === p.key)?.label ?? p.key);
+			const rawV =
+				p.axis === 'y'
+					? getScatterYValue(t, p.key, panelState.timePeriod)
+					: getScatterXValue(t, id, p.key, tractTodMetricsMap, panelState.timePeriod);
+			const n = rawV == null ? NaN : Number(rawV);
 			const xStr =
-				xk === 'affordable_share' && Number.isFinite(xNum)
-					? `${fmt1(xNum * 100)}% (share)`
-					: Number.isFinite(xNum)
-						? `${fmt1(xNum)}%`
+				p.axis === 'x' && p.key === 'affordable_share' && Number.isFinite(n)
+					? `${fmt1(n * 100)}% (share)`
+					: Number.isFinite(n)
+						? `${fmt1(n)}%`
 						: '—';
 			primaryRows.push({
-				label: `Map fill: ${xLab}`,
+				label: `Map fill: ${fillLab}`,
 				value: xStr
 			});
 		}
@@ -3338,6 +3424,7 @@
 		void revealStage;
 		void guidedMode;
 		void playgroundStoryCarousel;
+		void playgroundSandboxChoroId;
 		/** Cohort / dev layer toggles in playground step 5: repaint without re-aggregating MassBuilds. */
 		void playgroundSandboxCohortOutlines;
 		void playgroundSandboxDevs;
@@ -4033,9 +4120,6 @@
 											<p class="poc-key-one poc-key-dev">
 												<strong>Developments</strong>
 												<span class="poc-key-tract-fill-body">
-													<span class="poc-key-tract-fill-line">
-														Fill = share of new units that are multi-family. Darker purple fill means a higher multi-family share.
-													</span>
 													<span class="poc-key-tract-scale">
 														<span
 															class="poc-key-tract-bar"
@@ -4043,7 +4127,7 @@
 															aria-hidden="true"
 														></span>
 														<span class="poc-key-tract-scale-labels">
-															<span>0% multifamily</span>
+															<span>0%</span>
 															<span>100% multifamily</span>
 														</span>
 													</span>
@@ -4226,6 +4310,29 @@
 											{step?.body ?? ''}
 										{/if}
 									</p>
+									{#if pgStepIdx === 4}
+										<div class="poc-sandbox-choro-block">
+											<label class="poc-sandbox-choro-field">
+												<span class="poc-sandbox-choro-label">Choropleth variable</span>
+												<select class="poc-sandbox-choro-select" bind:value={playgroundSandboxChoroId}>
+													{#each groupedSandboxXVars as group (group.source)}
+														<optgroup label={group.sourceLabel}>
+															{#each group.vars as v (v.key)}
+																<option value="x:{v.key}">{v.label}</option>
+															{/each}
+														</optgroup>
+													{/each}
+													{#each groupedSandboxYVars as group (group.cat)}
+														<optgroup label={group.catLabel}>
+															{#each group.vars as v (v.key)}
+																<option value="y:{v.key}">{v.label}</option>
+															{/each}
+														</optgroup>
+													{/each}
+												</select>
+											</label>
+										</div>
+									{/if}
 								</section>
 							{/key}
 						{:else}
@@ -5673,8 +5780,8 @@
 		}
 
 		.poc-map-key-overlay {
-			left: 0;
-			max-width: 100%;
+			left: 2ch;
+			max-width: 60%;
 			max-height: 42%;
 		}
 	}
@@ -5977,10 +6084,10 @@
 	/* Cohort / mismatch / dev keys sit bottom-left on the choropleth, to the right of the in-SVG colorbar. */
 	.poc-map-key-overlay {
 		position: absolute;
-		left: 5.75rem;
+		left: calc(5.75rem + 2ch);
 		bottom: 0;
 		z-index: 3;
-		max-width: min(420px, calc(100% - 5.75rem - 0.5rem));
+		max-width: min(252px, calc((100% - 5.75rem - 0.5rem) * 0.6));
 		max-height: min(52%, 320px);
 		overflow: hidden auto;
 		padding: 0 0 1px 0;
