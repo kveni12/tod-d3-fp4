@@ -144,6 +144,11 @@
 	/** Tract ID waiting for debounce to complete. */
 	let pendingHoverId = $state(/** @type {string | null} */ (null));
 	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 10 : focusLowIncomeTracts);
+	/**
+	 * Main page guided walkthrough: tracts/insights are not toggled by map click (scrolly and
+	 * in-text controls drive focus). The playground carousel keeps full click-to-select behavior.
+	 */
+	const mainStoryMapClicksInert = $derived(guidedMode && !playgroundStoryCarousel);
 
 	/** Use pinned tooltip when a tract or development is click-locked, otherwise live. */
 	const activeTooltip = $derived(
@@ -217,6 +222,16 @@
 	const MISMATCH_W_HA = 2;
 	const MISMATCH_W_HG = 1.45;
 	const CHORO_COLOR_STEPS = ['#d73027', '#f46d43', '#f7d8cf', '#ffffff', '#d5e3f5', '#7ea6da', '#2f6eb5'];
+	/**
+	 * Legend glyph scale (bar, ticks, footnote). Kept in sync with the strip width below so tick
+	 * labels stay inside the reserved column.
+	 */
+	const CHORO_MAP_LEGEND_SCALE = 1.3;
+	/**
+	 * Right-hand SVG column for the choropleth colorbar: projection and clip use only the remaining
+	 * width so tract fills are not drawn beneath the scale.
+	 */
+	const CHORO_MAP_LEGEND_COLUMN_W = Math.round(92 * CHORO_MAP_LEGEND_SCALE);
 	/**
 	 * Non–mismatch tracts when the mismatch layer is on (revealStage ≥2).
 	 * ~0.11 opacity ≈ 89% dimming vs full (≥50% reduction vs the previous 0.22 pass) so violet/lavender outlines read clearly.
@@ -763,7 +778,7 @@
 	const mapH = $derived(choroplethMapHeight);
 	/** ViewBox dimensions for anchoring HTML callouts to projection coordinates. */
 	let mapViewBox = $state(/** @type {{ svgW: number; mapW: number; mapH: number }} */ ({
-		svgW: 520,
+		svgW: 520 + CHORO_MAP_LEGEND_COLUMN_W,
 		mapW: 520,
 		mapH: 430
 	}));
@@ -1276,10 +1291,12 @@
 		});
 
 		const cw = containerEl.clientWidth || 900;
-		mapW = Math.max(400, Math.min(1100, cw - 16));
+		const legendColW = CHORO_MAP_LEGEND_COLUMN_W;
+		const innerMax = Math.max(400, Math.min(1100, cw - 16));
+		mapW = Math.max(280, innerMax - legendColW);
 
 		mapCanvasLeft = 0;
-		const svgW = mapCanvasLeft + mapW;
+		const svgW = mapCanvasLeft + mapW + legendColW;
 		const svgH = mapH;
 		// Fit projection to the full-state GeoJSON when available so excluded
 		// background tracts render correctly; fall back to the story subset.
@@ -1787,21 +1804,23 @@
 
 		const svg = svgRef;
 		if (legend) {
-			/** Map growth colorbar + related glyphs vs prior baseline (~30% larger). */
-			const legScale = 1.3;
+			const legScale = CHORO_MAP_LEGEND_SCALE;
+			const stripW = CHORO_MAP_LEGEND_COLUMN_W;
 			const legGroup = svg.select('.map-legend-group');
 			legGroup.selectAll('*').remove();
 			const barW = 10 * legScale;
-			const barRight = 58 * legScale;
-			const barLeft = barRight - barW;
-			// Bottom-right of the map canvas: ticks extend left into the map; local bar right edge = ``barRight``.
 			const rightInset = 6 * legScale;
-			const legGroupX = mapCanvasLeft + mapW - rightInset - barRight;
+			// Colorbar is flush to the SVG right edge inside the reserved strip (choropleth uses ``mapW`` only).
+			const barRight = stripW - rightInset;
+			const barLeft = barRight - barW;
+			const legGroupX = mapCanvasLeft + mapW;
 			legGroup.attr('transform', `translate(${legGroupX},0)`);
+			const topPad = 8 * legScale;
 			const bottomPad = 3 * legScale;
-			const tanH = 11 * legScale;
-			const legBarH = Math.min(132, Math.max(88, mapH * 0.31)) * legScale;
-			const y0 = mapH - bottomPad - tanH - legBarH;
+			// Reserve extra vertical space for two-line tan footnote (tspan + dy 1.1em).
+			const tanH = 20 * legScale;
+			const legBarH = Math.max(48, mapH - topPad - bottomPad - tanH);
+			const y0 = topPad;
 			const fmtTick = (v) => {
 				const n = Number(invTransform(Number(v)));
 				if (!Number.isFinite(n)) return '';
@@ -1852,23 +1871,24 @@
 
 			legendG
 				.append('text')
-				.attr('transform', `translate(${4 * legScale}, ${y0 + legBarH * 0.5}) rotate(-90)`)
+				.attr('transform', `translate(${legBarH * 0.05}, ${y0 + legBarH * 0.5}) rotate(-90)`)
 				.attr('text-anchor', 'middle')
 				.attr('fill', 'var(--text-muted)')
 				.attr('font-size', `${7.5 * legScale}px`)
 				.attr('font-weight', 600)
 				.text(legendTitle);
 
-			// Tan tracts: right-aligned with the color strip so long labels do not exceed the map viewBox.
-			legendG
+			// Tan tracts: right-aligned with the color strip within the legend column.
+			const tanNote = legendG
 				.append('text')
 				.attr('x', barRight)
 				.attr('y', y0 + legBarH + 9 * legScale)
 				.attr('text-anchor', 'end')
 				.attr('fill', 'var(--text-muted)')
 				.attr('font-size', `${6.5 * legScale}px`)
-				.attr('font-weight', 500)
-				.text('Tan = limited or unreliable data');
+				.attr('font-weight', 500);
+			tanNote.append('tspan').text('Tan = limited or');
+			tanNote.append('tspan').attr('x', barRight).attr('dy', '1.1em').text('unreliable data');
 		}
 
 		containerEl.__pocChoroMaxAbs = maxAbs;
@@ -2221,10 +2241,10 @@
 				return 0;
 			});
 
-		// Hand cursor only when this tract would show a hover tooltip (``handleTractEnter``).
+		// Hand cursor only when tracts are interactive (hover tooltips / click-to-select); main story walkthrough is neither.
 		selRoot.selectAll('path.tract-hit').style('cursor', (d) => {
 			const id = d.properties?.gisjoin;
-			if (!id || pinnedTractId || pinnedDevKey) return 'default';
+			if (!id || pinnedTractId || pinnedDevKey || mainStoryMapClicksInert) return 'default';
 			return isTractDimmed(id) ? 'default' : 'pointer';
 		});
 	}
@@ -2500,6 +2520,7 @@
 
 	function handleTractClick(event, d) {
 		event.stopPropagation();
+		if (mainStoryMapClicksInert) return;
 		const id = d.properties?.gisjoin;
 		if (!id) return;
 
@@ -2783,6 +2804,7 @@
 		event.stopPropagation();
 		if (!d?.id) return;
 		zoomToTract(d.id);
+		if (mainStoryMapClicksInert) return;
 		if (!panelState.selectedTracts.has(d.id)) {
 			panelState.toggleTract(d.id);
 		}
@@ -3486,6 +3508,28 @@
 		return `${stage}_project:${id}`;
 	}
 
+	/**
+	 * Drop map selection, pins, and popups when the guided focus key (scroll step / sub-waypoint) changes
+	 * so scrolly-driven highlights do not stick after scrolling back past them.
+	 *
+	 * Parameters
+	 * ----------
+	 * None
+	 */
+	function resetGuidedWalkthroughMapState() {
+		panelState.clearSelection();
+		panelState.setHovered(null);
+		pinnedTractId = null;
+		pinnedTooltip = null;
+		pinnedDevKey = null;
+		pinnedDevTooltip = null;
+		tooltip = { ...tooltip, visible: false, anchorX: null, anchorY: null };
+		pinnedTooltipStage = null;
+		activeGuidedDevelopmentKey = null;
+		hoveredMismatchCluster = null;
+		cancelHoverRest();
+	}
+
 	$effect(() => {
 		void structuralKey;
 		void containerEl;
@@ -3510,6 +3554,7 @@
 		void revealStage;
 		void guidedMode;
 		void playgroundStoryCarousel;
+		void mainStoryMapClicksInert;
 		void playgroundSandboxChoroId;
 		/** Cohort / dev layer toggles in playground step 5: repaint without re-aggregating MassBuilds. */
 		void playgroundSandboxCohortOutlines;
@@ -3537,6 +3582,7 @@
 		void panelState.selectedTracts.size;
 		void pinnedTractId;
 		void pinnedDevKey;
+		void mainStoryMapClicksInert;
 		if (!containerEl || !svgRef) return;
 		updateChoropleth({ animate: false, legend: false });
 		updateSelection();
@@ -3615,12 +3661,15 @@
 		void guidedContrastFeatured;
 		void guidedMismatchFeatured;
 		void guidedStepTenFeatured;
+		void guidedStepTenExamples;
 		if (!guidedMode) {
 			lastAutoFocusedStage = null;
 			return;
 		}
 		const focusKey = `${revealStage}:${guidedFocusDetail ?? 'base'}`;
 		if (lastAutoFocusedStage === focusKey) return;
+		// New scroll / waypoint: clear prior scrolly-driven or incidental selection before applying the next focus.
+		resetGuidedWalkthroughMapState();
 		if (revealStage === 2 && guidedFocusDetail === 'contrast_example' && guidedContrastFeatured?.id) {
 			lastAutoFocusedStage = focusKey;
 			inspectGuidedExample(guidedContrastFeatured.id);
@@ -3655,50 +3704,6 @@
 			return;
 		}
 		lastAutoFocusedStage = focusKey;
-	});
-
-	// Track the previous reveal stage so we only react to actual changes,
-	// not to other $state dependencies read inside the block.
-	let prevRevealStageForPin = $state(0);
-	$effect(() => {
-		void guidedMode;
-		void playgroundStoryCarousel;
-		const stage = revealStage;
-		if (!guidedMode && !playgroundStoryCarousel) {
-			prevRevealStageForPin = stage;
-			return;
-		}
-		// Playground: keep tract selection + tooltips when changing the carousel step (no scroll story).
-		if (playgroundStoryCarousel) {
-			prevRevealStageForPin = stage;
-			return;
-		}
-		const stageChanged = stage !== prevRevealStageForPin;
-		prevRevealStageForPin = stage;
-		if (!stageChanged) return;
-		// Clear pinned tract / tooltip when the user scrolls to a new step.
-		if (pinnedTractId) {
-			pinnedTractId = null;
-			pinnedTooltip = null;
-			panelState.clearSelection();
-		}
-		if (pinnedDevKey) {
-			pinnedDevKey = null;
-			pinnedDevTooltip = null;
-		}
-		if (pinnedTooltipStage != null) {
-			tooltip = { ...tooltip, visible: false, anchorX: null, anchorY: null };
-			pinnedTooltipStage = null;
-			activeGuidedDevelopmentKey = null;
-			panelState.setHovered(null);
-		}
-		cancelHoverRest();
-		const hov = panelState.hoveredTract;
-		if (hov && isTractDimmed(hov)) {
-			panelState.setHovered(null);
-			hoveredMismatchCluster = null;
-			tooltip = { ...tooltip, visible: false };
-		}
 	});
 
 	$effect(() => {
@@ -6209,7 +6214,7 @@
 		margin-bottom: clamp(4px, 1.25vh, 10px);
 	}
 
-	/* Cohort / mismatch / dev keys sit bottom-left; in-SVG growth colorbar is on the right edge. */
+	/* Cohort / mismatch / dev keys sit bottom-left; growth colorbar sits in a dedicated right SVG column. */
 	.poc-map-key-overlay {
 		position: absolute;
 		left: 0.35rem;

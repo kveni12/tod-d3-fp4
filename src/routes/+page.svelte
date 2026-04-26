@@ -468,8 +468,8 @@
 	const eduMiniBar = $derived(cohortMiniBarLayout(eduRow));
 
 	/** Skinnier two-cohort bar chart: low vs high affordable TOD share (matches ``cohortMiniBarLayout`` geometry). */
-	/* Slightly narrower than the old 168px so bar cells sit tighter next to the wider scatter columns. */
-	const AFFORD_SPLIT_MINI = { W: 140, H: 248, fs: 11, tickPad: 6, rx: 1.5 };
+	/* 1.5× the prior 140×248 geometry so affordability compare bars read more easily beside scatters. */
+	const AFFORD_SPLIT_MINI = { W: 210, H: 372, fs: 16.5, tickPad: 9, rx: 2.25 };
 
 	/**
 	 * @param { { kind: 'pp' | 'pct' | 'min', meanLo: number, meanHi: number } | null | undefined } row
@@ -479,9 +479,9 @@
 		if (!row) return null;
 		const W = opts?.w ?? AFFORD_SPLIT_MINI.W;
 		const H = opts?.h ?? AFFORD_SPLIT_MINI.H;
-		const m = { b: 24, r: 8, l: 44 };
-		const categoryLabelY = 16;
-		const valuePlotTop = 28;
+		const m = { b: 36, r: 12, l: 66 };
+		const categoryLabelY = 24;
+		const valuePlotTop = 42;
 		const ih = H - valuePlotTop - m.b;
 		const items = [
 			{ id: 'lo', shortLabel: '<50%', v: row.meanLo, fill: AFFORD_BAR_LO },
@@ -520,7 +520,7 @@
 					wPx: x.bandwidth(),
 					hPx: 0,
 					valueLabel: '—',
-					valueLabelY: y0px + 5,
+					valueLabelY: y0px + 8,
 					valueLabelBaseline: /** @type {'middle'} */ ('middle')
 				};
 			}
@@ -530,7 +530,7 @@
 			const valueLabel = formatYMetricSummary(d.v, row.kind);
 			/** @type {'hanging' | 'alphabetic'} */
 			const valueLabelBaseline = yV > y0px ? 'hanging' : 'alphabetic';
-			const valueLabelY = yV > y0px ? yV + 2 : yV - 1;
+			const valueLabelY = yV > y0px ? yV + 3 : yV - 2;
 			return {
 				...d,
 				xPx: (x(d.id) ?? 0) + m.l,
@@ -1246,14 +1246,23 @@
 					</p>
 				{/if}
 
-				<div class="afford-four-grid" role="group" aria-label="Affordable TOD share: income and education scatters and cohort bars">
+				<div
+					class="afford-comparison-stack"
+					role="group"
+					aria-label="Affordable TOD share: income and education scatters and cohort bars"
+				>
+					<div
+						class="afford-metric-row"
+						role="group"
+						aria-label="Income change vs affordable TOD share"
+					>
 					<div class="afford-four-cell">
 						<h3 class="afford-four-cell__title">Income Change vs Affordability</h3>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">text goes here</figcaption>
+							<figcaption class="cohort-mini-bar__cap">Tracts with greater affordability trend towards smaller income increases.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -1353,13 +1362,19 @@
 							</figure>
 						{/if}
 					</div>
+					</div>
+					<div
+						class="afford-metric-row"
+						role="group"
+						aria-label="Education change vs affordable TOD share"
+					>
 					<div class="afford-four-cell">
 						<h3 class="afford-four-cell__title">Education Change vs Affordability</h3>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">text goes here</figcaption>
+							<figcaption class="cohort-mini-bar__cap">Tracts with greater affordability trend towards smaller education changes.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -1458,6 +1473,7 @@
 								<p class="cohort-mini-bar__cap">Bars appear when enough TOD tracts have affordable-share data.</p>
 							</figure>
 						{/if}
+					</div>
 					</div>
 				</div>
 			</section>
@@ -2755,18 +2771,23 @@
 		margin-top: 10px;
 	}
 
-	/* Affordability: four charts in one row (scatters from playground + skinny compare bars) */
+	/* Affordability: stacked rows (income, then education), each row = scatter + skinny compare bar */
 	.afford-compare {
 		margin-top: 8px;
 	}
 
-	.afford-four-grid {
+	.afford-comparison-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 28px;
+		margin-top: 14px;
+	}
+
+	.afford-metric-row {
 		display: grid;
-		/* 3:2 fr gives scatter columns ~20% more width than equal 4-col split (30% vs 25% each). */
-		grid-template-columns: 3fr 2fr 3fr 2fr;
+		grid-template-columns: 3fr 2fr;
 		gap: 10px 12px;
 		align-items: start;
-		margin-top: 14px;
 	}
 
 	.afford-four-cell {
@@ -2796,11 +2817,11 @@
 		width: 100%;
 	}
 
-	.afford-four-grid :global(.tod-aff-wrap) {
+	.afford-comparison-stack :global(.tod-aff-wrap) {
 		width: 100%;
 	}
 
-	.afford-four-grid :global(.tod-aff-chart svg) {
+	.afford-comparison-stack :global(.tod-aff-chart svg) {
 		max-width: 100%;
 		height: auto;
 	}
@@ -2811,19 +2832,13 @@
 	}
 
 	.afford-split-mini-bar.cohort-mini-bar {
-		max-width: 168px;
+		max-width: 252px;
 		margin-left: auto;
 		margin-right: auto;
 	}
 
-	@media (max-width: 1320px) {
-		.afford-four-grid {
-			grid-template-columns: 3fr 2fr;
-		}
-	}
-
 	@media (max-width: 700px) {
-		.afford-four-grid {
+		.afford-metric-row {
 			grid-template-columns: 1fr;
 		}
 	}
