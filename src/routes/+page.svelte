@@ -2189,7 +2189,7 @@
 
 	.story-chart-panel__chart .chart-wrap.small-chart.compact-side-chart {
 		flex: 0 0 auto;
-		min-height: 0;
+		min-height: 320px;
 		height: auto;
 		width: 100%;
 	}
