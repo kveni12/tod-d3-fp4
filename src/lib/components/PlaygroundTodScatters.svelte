@@ -19,6 +19,9 @@
 	/** TOD intensity (XY from MassBuilds + census) vs affordable-share view (TOD-dominated tracts). */
 	let scatterMode = $state(/** @type {'intensity' | 'affordability'} */ ('intensity'));
 
+	/** Optional line of total tracts per cohort (replaces map Cohort spotlight counts on playground). */
+	let showCohortTractCounts = $state(false);
+
 	/** Same dependency key as ``ExploreTractSection``, including ``yVar`` for the active demographic. */
 	const cohortSummaryKey = $derived(
 		JSON.stringify({
@@ -70,10 +73,8 @@
 			<p class="playground-tod-kicker">TOD analysis</p>
 			<h2 class="playground-tod-title">Scatter plots</h2>
 			<p class="playground-tod-hint">
-				These use the same tract filters, development rules, and Y axis (Time &amp; Axes) as the map. TOD
-				intensity mode plots that variable against TOD share of new development; affordable TOD share mode
-				keeps TOD-dominated tracts and compares the affordable share of TOD build-out on the X axis. Brush
-				on the plot to add tracts to the selection.
+				These use the same controls as the map. Compare any demographic change against
+		        any development change. Brush/select the plot to add tracts to the selection.
 			</p>
 		</div>
 		<div class="playground-tod-toggle" role="group" aria-label="TOD scatter type">
@@ -103,7 +104,22 @@
 				role="region"
 				aria-label="Population-weighted averages: {cohortStats.displayLabel}"
 			>
-				<p class="cohort-summary-heading">{cohortStats.displayLabel}</p>
+				<div class="cohort-summary-head">
+					<p class="cohort-summary-heading">{cohortStats.displayLabel}</p>
+					<label class="cohort-tract-counts-option">
+						<input type="checkbox" bind:checked={showCohortTractCounts} />
+						<span>Tract counts</span>
+					</label>
+				</div>
+				{#if showCohortTractCounts}
+					<p class="cohort-tract-counts-line" aria-live="polite">
+						<span class="cohort-tract-counts-line__label">Tracts in cohort</span>
+						<span class="cohort-tract-counts-line__values">
+							TOD {cohortStats.nTod} · non-TOD {cohortStats.nNonTod} · min. dev. {cohortStats.nMinimal}
+							· selected {cohortStats.nSel}
+						</span>
+					</p>
+				{/if}
 				<div class="cohort-summary-grid cohort-summary-grid--four">
 					<div class="cohort-pill cohort-pill--tod">
 						<span class="cohort-pill-label">TOD-dominated</span>
@@ -164,7 +180,6 @@
 		--muted: #5e6573;
 		--accent: #00843d;
 		--line: #d8d2c7;
-		margin-top: 8px;
 		padding: 20px 22px 24px;
 		display: grid;
 		gap: 14px;
@@ -260,13 +275,65 @@
 		border-radius: 12px;
 	}
 
+	.cohort-summary-head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 8px 14px;
+		margin-bottom: 6px;
+	}
+
 	.cohort-summary-heading {
-		margin: 0 0 6px;
+		margin: 0;
 		font-size: 0.65rem;
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--muted);
+	}
+
+	.cohort-tract-counts-option {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		margin: 0;
+		font-size: 0.72rem;
+		font-weight: 600;
+		color: var(--muted);
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.cohort-tract-counts-option input {
+		margin: 0;
+		accent-color: var(--accent);
+		cursor: pointer;
+	}
+
+	.cohort-tract-counts-line {
+		margin: 0 0 8px;
+		padding: 6px 8px;
+		font-size: 0.72rem;
+		line-height: 1.45;
+		color: var(--ink);
+		background: color-mix(in srgb, var(--accent) 6%, var(--paper));
+		border: 1px solid rgba(120, 114, 102, 0.12);
+		border-radius: 8px;
+	}
+
+	.cohort-tract-counts-line__label {
+		display: block;
+		margin-bottom: 2px;
+		font-size: 0.58rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: var(--muted);
+	}
+
+	.cohort-tract-counts-line__values {
+		font-variant-numeric: tabular-nums;
 	}
 
 	.cohort-summary-grid {

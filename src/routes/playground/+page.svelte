@@ -78,10 +78,11 @@
 <section class="playground-root">
 	<div class="playground-hero card">
 		<p class="playground-eyebrow">Map Playground</p>
-		<h1>Explore the choropleth without the walkthrough</h1>
+		<h1>Explore the choropleth without the full scroll story</h1>
 		<p class="playground-lead">
-			This page keeps the full tract map interactive from the start. Toggle transit overlays, development
-			dots, and tract classifications, then click tracts to inspect them in more detail.
+			The map uses the same short five-step sequence as the main playground view—baseline growth, TOD/non-TOD outlines,
+			mismatch outlines, projects, and a final sandbox for the X-axis metric plus optional overlays—controlled with
+			arrows or the dropdown instead of scroll-sync. FilterPanel and tract detail work as usual; pan and zoom stay enabled.
 		</p>
 		<p class="playground-link">
 			<a href={`${base}/`}>Back to the guided story</a>
@@ -91,17 +92,17 @@
 	<div class="playground-grid">
 		<aside class="playground-side">
 			<div class="card playground-panel">
-				<h2>Controls</h2>
+				<h3>Controls</h3>
 				<p class="playground-note">
-					Directly control all plots by using the overlay, filter, and development settings.
+					Dynamically control all plots.
 				</p>
 				<FilterPanel panelState={playgroundPanel} allowedXKeys={ALLOWED_X_KEYS} />
 			</div>
 
 			<div class="card playground-panel">
-				<h2>Selected tract detail</h2>
+				<h3>Selected tract detail</h3>
 				<p class="playground-note">
-					Click one or more tracts on the map to pin them here. Hovering still gives quick tooltip detail.
+					Click one or more tracts on the map to pin.
 				</p>
 				<TractDetail
 					panelState={playgroundPanel}
@@ -114,42 +115,46 @@
 			</div>
 		</aside>
 
-		<div class="card playground-map-card">
-			<div class="playground-map-head">
-				<div>
-					<p class="playground-map-kicker">Interactive map</p>
-					<h2>Choropleth playground</h2>
-				</div>
-				<!-- <p class="playground-map-note">
+		<div class="playground-main">
+			<div class="card playground-map-card">
+				<div class="playground-map-head">
+					<div>
+						<p class="playground-map-kicker">Interactive map</p>
+						<h2>Choropleth playground</h2>
+					</div>
+					<!-- <p class="playground-map-note">
 					Blue means stronger housing growth, red means weaker or negative growth, and overlays can be
 					switched on and off as needed.
 				</p> -->
+				</div>
+
+				<div class="playground-map-wrap">
+					<PocNhgisTractMap
+						panelState={playgroundPanel}
+						tractList={filteredTracts}
+						nhgisRows={nhgisRows}
+						metricsDevelopments={filteredDevs}
+						playgroundStoryCarousel={true}
+						bind:mapFocusedTractDetail
+						bind:mapViewActions
+					/>
+				</div>
 			</div>
 
-			<div class="playground-map-wrap">
-				<PocNhgisTractMap
-					panelState={playgroundPanel}
-					tractList={filteredTracts}
-					nhgisRows={nhgisRows}
-					metricsDevelopments={filteredDevs}
-					bind:mapFocusedTractDetail
-					bind:mapViewActions
-				/>
-			</div>
+			<!-- Same column as the map so the sticky left column (controls + tract detail) spans map + scatters. -->
+			<!-- Client-only + deferred: scatters + cohort re-run the heavy TOD path; do not start on first paint. -->
+			{#if browser && loadTodSection}
+				{#await import('$lib/components/PlaygroundTodScatters.svelte')}
+					<p class="playground-tod-loading card" aria-live="polite">Loading TOD analysis charts…</p>
+				{:then mod}
+					{@const PlaygroundTodScatters = mod.default}
+					<PlaygroundTodScatters panelState={playgroundPanel} />
+				{:catch}
+					<p class="playground-tod-fail card">TOD analysis charts could not be loaded. Try refreshing the page.</p>
+				{/await}
+			{/if}
 		</div>
 	</div>
-
-	<!-- Client-only + deferred: scatters + cohort re-run the heavy TOD path; do not start on first paint. -->
-	{#if browser && loadTodSection}
-		{#await import('$lib/components/PlaygroundTodScatters.svelte')}
-			<p class="playground-tod-loading card" aria-live="polite">Loading TOD analysis charts…</p>
-		{:then mod}
-			{@const PlaygroundTodScatters = mod.default}
-			<PlaygroundTodScatters panelState={playgroundPanel} />
-		{:catch}
-			<p class="playground-tod-fail card">TOD analysis charts could not be loaded. Try refreshing the page.</p>
-		{/await}
-	{/if}
 </section>
 
 <style>
@@ -224,11 +229,22 @@
 		align-items: start;
 	}
 
+	/* Map + TOD scatters: one column so the left ``aside`` row height includes both (sticky controls + detail). */
+	.playground-main {
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+		min-width: 0;
+	}
+
 	.playground-side {
 		display: grid;
 		gap: 18px;
 		position: sticky;
 		top: 18px;
+		/* Long filter + tract detail: allow internal scroll in short viewports while staying sticky. */
+		max-height: calc(100vh - 36px);
+		overflow-y: auto;
 	}
 
 	.playground-panel {

@@ -69,7 +69,7 @@
 			</select>
 			</label>
 			<label class="field grow">
-				<span class="label">X axis</span>
+				<span class="label">Development axis</span>
 				<select bind:value={panelState.xVar}>
 					{#each groupedXVars as group (group.source)}
 						<optgroup label={group.sourceLabel}>
@@ -81,7 +81,7 @@
 				</select>
 			</label>
 			<label class="field grow">
-				<span class="label">Y axis</span>
+				<span class="label">Demographic change axis</span>
 				<select bind:value={panelState.yVar}>
 					{#each groupedYVars as group (group.cat)}
 						<optgroup label={group.catLabel}>

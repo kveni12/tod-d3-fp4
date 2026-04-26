@@ -16,11 +16,13 @@
 		developmentAffordableUnitsCapped,
 		developmentMultifamilyShare,
 		developmentMbtaProximity,
+		getScatterXValue,
 		isDevelopmentTransitAccessible,
 		popWeightKey,
 		transitDistanceMiToMetres,
 		transitModeUiLabel
 	} from '$lib/utils/derived.js';
+	import { meta } from '$lib/stores/data.svelte.js';
 	import { periodCensusBounds, periodDisplayLabel } from '$lib/utils/periods.js';
 	import { LOW_INCOME_MEDIAN_THRESHOLD } from '$lib/utils/incomeTract.js';
 	import { computeTodMismatchClusters } from '$lib/utils/todMismatchClusters.js';
@@ -52,6 +54,9 @@
 	 *     When bound, mirrors the focused tract’s choropleth summary (for sidebars, e.g. ``TractDetail``).
 	 * mapViewActions : { zoomToTract: (gisjoin: string) => void } | null | undefined
 	 *     When bound, exposes map zoom for that sidebar.
+	 * playgroundStoryCarousel : boolean
+	 *     When true (playground only): the five short playground steps (baseline → cohort → mismatch →
+	 *     projects → sandbox) with arrow/dropdown navigation instead of scroll-sync. Implies ``!guidedMode``.
 	 */
 	let {
 		panelState,
@@ -59,11 +64,14 @@
 		nhgisRows,
 		metricsDevelopments = null,
 		guidedMode = false,
+		playgroundStoryCarousel = false,
 		mapFocusedTractDetail = $bindable(null),
 		mapViewActions = $bindable(null)
 	} = $props();
 
 	let containerEl = $state(null);
+	/** Measured block height of ``map-main`` (choropleth + in-map overlays); used to size playground step cards. */
+	let mapMainBlockHeight = $state(0);
 	let tooltipEl = $state(null);
 	let stepEls = $state([]);
 	let focusWaypointEls = $state([]);
@@ -81,6 +89,14 @@
 		secondaryRows: []
 	});
 	let revealStage = $state(0);
+	/**
+	 * Playground step 5 only: show TOD / non-TOD interior rims (independent of walkthrough auto-layers).
+	 */
+	let playgroundSandboxCohortOutlines = $state(true);
+	/**
+	 * Playground step 5 only: show MassBuilds project dots.
+	 */
+	let playgroundSandboxDevs = $state(true);
 	let hoveredSpotlight = $state(/** @type {'tod_dominated' | 'nontod_dominated' | 'minimal' | null} */ (null));
 	let pinnedSpotlight = $state(/** @type {'tod_dominated' | 'nontod_dominated' | 'minimal' | null} */ (null));
 	let comparisonMetric = $state(/** @type {'hu_growth' | 'tod_share' | 'stock_increase'} */ ('hu_growth'));
@@ -240,7 +256,13 @@
 	}
 
 	function showCohortOutlines() {
-		if (guidedMode) return (revealStage >= 4 && revealStage <= 7) || (revealStage === 10 && guidedLowerIncomeOverlay === 'cohort');
+		if (guidedMode) {
+			return (revealStage >= 4 && revealStage <= 7) || (revealStage === 10 && guidedLowerIncomeOverlay === 'cohort');
+		}
+		if (playgroundStoryCarousel) {
+			if (revealStage === 4) return playgroundSandboxCohortOutlines;
+			return revealStage === 1 || revealStage === 3;
+		}
 		return revealStage === 1 || revealStage === 3;
 	}
 
@@ -251,6 +273,10 @@
 
 	function showDevelopmentDots() {
 		if (guidedMode) return revealStage >= 8 && revealStage <= 9;
+		if (playgroundStoryCarousel) {
+			if (revealStage === 4) return playgroundSandboxDevs;
+			return revealStage === 3;
+		}
 		return panelState.showDevelopments;
 	}
 
@@ -386,9 +412,15 @@
 		return visibleMismatchIds;
 	});
 
-	/** When the mismatch outline layer should affect fill/stroke (respects scroll unless user overrides). */
+	/**
+	 * When the mismatch outline layer should affect fill/stroke (respects scroll unless user overrides).
+	 * In the playground carousel, only the dedicated mismatch step (index 2) applies mismatch dimming,
+	 * not the later project or sandbox steps.
+	 */
 	const mismatchLayerOn = $derived(
-		effectiveMismatchIds.size > 0 && (mismatchOutlineMode !== 'follow_scroll' || revealStage >= 2)
+		effectiveMismatchIds.size > 0 &&
+			(mismatchOutlineMode !== 'follow_scroll' ||
+				(playgroundStoryCarousel ? revealStage === 2 : revealStage >= 2))
 	);
 
 	/**
@@ -420,97 +452,104 @@
 		return null;
 	}
 
-	const stepContent = guidedMode
-		? [
-			{
-				kicker: 'Step 1',
-				title: 'Where Transit Access Is Strongest',
-				bodyHtml:
-					'This map shows how transit access across Greater Boston is concentrated in a dense, radial network centered on the urban core. The Red, Orange, Blue, and Green lines cluster around Boston and Cambridge, while the commuter rail extends outward into surrounding suburbs, with services like the CapeFLYER reaching even farther.<br><br>Focus on where lines overlap most. Boston and Cambridge stand out, along with places like Quincy and Revere. These areas represent the strongest and most consistent transit access.<br><br>This sets up a simple question: does housing growth appear in these same places?'
-			},
-			{
-				kicker: 'Step 2',
-				title: 'Where Housing Growth Is Happening',
-				bodyHtml:
-					'This map adds housing growth. Darker blues show stronger growth, reds show weaker or negative growth. The Seaport stands out, but strong growth also appears farther out in parts of Plymouth, Essex, and Worcester counties.<br><br>Now compare this to the previous map. Some growth appears near strong transit, but much of it appears beyond those areas.<br><br>If transit-oriented development is working as intended, we might expect growth to be more concentrated near the strongest parts of the network. Instead, the pattern looks more spread out, raising questions about how growth and access are distributed.'
-			},
-			{
-				kicker: 'Step 3',
-				title: 'Looking at the Contrast Up Close',
-				bodyHtml:
-					'Here, we zoom into individual tracts to make the pattern easier to see.<br><br>Focus on a few examples. Some tracts show strong housing growth with only limited transit access nearby. Others sit closer to strong transit but show little or even negative growth.<br><br>Looking at these side by side makes the contrast clearer. Growth and transit access do not consistently appear together.'
-			},
-			{
-				kicker: 'Step 4',
-				title: 'A measurable mismatch',
-				bodyHtml:
-					'This step makes the pattern explicit. Solid purple outlines mark tracts with strong transit access but low or negative housing growth. Dashed purple outlines mark the opposite, where growth is strong despite weaker or minimal transit access.<br><br>Both patterns appear across the region. Some high-access areas show limited growth, while some lower-access areas show substantial growth.<br><br>This does not mean growth outside transit is inherently negative, but it highlights a clear difference between where access is strongest and where housing is being added.'
-			},
-			{
-				kicker: 'Step 5',
-				title: 'How Growth Is Distributed Relative to Transit',
-				bodyHtml:
-					'We now move from mismatch to classification. Tracts are grouped based on how development is distributed relative to transit. Green outlines mark more transit-oriented development, while orange outlines mark more non-TOD patterns.<br><br>The map still shows housing growth underneath, but now also shows whether that growth is concentrated near transit or not.<br><br>This makes it easier to compare not just where growth appears, but how it relates to transit access across the region.'
-			},
-			{
-				kicker: 'Step 6',
-				title: 'Boston and Cambridge',
-				bodyHtml:
-					'This zoom focuses on Boston and Cambridge as a reference case. Most tracts here are TOD-dominated, which aligns with strong transit access.<br><br>At the same time, the pattern is not uniform. There are areas with minimal development, and some tracts show low or even negative growth.<br><br>This shows that even in the most connected areas, housing growth is not consistently high.'
-			},
-			{
-				kicker: 'Step 7',
-				title: 'Quincy and Revere',
-				bodyHtml:
-					'Moving outward to Quincy and Revere, the pattern becomes more mixed. Transit access is still present, but nearby tracts do not all show the same relationship between growth and TOD.<br><br>There are slightly more non-TOD tracts, and there are also areas with minimal development or low growth.<br><br>This suggests that the relationship between transit and growth becomes less consistent outside the urban core.'
-			},
-			{
-				kicker: 'Step 8',
-				title: 'Outer-Ring Growth',
-				bodyHtml:
-					'In the outer ring, the pattern shifts more clearly. Many tracts are farther from strong transit, and much of the development appears in non-TOD categories.<br><br>Transit is still present in some places, but it is more limited and less frequent. Growth appears more dispersed and less closely associated with strong transit access.<br><br>This highlights a different pattern compared to the urban core.'
-			},
-			{
-				kicker: 'Step 9',
-				title: 'Projects Enter the Picture',
-				bodyHtml:
-					'This step adds individual developments. Each dot represents a project, with size reflecting units and color showing the share of multi-family housing from white to purple. Green outlines indicate transit-accessible projects, while yellow outlines indicate those that are not.<br><br>Most projects are overwhelmingly multi-family, with many near 100 percent. Larger projects appear more often near the core, but projects are distributed across the region.<br><br>Many projects, even in highly accessible areas, include little or no affordable housing, which limits who is able to access those units.'
-			},
-			{
-				kicker: 'Step 10',
-				title: 'Projects as Examples',
-				bodyHtml:
-					'This step highlights a few projects to make the pattern more concrete. Some, like Assembly Row and 16 Boardman St, represent strong TOD cases with dense housing near transit. Others, like 16 Dyer, are near transit but less tightly integrated.<br><br>On the other end, projects like Mahoney Farm and The Pinehills show substantial growth farther from strong transit access.<br><br>These examples make it easier to compare how location, scale, and affordability vary across developments.'
-			},
-			{
-				kicker: 'Step 11',
-				title: 'Who This Affects',
-				bodyHtml:
-					'In this final step, higher-income tracts fade into the background, where high income is defined as greater than $125k per year and lower income as less than $125k.<br><br>Many lower-income tracts appear within mismatch categories. Some are in high-access areas with limited growth, while others are in areas with growth but weaker transit access.<br><br>Among lower-income tracts, there also appear to be more areas with minimal development, even in places with transit access.<br><br>This shifts the focus from where housing is built to how access is distributed. Transit-oriented development is often associated with improved access, but without affordability, that access may not be equally available to all households.'
-			}
-		]
-		: [
-			{
-				kicker: 'Step 1',
-				title: 'Transit-rich places',
-				body: 'Start with tract fill only. This is the baseline view of housing growth before any extra layers appear.'
-			},
-			{
-				kicker: 'Step 2',
-				title: 'Growth is not only “on the line”',
-				body: 'Orange and green outlines mark tracts that lean more TOD-dominated or non-TOD-dominated, while the choropleth still carries the main story.'
-			},
-			{
-				kicker: 'Step 3',
-				title: 'A measurable mismatch',
-				body: 'Purple outlines take over here to show where transit access and housing growth pull apart, without the cohort outlines getting in the way.'
-			},
-			{
-				kicker: 'Step 4',
-				title: 'Bring projects back in',
-				body: 'The cohort outlines return with development dots on top, so you can compare tract patterns with the projects that sit inside them.'
-			}
-		];
+	const GUIDED_NARRATIVE_STEPS = [
+		{
+			kicker: 'Step 1',
+			title: 'Where Transit Access Is Strongest',
+			bodyHtml:
+				'This map shows how transit access across Greater Boston is concentrated in a dense, radial network centered on the urban core. The Red, Orange, Blue, and Green lines cluster around Boston and Cambridge, while the commuter rail extends outward into surrounding suburbs, with services like the CapeFLYER reaching even farther.<br><br>Focus on where lines overlap most. Boston and Cambridge stand out, along with places like Quincy and Revere. These areas represent the strongest and most consistent transit access.<br><br>This sets up a simple question: does housing growth appear in these same places?'
+		},
+		{
+			kicker: 'Step 2',
+			title: 'Where Housing Growth Is Happening',
+			bodyHtml:
+				'This map adds housing growth. Darker blues show stronger growth, reds show weaker or negative growth. The Seaport stands out, but strong growth also appears farther out in parts of Plymouth, Essex, and Worcester counties.<br><br>Now compare this to the previous map. Some growth appears near strong transit, but much of it appears beyond those areas.<br><br>If transit-oriented development is working as intended, we might expect growth to be more concentrated near the strongest parts of the network. Instead, the pattern looks more spread out, raising questions about how growth and access are distributed.'
+		},
+		{
+			kicker: 'Step 3',
+			title: 'Looking at the Contrast Up Close',
+			bodyHtml:
+				'Here, we zoom into individual tracts to make the pattern easier to see.<br><br>Focus on a few examples. Some tracts show strong housing growth with only limited transit access nearby. Others sit closer to strong transit but show little or even negative growth.<br><br>Looking at these side by side makes the contrast clearer. Growth and transit access do not consistently appear together.'
+		},
+		{
+			kicker: 'Step 4',
+			title: 'A measurable mismatch',
+			bodyHtml:
+				'This step makes the pattern explicit. Solid purple outlines mark tracts with strong transit access but low or negative housing growth. Dashed purple outlines mark the opposite, where growth is strong despite weaker or minimal transit access.<br><br>Both patterns appear across the region. Some high-access areas show limited growth, while some lower-access areas show substantial growth.<br><br>This does not mean growth outside transit is inherently negative, but it highlights a clear difference between where access is strongest and where housing is being added.'
+		},
+		{
+			kicker: 'Step 5',
+			title: 'How Growth Is Distributed Relative to Transit',
+			bodyHtml:
+				'We now move from mismatch to classification. Tracts are grouped based on how development is distributed relative to transit. Green outlines mark more transit-oriented development, while orange outlines mark more non-TOD patterns.<br><br>The map still shows housing growth underneath, but now also shows whether that growth is concentrated near transit or not.<br><br>This makes it easier to compare not just where growth appears, but how it relates to transit access across the region.'
+		},
+		{
+			kicker: 'Step 6',
+			title: 'Boston and Cambridge',
+			bodyHtml:
+				'This zoom focuses on Boston and Cambridge as a reference case. Most tracts here are TOD-dominated, which aligns with strong transit access.<br><br>At the same time, the pattern is not uniform. There are areas with minimal development, and some tracts show low or even negative growth.<br><br>This shows that even in the most connected areas, housing growth is not consistently high.'
+		},
+		{
+			kicker: 'Step 7',
+			title: 'Quincy and Revere',
+			bodyHtml:
+				'Moving outward to Quincy and Revere, the pattern becomes more mixed. Transit access is still present, but nearby tracts do not all show the same relationship between growth and TOD.<br><br>There are slightly more non-TOD tracts, and there are also areas with minimal development or low growth.<br><br>This suggests that the relationship between transit and growth becomes less consistent outside the urban core.'
+		},
+		{
+			kicker: 'Step 8',
+			title: 'Outer-Ring Growth',
+			bodyHtml:
+				'In the outer ring, the pattern shifts more clearly. Many tracts are farther from strong transit, and much of the development appears in non-TOD categories.<br><br>Transit is still present in some places, but it is more limited and less frequent. Growth appears more dispersed and less closely associated with strong transit access.<br><br>This highlights a different pattern compared to the urban core.'
+		},
+		{
+			kicker: 'Step 9',
+			title: 'Projects Enter the Picture',
+			bodyHtml:
+				'This step adds individual developments. Each dot represents a project, with size reflecting units and color showing the share of multi-family housing from white to purple. Green outlines indicate transit-accessible projects, while yellow outlines indicate those that are not.<br><br>Most projects are overwhelmingly multi-family, with many near 100 percent. Larger projects appear more often near the core, but projects are distributed across the region.<br><br>Many projects, even in highly accessible areas, include little or no affordable housing, which limits who is able to access those units.'
+		},
+		{
+			kicker: 'Step 10',
+			title: 'Projects as Examples',
+			bodyHtml:
+				'This step highlights a few projects to make the pattern more concrete. Some, like Assembly Row and 16 Boardman St, represent strong TOD cases with dense housing near transit. Others, like 16 Dyer, are near transit but less tightly integrated.<br><br>On the other end, projects like Mahoney Farm and The Pinehills show substantial growth farther from strong transit access.<br><br>These examples make it easier to compare how location, scale, and affordability vary across developments.'
+		},
+		{
+			kicker: 'Step 11',
+			title: 'Who This Affects',
+			bodyHtml:
+				'In this final step, higher-income tracts fade into the background, where high income is defined as greater than $125k per year and lower income as less than $125k.<br><br>Many lower-income tracts appear within mismatch categories. Some are in high-access areas with limited growth, while others are in areas with growth but weaker transit access.<br><br>Among lower-income tracts, there also appear to be more areas with minimal development, even in places with transit access.<br><br>This shifts the focus from where housing is built to how access is distributed. Transit-oriented development is often associated with improved access, but without affordability, that access may not be equally available to all households.'
+		}
+	];
+
+	const PLAYGROUND_MINI_STEPS = [
+		{
+			kicker: 'Step 1',
+			title: 'Development',
+			body: 'Start with a choropleth with tracts filled according to their % housing growth.'
+		},
+		{
+			kicker: 'Step 2',
+			title: 'TOD tract cohorts',
+			body: 'Orange and green outlines mark tracts that lean more TOD-dominated or non-TOD-dominated, while the choropleth still carries the main story.'
+		},
+		{
+			kicker: 'Step 3',
+			title: 'Access–growth mismatch',
+			body: 'Purple outlines take over here to show where transit access and housing growth pull apart, without the cohort outlines getting in the way.'
+		},
+		{
+			kicker: 'Step 4',
+			title: 'Development projects',
+			body: 'The cohort outlines return with development dots on top, so you can compare tract patterns with the projects that sit inside them.'
+		},
+		{
+			kicker: 'Step 5',
+			title: 'Sandbox map',
+			body: 'Choropleth fill tracks the X-axis (development) variable from the controls. Toggle developments, TOD / non-TOD outlines, and MBTA layers independently.'
+		}
+	];
+
+	const stepContent = guidedMode ? GUIDED_NARRATIVE_STEPS : PLAYGROUND_MINI_STEPS;
 
 	const keyFindings = guidedMode
 		? [
@@ -523,7 +562,7 @@
 			'Housing growth is uneven across the region, and the strongest growth does not simply track the transit network.',
 			'TOD-dominated and non-TOD-dominated tracts both show up across the map, so transit-oriented development is only one part of the bigger pattern.',
 			'Several transit-rich tracts still show relatively weak housing growth, which points to a clear access-growth mismatch.',
-			'Project dots in the final view make it easier to compare tract-level patterns with the developments located there.'
+			'Project dots build up to a configurable sandbox: pick any development-axis metric for the fill and add overlays on demand, including the MBTA network.'
 		];
 
 	function stepRef(node, index) {
@@ -535,6 +574,23 @@
 				stepEls = [...stepEls];
 			}
 		};
+	}
+
+	/**
+	 * Jump to a guided walkthrough step (arrows / dropdown). Clears waypoint sub-focus
+	 * so auto-zoom does not apply the wrong example.
+	 *
+	 * Parameters
+	 * ----------
+	 * next : number
+	 *     Zero-based step index, clamped to the current ``stepContent`` range.
+	 */
+	function commitGuidedStage(next) {
+		const last = Math.max(0, stepContent.length - 1);
+		const clamped = Math.max(0, Math.min(last, next));
+		if (clamped === revealStage) return;
+		revealStage = clamped;
+		guidedFocusDetail = null;
 	}
 
 	function focusWaypointRef(node, meta) {
@@ -628,6 +684,29 @@
 		return [-0.66 * abs, -0.33 * abs, -0.08 * abs, 0.08 * abs, 0.33 * abs, 0.66 * abs];
 	}
 
+	/**
+	 * Six thresholds that partition ``[lo, hi]`` into seven bands (same count as
+	 * ``buildChoroplethThresholds``) for one-sided metrics such as affordable share.
+	 *
+	 * Parameters
+	 * ----------
+	 * lo : number
+	 * hi : number
+	 *
+	 * Returns
+	 * -------
+	 * number[]
+	 */
+	function buildChoroplethLinearThresholds(lo, hi) {
+		const a = Number(lo);
+		const b = Number(hi);
+		if (!Number.isFinite(a) || !Number.isFinite(b) || b <= a) {
+			return d3.range(1, 7).map((i) => i / 7);
+		}
+		const span = b - a;
+		return d3.range(1, 7).map((i) => a + (i / 7) * span);
+	}
+
 	let mapCanvasLeft = 0;
 	let mapW = 520;
 	const mapH = 430;
@@ -676,7 +755,10 @@
 			dn: developments.length,
 			nr: nhgisRows?.length ?? 0,
 			md: metricsDevelopments?.length ?? -1,
-			showDev: panelState.showDevelopments
+			showDev: panelState.showDevelopments,
+			xVar: panelState.xVar,
+			pSandC: playgroundStoryCarousel ? Number(playgroundSandboxCohortOutlines) : 0,
+			pSandD: playgroundStoryCarousel ? Number(playgroundSandboxDevs) : 0
 		})
 	);
 
@@ -1277,17 +1359,78 @@
 		refreshMetrics();
 
 		const rowByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
+		const tractByGjX = new Map((tractList ?? []).map((t) => [t.gisjoin, t]));
 		const spotlight = activeSpotlight;
-		const values = (nhgisRows ?? [])
-			.map((r) => Number(r.census_hu_pct_change))
-			.filter(Number.isFinite);
-		// Clip colorbar domain to 5-sigma so extreme outlier tracts don't
-		// squash the scale and make the rest of the map look uniform.
-		const mean = values.length ? d3.mean(values) : 0;
-		const sd = values.length > 1 ? d3.deviation(values) : 1;
-		const clipBound = Math.max(1, Math.abs(mean) + 5 * (sd || 1));
-		const maxAbs = Math.min(clipBound, Math.max(1, d3.max(values, (d) => Math.abs(d)) || 1));
-		const choroThresholds = buildChoroplethThresholds(maxAbs);
+		const isPlaygroundSandboxX = playgroundStoryCarousel && revealStage === 4;
+		const xVarKey = panelState.xVar;
+		const xVarMeta = meta.xVariables?.find((v) => v.key === xVarKey);
+		const defaultGrowthTitle = `% housing growth (${periodDisplayLabel(panelState.timePeriod)})`;
+		const legendTitle = isPlaygroundSandboxX
+			? (xVarMeta?.label ? String(xVarMeta.label) : xVarKey)
+			: defaultGrowthTitle;
+		/** @type {number[]} */
+		let values;
+		/** @type {'sym' | 'affshare'} */
+		const choroKind = isPlaygroundSandboxX && xVarKey === 'affordable_share' ? 'affshare' : 'sym';
+		if (isPlaygroundSandboxX) {
+			values = (nhgisRows ?? [])
+				.map((r) => {
+					const t = r?.gisjoin ? tractByGjX.get(r.gisjoin) : undefined;
+					const xv = getScatterXValue(
+						t,
+						r.gisjoin,
+						xVarKey,
+						tractTodMetricsMap,
+						panelState.timePeriod
+					);
+					if (choroKind === 'affshare') {
+						const n = xv == null ? NaN : Number(xv);
+						return Number.isFinite(n) ? n : NaN;
+					}
+					return xv == null || !Number.isFinite(Number(xv)) ? NaN : Number(xv);
+				})
+				.filter(Number.isFinite);
+		} else {
+			values = (nhgisRows ?? [])
+				.map((r) => Number(r.census_hu_pct_change))
+				.filter(Number.isFinite);
+		}
+		const transformed = values;
+		const invTransform = (v) => (choroKind === 'affshare' ? Number(v) * 100 : v);
+		let choroThresholds;
+		/** @type {number} */
+		let d0;
+		/** @type {number} */
+		let d1;
+		/** @type {number} */
+		let maxAbs;
+		if (isPlaygroundSandboxX && choroKind === 'affshare') {
+			const lo = 0;
+			const hi = Math.max(0.01, d3.max(transformed, (d) => d) ?? 1);
+			maxAbs = hi;
+			d0 = lo;
+			d1 = Math.min(1, hi * 1.02);
+			choroThresholds = buildChoroplethLinearThresholds(d0, d1);
+		} else if (isPlaygroundSandboxX) {
+			// Clip colorbar to 5-sigma (same as census growth) for development X metrics in % units.
+			const mean = transformed.length ? d3.mean(transformed) : 0;
+			const sd = transformed.length > 1 ? d3.deviation(transformed) : 1;
+			const clipBound = Math.max(1, Math.abs(mean) + 5 * (sd || 1));
+			maxAbs = Math.min(clipBound, Math.max(1, d3.max(transformed, (d) => Math.abs(d)) || 1));
+			d0 = -maxAbs;
+			d1 = maxAbs;
+			choroThresholds = buildChoroplethThresholds(maxAbs);
+		} else {
+			// Clip colorbar domain to 5-sigma so extreme outlier tracts don't
+			// squash the scale and make the rest of the map look uniform.
+			const mean = transformed.length ? d3.mean(transformed) : 0;
+			const sd = transformed.length > 1 ? d3.deviation(transformed) : 1;
+			const clipBound = Math.max(1, Math.abs(mean) + 5 * (sd || 1));
+			maxAbs = Math.min(clipBound, Math.max(1, d3.max(transformed, (d) => Math.abs(d)) || 1));
+			d0 = -maxAbs;
+			d1 = maxAbs;
+			choroThresholds = buildChoroplethThresholds(maxAbs);
+		}
 		const color = d3
 			.scaleThreshold()
 			.domain(choroThresholds)
@@ -1306,7 +1449,23 @@
 			if (lowIncomeFocusOn && li !== true && !isSelHover) {
 				return LOW_INCOME_FOCUS_INACTIVE_FILL;
 			}
-			const v = row ? Number(row.census_hu_pct_change) : NaN;
+			const v = (() => {
+				if (isPlaygroundSandboxX) {
+					const t = id ? tractByGjX.get(id) : undefined;
+					const xv = getScatterXValue(
+						t,
+						id,
+						xVarKey,
+						tractTodMetricsMap,
+						panelState.timePeriod
+					);
+					if (choroKind === 'affshare') {
+						return xv == null ? NaN : Number(xv);
+					}
+					return xv == null || !Number.isFinite(Number(xv)) ? NaN : Number(xv);
+				}
+				return row ? Number(row.census_hu_pct_change) : NaN;
+			})();
 			let baseFill = Number.isFinite(v) ? color(v) : '#e7e0d5';
 			let fill = tintFill(baseFill, row);
 			if (guidedMode && guidedFocusIds.size && !guidedFocusIds.has(id) && !isSelHover) {
@@ -1450,16 +1609,17 @@
 			const legBarH = Math.min(132, Math.max(88, mapH * 0.31));
 			const y0 = mapH - bottomPad - tanH - legBarH;
 			const fmtTick = (v) => {
-				const n = Number(v);
+				const n = Number(invTransform(Number(v)));
 				if (!Number.isFinite(n)) return '';
+				if (isPlaygroundSandboxX && choroKind === 'affshare') {
+					return `${d3.format('.0f')(n)}%`;
+				}
 				const ax = Math.abs(n);
 				if (ax >= 1000 || (ax > 0 && ax < 0.01)) return `${d3.format('.2~s')(n)}%`;
 				return `${d3.format('.1f')(n)}%`;
 			};
 
 			const legendG = legGroup.append('g').attr('class', 'map-legend-inner');
-			const d0 = -maxAbs;
-			const d1 = maxAbs;
 			const binEdges = [d0, ...choroThresholds, d1];
 			for (let i = 0; i < CHORO_COLOR_STEPS.length; i += 1) {
 				const topVal = binEdges[i + 1];
@@ -1499,7 +1659,7 @@
 				.attr('fill', 'var(--text-muted)')
 				.attr('font-size', '7.5px')
 				.attr('font-weight', 600)
-				.text(`% housing growth (${periodDisplayLabel(panelState.timePeriod)})`);
+				.text(legendTitle);
 
 			// Tan tracts: explain under the in-map colorbar (HTML duplicate removed from the key card).
 			legendG
@@ -1768,15 +1928,16 @@
 	function updateOverlays() {
 		if (!containerEl || !svgRef) return;
 
+		const hideMbtaForPlaygroundSteps = playgroundStoryCarousel && revealStage !== 4;
 		const lineVis = {
-			rail: panelState.showRailLines,
-			commuter_rail: panelState.showCommuterRailLines,
-			bus: panelState.showBusLines
+			rail: hideMbtaForPlaygroundSteps ? false : panelState.showRailLines,
+			commuter_rail: hideMbtaForPlaygroundSteps ? false : panelState.showCommuterRailLines,
+			bus: hideMbtaForPlaygroundSteps ? false : panelState.showBusLines
 		};
 		const stopVis = {
-			rail: panelState.showRailStops,
-			commuter_rail: panelState.showCommuterRailStops,
-			bus: panelState.showBusStops
+			rail: hideMbtaForPlaygroundSteps ? false : panelState.showRailStops,
+			commuter_rail: hideMbtaForPlaygroundSteps ? false : panelState.showCommuterRailStops,
+			bus: hideMbtaForPlaygroundSteps ? false : panelState.showBusStops
 		};
 
 		d3.select(containerEl).selectAll('path.mbta-line')
@@ -1918,12 +2079,33 @@
 					: devClass === 'minimal'
 						? 'minimal'
 						: 'neutral';
-		const primaryRows = [
-			{
-				label: `Census % housing growth (${pl})`,
-				value: Number.isFinite(huPct) ? `${fmt1(huPct)}%` : '—'
-			}
-		];
+		const primaryRows = [];
+		if (playgroundStoryCarousel && revealStage === 4) {
+			const xk = panelState.xVar;
+			const xLab = meta.xVariables?.find((v) => v.key === xk)?.label ?? xk;
+			const xRaw = getScatterXValue(
+				t,
+				id,
+				xk,
+				tractTodMetricsMap,
+				panelState.timePeriod
+			);
+			const xNum = xRaw == null ? NaN : Number(xRaw);
+			const xStr =
+				xk === 'affordable_share' && Number.isFinite(xNum)
+					? `${fmt1(xNum * 100)}% (share)`
+					: Number.isFinite(xNum)
+						? `${fmt1(xNum)}%`
+						: '—';
+			primaryRows.push({
+				label: `Map fill: ${xLab}`,
+				value: xStr
+			});
+		}
+		primaryRows.push({
+			label: `Census % housing growth (${pl})`,
+			value: Number.isFinite(huPct) ? `${fmt1(huPct)}%` : '—'
+		});
 		const mhRow = row?.median_household_income ?? mismatchFlag?.medianHouseholdIncome;
 		if (Number.isFinite(Number(mhRow))) {
 			const mhNum = Number(mhRow);
@@ -2375,6 +2557,8 @@
 
 	const activeSpotlight = $derived(hoveredSpotlight ?? pinnedSpotlight);
 	const spotlightSummary = $derived.by(() => {
+		// Playground: cohort means are in ``PlaygroundTodScatters``; tract counts via optional strip there.
+		if (playgroundStoryCarousel) return null;
 		const spotlight = activeSpotlight;
 		if (!spotlight) return null;
 		const rows = (nhgisRows ?? []).filter((row) => row?.devClass === spotlight && passesGrowthFilter(row));
@@ -3018,7 +3202,7 @@
 		zoomToDevelopment(d);
 		window.setTimeout(() => {
 			const anchor = developmentScreenAnchor(d);
-			const fallbackX = typeof window !== 'undefined' ? window.innerWidth * 0.7 : 980;
+			const fallbackX = typeof window !== 'undefined' ? window.innerWidth * 0.6 : 980;
 			const fallbackY = typeof window !== 'undefined' ? window.innerHeight * 0.38 : 380;
 			const x = anchor ? anchor.x + 76 : fallbackX;
 			const y = anchor ? anchor.y - 14 : fallbackY;
@@ -3052,10 +3236,13 @@
 	$effect(() => {
 		void dataKey;
 		void revealStage;
+		void guidedMode;
+		void playgroundStoryCarousel;
 		void activeSpotlight;
 		void lowIncomeFocusOn;
 		void hoveredMismatchCluster;
 		void mismatchOutlineMode;
+		void comparisonMetric;
 		if (!containerEl || !svgRef) return;
 		updateChoropleth({ animate: true, legend: true });
 		updateFocusRegion();
@@ -3195,8 +3382,13 @@
 	// not to other $state dependencies read inside the block.
 	let prevRevealStageForPin = $state(0);
 	$effect(() => {
+		void guidedMode;
+		void playgroundStoryCarousel;
 		const stage = revealStage;
-		if (!guidedMode) { prevRevealStageForPin = stage; return; }
+		if (!guidedMode && !playgroundStoryCarousel) {
+			prevRevealStageForPin = stage;
+			return;
+		}
 		const stageChanged = stage !== prevRevealStageForPin;
 		prevRevealStageForPin = stage;
 		if (!stageChanged) return;
@@ -3226,7 +3418,9 @@
 	});
 
 	$effect(() => {
-		if (!guidedMode || !containerEl) return;
+		void guidedMode;
+		void playgroundStoryCarousel;
+		if ((!guidedMode && !playgroundStoryCarousel) || !containerEl) return;
 		const clearGuidedPopupState = () => {
 			tooltip = { ...tooltip, visible: false, anchorX: null, anchorY: null };
 			pinnedTooltipStage = null;
@@ -3250,11 +3444,15 @@
 
 	$effect(() => {
 		void overlayKey;
+		void revealStage;
+		void playgroundStoryCarousel;
 		if (!containerEl || !svgRef) return;
 		updateOverlays();
 	});
 
 	$effect(() => {
+		void playgroundStoryCarousel;
+		if (playgroundStoryCarousel) return;
 		if (stepEls.filter(Boolean).length !== stepContent.length) return;
 		let frame = 0;
 		const updateStageFromScroll = () => {
@@ -3433,8 +3631,7 @@
 				<div class="poc-scrolly-left">
 					{#if !guidedMode}
 					<div class="poc-control-stack">
-				<div class="poc-side-cards">
-
+				<div class="poc-spotlight-mismatch-row">
 				<div class="poc-spotlight card-key" role="group" aria-label="Tract cohort spotlight">
 					<div class="poc-spotlight__head">
 						<p class="poc-spotlight__kicker">Cohort spotlight</p>
@@ -3489,7 +3686,7 @@
 							onblur={() => (hoveredSpotlight = null)}
 							onclick={() => (pinnedSpotlight = pinnedSpotlight === 'minimal' ? null : 'minimal')}
 						>
-							Minimal development
+							Min. development
 						</button>
 					</div>
 					{#if spotlightSummary}
@@ -3523,7 +3720,6 @@
 						</div>
 					{/if}
 				</div>
-				</div>
 
 				<div class="poc-insight card-key" role="group" aria-label="Mismatch focus">
 					<p class="poc-detail__kicker">Mismatch focus</p>
@@ -3531,7 +3727,7 @@
 						<input type="checkbox" bind:checked={focusLowIncomeTracts} />
 						<span>Bring lower-income tracts (&lt;$125k median) forward</span>
 					</label>
-					<p class="poc-detail__kicker" style="margin-top: 12px">Mismatch outlines</p>
+					<p class="poc-detail__kicker poc-insight__kicker-sub">Mismatch outlines</p>
 					<div class="poc-mismatch-mode" role="group" aria-label="Which mismatch categories to outline">
 						<button
 							type="button"
@@ -3566,9 +3762,10 @@
 							High growth, low access
 						</button>
 					</div>
-					<p class="poc-detail__summary">
+					<!-- <p class="poc-detail__summary poc-insight__summary">
 						Use these controls to isolate one mismatch pattern, highlight lower-income tracts, or jump to a notable example with the red markers.
-					</p>
+					</p> -->
+				</div>
 				</div>
 
 				{#if comparisonPairDetails.length > 0}
@@ -3606,7 +3803,22 @@
 						<div class="map-visual-column">
 							<div class="map-left-column">
 								<div class="poc-legend-row">
-					{#if !guidedMode}
+					{#if !guidedMode && playgroundStoryCarousel && revealStage === 4}
+						<fieldset class="poc-transit-field poc-sandbox-layers" aria-label="Sandbox map layers">
+							<legend class="poc-transit-legend">Map layers</legend>
+							<div class="poc-sandbox-toggles" role="group">
+								<label class="poc-sandbox-check">
+									<input type="checkbox" bind:checked={playgroundSandboxCohortOutlines} />
+									<span>TOD / non-TOD tract outlines</span>
+								</label>
+								<label class="poc-sandbox-check">
+									<input type="checkbox" bind:checked={playgroundSandboxDevs} />
+									<span>Developments (MassBuilds)</span>
+								</label>
+							</div>
+						</fieldset>
+					{/if}
+					{#if !guidedMode && (!playgroundStoryCarousel || revealStage === 4)}
 					<fieldset class="poc-transit-field">
 						<legend class="poc-transit-legend">MBTA Overlays</legend>
 						<div class="poc-transit-compact" role="group" aria-label="Transit overlays">
@@ -3640,6 +3852,7 @@
 						class="map-main"
 						role="region"
 						aria-label="Interactive census tract map"
+						bind:clientHeight={mapMainBlockHeight}
 						onmouseleave={handleOverlayLeave}
 					>
 						<div class="map-widget">
@@ -3803,10 +4016,81 @@
 				<aside class="poc-stepper-side" aria-label="Map explanation steps">
 					<div class="poc-stepper-head">
 						<p class="poc-stepper-inline-kicker">Map walkthrough</p>
-						<p class="poc-stepper-inline-hint">When you scroll here, the map adds one layer at a time.</p>
+						{#if playgroundStoryCarousel}
+							<div class="poc-guided-nav" aria-label="Walkthrough step controls">
+								<button
+									type="button"
+									class="poc-guided-nav__arrow"
+									disabled={revealStage <= 0}
+									onclick={() => commitGuidedStage(revealStage - 1)}
+									aria-label="Previous map step"
+								>
+									‹
+								</button>
+								<select
+									class="poc-guided-nav__select"
+									value={String(revealStage)}
+									onchange={(e) => commitGuidedStage(Number(e.currentTarget.value))}
+									aria-label="Select map step"
+								>
+									{#each stepContent as step, i (i)}
+										<option value={String(i)}>{step.title}</option>
+									{/each}
+								</select>
+								<button
+									type="button"
+									class="poc-guided-nav__arrow"
+									disabled={revealStage >= stepContent.length - 1}
+									onclick={() => commitGuidedStage(revealStage + 1)}
+									aria-label="Next map step"
+								>
+									›
+								</button>
+							</div>
+							<p class="poc-stepper-inline-hint">
+								Use the arrows or menu to step through five map layers.
+							</p>
+						{:else if guidedMode}
+							<p class="poc-stepper-inline-hint">When you scroll here, the map adds one layer at a time.</p>
+						{:else}
+							<p class="poc-stepper-inline-hint">When you scroll here, the map adds one layer at a time.</p>
+						{/if}
 					</div>
-					<div class="poc-stepper-inline-rail" aria-label="Map steps">
-						{#each stepContent as step, i (i)}
+					<div
+						class="poc-stepper-inline-rail"
+						class:poc-stepper-inline-rail--single={playgroundStoryCarousel}
+						aria-label="Map steps"
+					>
+						{#if playgroundStoryCarousel}
+							{#key revealStage}
+								{@const pgStepIdx = Math.min(Math.max(0, revealStage), stepContent.length - 1)}
+								{@const step = stepContent[pgStepIdx]}
+								<section
+									class="poc-stepper-card poc-stepper-card--active poc-stepper-card--carousel"
+									data-step-index={pgStepIdx}
+									aria-current="step"
+									style:height={playgroundStoryCarousel && mapMainBlockHeight > 0
+										? `${Math.round(mapMainBlockHeight * 0.6)}px`
+										: undefined}
+								>
+									<div class="poc-stepper-card-top">
+										<span class="poc-stepper-pill-num">{pgStepIdx + 1}</span>
+										<div class="poc-stepper-pill-text">
+											<span class="poc-stepper-pill-kicker">{step.kicker}</span>
+											<span class="poc-stepper-pill-title">{step.title}</span>
+										</div>
+									</div>
+									<p class="poc-stepper-card-body">
+										{#if step.bodyHtml}
+											{@html step.bodyHtml}
+										{:else}
+											{step.body}
+										{/if}
+									</p>
+								</section>
+							{/key}
+						{:else}
+							{#each stepContent as step, i (i)}
 							<section
 								use:stepRef={i}
 								class="poc-stepper-card"
@@ -4019,18 +4303,28 @@
 								{/if}
 							</section>
 						{/each}
+						{/if}
 					</div>
 				</aside>
 			</div>
-			<div class="poc-key-findings card-key" role="note" aria-label="Key findings summary">
+			<!-- <div class="poc-key-findings card-key" role="note" aria-label="Key findings summary">
 				<p class="poc-detail__kicker">Key findings</p>
 				<ul class="poc-map-callouts__list">
 					{#each keyFindings as c, i (i)}
 						<li>{c}</li>
 					{/each}
 				</ul>
-			</div>
-			<p class="poc-map-zoom-hint">Scroll through the walkthrough, drag to pan, and scroll or pinch to zoom.</p>
+			</div> -->
+			<p class="poc-map-zoom-hint">
+				{#if playgroundStoryCarousel}
+					Use the step controls to run through the five layers. Pan and zoom freely; Controls adjust filters for the map
+					and charts.
+				{:else if guidedMode}
+					Scroll through the walkthrough, drag to pan, and scroll or pinch to zoom.
+				{:else}
+					Scroll through the walkthrough, drag to pan, and scroll or pinch to zoom.
+				{/if}
+			</p>
 		</div>
 	</div>
 </div>
@@ -4105,15 +4399,52 @@
 	}
 
 	.poc-stepper-head {
-		position: sticky;
-		top: 16px;
-		z-index: 3;
+		position: relative;
+		top: auto;
+		z-index: auto;
 		display: grid;
 		gap: 4px;
 		padding: 10px 12px;
 		border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
 		border-radius: var(--radius-sm);
 		background: color-mix(in srgb, var(--bg-card) 96%, white);
+	}
+
+	.poc-guided-nav {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		min-width: 0;
+	}
+
+	.poc-guided-nav__arrow {
+		flex: 0 0 auto;
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+		border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
+		border-radius: var(--radius-sm);
+		background: var(--bg-card);
+		color: var(--text);
+		font-size: 1.25rem;
+		line-height: 1;
+		cursor: pointer;
+	}
+
+	.poc-guided-nav__arrow:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+
+	.poc-guided-nav__select {
+		flex: 1 1 auto;
+		min-width: 0;
+		padding: 6px 8px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		background: var(--bg-card);
+		color: var(--text);
+		font-size: 0.72rem;
 	}
 
 	.poc-stepper-inline-kicker,
@@ -4136,11 +4467,27 @@
 
 	.poc-stepper-inline-rail {
 		display: grid;
-		gap: 33vh;
+		gap: calc(33vh * 0.6);
 		padding-top: 8px;
 		/* Extra runway after step 3 so the page does not jump to the next section immediately */
-		padding-bottom: calc(57vh + 108px);
+		padding-bottom: calc(57vh * 0.6 + 108px);
 		isolation: isolate;
+	}
+
+	.poc-stepper-inline-rail--single {
+		gap: 10px;
+		padding-top: 4px;
+		padding-bottom: 10px;
+	}
+
+	.poc-stepper-card--carousel {
+		min-height: 0;
+		opacity: 1;
+		transform: none;
+		padding-top: 8px;
+		box-sizing: border-box;
+		align-content: start;
+		overflow: auto;
 	}
 
 	.poc-stepper-card {
@@ -4148,7 +4495,7 @@
 		align-content: center;
 		gap: 12px;
 		width: 100%;
-		min-height: 84vh;
+		min-height: calc(84vh * 0.6);
 		padding: 10px 0 0;
 		border-left: 2px solid color-mix(in srgb, var(--accent) 16%, var(--border));
 		padding-left: 18px;
@@ -4182,7 +4529,7 @@
 	}
 
 	.poc-stepper-card--runway-after {
-		margin-bottom: 18vh;
+		margin-bottom: calc(18vh * 0.6);
 	}
 
 	.poc-stepper-card-top {
@@ -4299,7 +4646,7 @@
 	.poc-stepper-example-wrap {
 		display: grid;
 		gap: 0.4rem;
-		min-height: 24vh;
+		min-height: calc(24vh * 0.7);
 		align-content: start;
 	}
 
@@ -4526,10 +4873,13 @@
 		margin-bottom: 0;
 	}
 
-	.poc-side-cards {
+	/* Cohort spotlight (left) + mismatch controls (right) on wide viewports. */
+	.poc-spotlight-mismatch-row {
 		display: grid;
-		gap: 5px;
-		align-content: start;
+		grid-template-columns: 1fr;
+		gap: 6px;
+		align-items: start;
+		min-width: 0;
 	}
 
 	@media (min-width: 640px) {
@@ -4551,6 +4901,10 @@
 			align-items: start;
 		}
 
+		.poc-spotlight-mismatch-row {
+			grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.95fr);
+			column-gap: 8px;
+		}
 	}
 
 	@media (max-width: 900px) {
@@ -4609,6 +4963,10 @@
 			gap: 18px;
 		}
 
+		.poc-stepper-inline-rail--single {
+			gap: 10px;
+		}
+
 		.poc-stepper-card {
 			min-height: 0;
 			padding-top: 0;
@@ -4621,6 +4979,21 @@
 		background: var(--bg-card);
 		padding: 0 2px 1px;
 		margin: 0;
+	}
+
+	.poc-sandbox-toggles {
+		display: grid;
+		gap: 4px;
+		padding: 2px 4px 6px;
+		font-size: 0.78rem;
+		line-height: 1.25;
+	}
+
+	.poc-sandbox-check {
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		cursor: pointer;
 	}
 
 	.poc-spotlight {
@@ -4864,7 +5237,21 @@
 
 	.poc-insight {
 		display: grid;
-		gap: 5px;
+		gap: 3px;
+		align-content: start;
+		align-self: start;
+		padding: 2px 5px;
+	}
+
+	.poc-insight__kicker-sub {
+		margin: 1px 0 0;
+		font-size: 0.64rem;
+	}
+
+	.poc-insight__summary {
+		font-size: 0.59rem;
+		line-height: 1.12;
+		margin-top: 0;
 	}
 
 	.poc-insight__buttons {
@@ -5111,7 +5498,7 @@
 			grid-template-columns: 1fr;
 		}
 
-		.poc-side-cards {
+		.poc-spotlight-mismatch-row {
 			grid-column: auto;
 		}
 
@@ -5340,18 +5727,18 @@
 	.poc-mismatch-mode {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 4px;
-		margin: 0 0 4px;
+		gap: 3px;
+		margin: 0 0 1px;
 	}
 
 	.poc-mismatch-mode__btn {
 		border: 1px solid var(--border);
 		background: color-mix(in srgb, var(--bg-card) 92%, transparent);
 		color: var(--text);
-		font-size: 0.6rem;
-		line-height: 1.25;
-		padding: 3px 6px;
-		border-radius: 6px;
+		font-size: 0.57rem;
+		line-height: 1.15;
+		padding: 2px 5px;
+		border-radius: 5px;
 		cursor: pointer;
 		text-align: left;
 		transition:
