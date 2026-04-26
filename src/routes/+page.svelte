@@ -317,19 +317,24 @@
 
 	/**
 	 * Layout for a three-cohort bar chart (same population-weighted means as body copy / scatter Y).
-	 * Default size is 1.5× 268×96 with scaled margins and type (see ``COHORT_MINI_BAR``).
+	 * Category axis (TOD / non-TOD / minimal) along the top; value scale increases downward. Default
+	 * size and type from ``COHORT_MINI_BAR``.
 	 *
 	 * @param { { meanTod: number, meanNonTod: number, meanMinimal: number, kind: 'pp' | 'pct' | 'min' } | undefined } row
 	 * @param {{ w?: number, h?: number }} [opts]
 	 */
-	const COHORT_MINI_BAR = { W: 402, H: 288, fs: 14, tickPad: 8, bottomLabelyPad: 20, valueLabelyPad: 6, rx: 1.5 };
+	const COHORT_MINI_BAR = { W: 402, H: 288, fs: 14, tickPad: 8, valueLabelyPad: 6, rx: 1.5 };
 
+	/** Down-facing vertical bars: categories (x) along the top; y increases with value going downward. */
 	function cohortMiniBarLayout(row, opts) {
 		if (!row) return null;
 		const W = opts?.w ?? COHORT_MINI_BAR.W;
 		const H = opts?.h ?? COHORT_MINI_BAR.H;
-		// Margins and typography scale with the 50% larger plot (1.5× base).
-		const m = { t: 24, r: 12, b: 30, l: 54 };
+		const m = { b: 28, r: 12, l: 54 };
+		// Space above the plot for category labels; value scale occupies [valuePlotTop, H - m.b]
+		const categoryLabelY = 20;
+		const valuePlotTop = 32;
+		const ih = H - valuePlotTop - m.b;
 		// TOD / non-TOD / minimal: same MBTA green & orange as scatter & map; grey matches minimal-class outline
 		const items = [
 			{ id: 'tod', shortLabel: 'TOD', v: row.meanTod, fill: MBTA_GREEN },
@@ -346,12 +351,11 @@
 		const pad = span > 0 ? span * 0.08 : 0.5;
 		const yDomain = [y0 - pad, y1 + pad];
 		const iw = W - m.l - m.r;
-		const ih = H - m.t - m.b;
-		const x = d3.scaleBand().domain(items.map((d) => d.id)).range([0, iw]).padding(0.22);
-		const y = d3.scaleLinear().domain(yDomain).range([ih, 0]);
+		const yScale = d3.scaleLinear().domain(yDomain).range([0, ih]);
 		/** @param {number} v */
-		const toSvgY = (v) => m.t + y(v);
-		const y0px = toSvgY(0);
+		const toPlotY = (v) => valuePlotTop + yScale(v);
+		const y0px = toPlotY(0);
+		const x = d3.scaleBand().domain(items.map((d) => d.id)).range([0, iw]).padding(0.22);
 		const tickFmt =
 			row.kind === 'pp'
 				? d3.format('.1f')
@@ -370,20 +374,32 @@
 					wPx: x.bandwidth(),
 					hPx: 0,
 					valueLabel: '—',
-					labelY: y0px - COHORT_MINI_BAR.valueLabelyPad
+					valueLabelY: y0px + 6,
+					valueLabelBaseline: /** @type {'middle'} */ ('middle')
 				};
 			}
-			const yV = toSvgY(d.v);
+			const yV = toPlotY(d.v);
+			// Bar segment between zero and v; positive v → bar extends downward in SVG space
 			const top = Math.min(y0px, yV);
 			const hPx = Math.abs(yV - y0px);
 			const valueLabel = formatYMetricSummary(d.v, row.kind);
-			// Alphabetic baseline: a few px above the top of the bar (smaller y = higher on screen)
-			const labelY = top - COHORT_MINI_BAR.valueLabelyPad;
-			return { ...d, xPx: (x(d.id) ?? 0) + m.l, yPx: top, wPx: x.bandwidth(), hPx, valueLabel, labelY };
+			/** @type {'hanging' | 'alphabetic'} */
+			const valueLabelBaseline = yV > y0px ? 'hanging' : 'alphabetic';
+			const valueLabelY = yV > y0px ? yV + 2 : yV - 1;
+			return {
+				...d,
+				xPx: (x(d.id) ?? 0) + m.l,
+				yPx: top,
+				wPx: x.bandwidth(),
+				hPx,
+				valueLabel,
+				valueLabelY,
+				valueLabelBaseline
+			};
 		});
 		const yAxisTicks = yTicks.map((t) => ({
 			t,
-			yPx: toSvgY(t),
+			yPx: toPlotY(t),
 			label:
 				row.kind === 'pp'
 					? `${tickFmt(t)}`
@@ -397,6 +413,8 @@
 			m,
 			mInner: iw,
 			ih,
+			valuePlotTop,
+			plotBottom: valuePlotTop + ih,
 			y0px,
 			bars,
 			yDomain,
@@ -404,7 +422,7 @@
 			unitKind: row.kind,
 			fontSize: COHORT_MINI_BAR.fs,
 			tickTextPad: COHORT_MINI_BAR.tickPad,
-			bottomLabelY: m.t + ih + COHORT_MINI_BAR.bottomLabelyPad,
+			categoryLabelY,
 			barRectRx: COHORT_MINI_BAR.rx
 		};
 	}
@@ -824,9 +842,9 @@
 							>
 								<line
 									x1={incomeMiniBar.m.l - 0.5}
-									y1={incomeMiniBar.m.t}
+									y1={incomeMiniBar.valuePlotTop}
 									x2={incomeMiniBar.m.l - 0.5}
-									y2={incomeMiniBar.m.t + incomeMiniBar.ih}
+									y2={incomeMiniBar.plotBottom}
 									stroke="#cbd5e1"
 									stroke-width="1"
 								/>
@@ -875,18 +893,22 @@
 									</rect>
 									<text
 										x={b.xPx + b.wPx / 2}
-										y={b.labelY}
+										y={b.valueLabelY}
 										text-anchor="middle"
+										dominant-baseline={b.valueLabelBaseline}
 										font-size={incomeMiniBar.fontSize}
 										font-weight="600"
 										fill="var(--ink, #1f2430)"
 									>
 										{b.valueLabel}
 									</text>
+								{/each}
+								{#each incomeMiniBar.bars as b (b.id)}
 									<text
 										x={b.xPx + b.wPx / 2}
-										y={incomeMiniBar.bottomLabelY}
+										y={incomeMiniBar.categoryLabelY}
 										text-anchor="middle"
+										dominant-baseline="middle"
 										fill="var(--ink, #1f2430)"
 										font-size={incomeMiniBar.fontSize}
 									>
@@ -946,9 +968,9 @@
 							>
 								<line
 									x1={eduMiniBar.m.l - 0.5}
-									y1={eduMiniBar.m.t}
+									y1={eduMiniBar.valuePlotTop}
 									x2={eduMiniBar.m.l - 0.5}
-									y2={eduMiniBar.m.t + eduMiniBar.ih}
+									y2={eduMiniBar.plotBottom}
 									stroke="#cbd5e1"
 									stroke-width="1"
 								/>
@@ -997,18 +1019,22 @@
 									</rect>
 									<text
 										x={b.xPx + b.wPx / 2}
-										y={b.labelY}
+										y={b.valueLabelY}
 										text-anchor="middle"
+										dominant-baseline={b.valueLabelBaseline}
 										font-size={eduMiniBar.fontSize}
 										font-weight="600"
 										fill="var(--ink, #1f2430)"
 									>
 										{b.valueLabel}
 									</text>
+								{/each}
+								{#each eduMiniBar.bars as b (b.id)}
 									<text
 										x={b.xPx + b.wPx / 2}
-										y={eduMiniBar.bottomLabelY}
+										y={eduMiniBar.categoryLabelY}
 										text-anchor="middle"
+										dominant-baseline="middle"
 										fill="var(--ink, #1f2430)"
 										font-size={eduMiniBar.fontSize}
 									>

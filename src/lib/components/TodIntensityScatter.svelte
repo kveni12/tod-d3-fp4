@@ -39,7 +39,8 @@
 	const marginRightDefault = 14;
 	/** Default plot size (square-ish); ``wideLayout`` overrides below in the draw effect. */
 	const INNER_W_DEFAULT = 380;
-	const INNER_H_DEFAULT = 340;
+	/** Default inner plot height (1.5× previous 340px for taller charts). */
+	const INNER_H_DEFAULT = 510;
 	const marginBottom = 52;
 
 	/**
@@ -133,7 +134,8 @@
 
 		/** Wide layout: landscape plot, side legends, regression key in an inset (POC / journalism use). */
 		const innerWidth = wideLayout ? 580 : INNER_W_DEFAULT;
-		const innerHeight = wideLayout ? 252 : INNER_H_DEFAULT;
+		/** Wide layout: inner height 1.5× previous 252px to match default layout scale-up. */
+		const innerHeight = wideLayout ? 378 : INNER_H_DEFAULT;
 		const legendColW = wideLayout ? 108 : 54;
 		const marginRight = wideLayout ? 12 : marginRightDefault;
 
@@ -208,6 +210,7 @@
 			.domain(wMin === wMax ? [Math.max(wMin * 0.9, 1), wMax * 1.1 + 1] : [wMin, wMax])
 			.range([2.5, 5.2]);
 		for (const p of allPoints) p.dotR = rScale(p.w);
+		const rMax = rScale(wMax);
 
 		let xDomain;
 		let yDomain;
@@ -252,10 +255,28 @@
 		const regLegendRows = 3 + (showSelReg ? 1 : 0);
 		const regLegendRowH = 28;
 		const legendBlockH = wideLayout ? 0 : 6 + regLegendRows * regLegendRowH + 4;
-		const chartOffsetTop = firstTitleBaseline + scatterTitleLines.length * 16 + (wideLayout ? 6 : legendBlockH + 8);
+		/** Matches the bottom-right WLS inset in ``wideLayout`` (used to stack the size box above it). */
+		const regInsetRowH = 21;
+		const regInsetH = 14 + (3 + (showSelReg ? 1 : 0)) * regInsetRowH + 10;
+		const sizeBoxPad = 8;
+		const sizeBoxHWide = sizeBoxPad + 22 + 6 + 30 + 6 + 14 + sizeBoxPad;
+
+		let sizeLegY0;
+		let regLegY0;
+		let chartOffsetTop;
+		if (wideLayout) {
+			chartOffsetTop = firstTitleBaseline + scatterTitleLines.length * 16 + 6;
+			sizeLegY0 = 0;
+			regLegY0 = 0;
+		} else {
+			sizeLegY0 = firstTitleBaseline + scatterTitleLines.length * 16 + 6;
+			const sizeLegendBlockH = 18 + 2 * rMax + 9 + 4;
+			regLegY0 = sizeLegY0 + sizeLegendBlockH + 8;
+			chartOffsetTop = regLegY0 + legendBlockH;
+		}
 		const width = marginLeft + innerWidth + legendColW + marginRight;
-		/** Extra SVG height: default puts size legend below plot; wide uses a boxed size legend (taller). */
-		const height = chartOffsetTop + innerHeight + marginBottom + (wideLayout ? 124 : 44);
+		/** Size legend is laid out in the top band (default) or above the WLS inset (wide); no extra bottom pad. */
+		const height = chartOffsetTop + innerHeight + marginBottom;
 
 		const svg = root
 			.append('svg')
@@ -278,7 +299,77 @@
 			if (i > 0) ts.attr('dy', '1.15em');
 		});
 
-		const regLegY0 = firstTitleBaseline + scatterTitleLines.length * 16 + 8;
+		if (!wideLayout) {
+			const sizeY = sizeLegY0;
+			const huFmt0 = d3.format(',.0f');
+			const sizeG0 = svg.append('g').attr('class', 'tod-intensity-size-legend').attr('pointer-events', 'none');
+			const titleX = marginLeft + innerWidth / 2;
+			sizeG0
+				.append('text')
+				.attr('x', titleX)
+				.attr('y', sizeY)
+				.attr('text-anchor', 'middle')
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '7.5px')
+				.attr('font-weight', '600')
+				.text('# of Housing Units');
+			sizeG0
+				.append('text')
+				.attr('x', titleX)
+				.attr('y', sizeY + 9)
+				.attr('text-anchor', 'middle')
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '6.5px')
+				.text(`Dot size ∝ (${startY})`);
+
+			const sizeRowY = sizeY + 18;
+			const span = Math.min(132, innerWidth - 36);
+			const x0s = marginLeft + (innerWidth - span) / 2;
+			const cbColX = marginLeft + innerWidth + 12;
+			const sizeSamples0 = [
+				{ w: wMin, disp: niceHousingUnitsLabel(wMin) },
+				{ w: (wMin + wMax) / 2, disp: niceHousingUnitsLabel((wMin + wMax) / 2) },
+				{ w: wMax, disp: niceHousingUnitsLabel(wMax) }
+			];
+			sizeSamples0.forEach((s, i) => {
+				const cx = x0s + (i * span) / 2;
+				const rr = rScale(s.w);
+				sizeG0
+					.append('circle')
+					.attr('cx', cx)
+					.attr('cy', sizeRowY + rr)
+					.attr('r', rr)
+					.attr('fill', 'color-mix(in srgb, var(--bg-hover) 85%, var(--text-muted))')
+					.attr('stroke', 'var(--border)')
+					.attr('stroke-width', 0.6);
+				sizeG0
+					.append('text')
+					.attr('x', cx)
+					.attr('y', sizeRowY + rr * 2 + 9)
+					.attr('text-anchor', 'middle')
+					.attr('fill', 'var(--text-muted)')
+					.attr('font-size', '6.5px')
+					.text(`${huFmt0(s.disp)}`);
+			});
+
+			const miniTop = sizeRowY - 2;
+			sizeG0
+				.append('rect')
+				.attr('x', cbColX)
+				.attr('y', miniTop)
+				.attr('width', 8)
+				.attr('height', 8)
+				.attr('rx', 2)
+				.attr('fill', GREY_MINIMAL);
+			sizeG0
+				.append('text')
+				.attr('x', cbColX + 11)
+				.attr('y', miniTop + 7)
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '6.5px')
+				.text('Minimal dev. (no fit)');
+		}
+
 		const slopeFmt = d3.format('.4f');
 
 		/**
@@ -567,11 +658,11 @@
 			.call(bindDotInteractions);
 
 		if (wideLayout) {
-			const rowH = 21;
+			/* Same vertical extent as ``regInsetH`` / size box stacking above. */
+			const rowH = regInsetRowH;
+			const insetH = regInsetH;
 			/* Narrower than before (~30% less width) so the plot has more room. */
 			const insetW = Math.min(232, innerWidth * 0.4) * 0.7;
-			/* Title + cohort rows + optional selected WLS row */
-			const insetH = 14 + (3 + (showSelReg ? 1 : 0)) * rowH + 10;
 			const insetG = chart
 				.append('g')
 				.attr('class', 'tod-intensity-reg-inset')
@@ -652,6 +743,98 @@
 					6
 				);
 			}
+
+			/** Dot-size card: inside the plot, above the WLS inset (same right margin as inset); avoids the TOD color column. */
+			const wMidWide = (wMin + wMax) / 2;
+			const sizeSamplesWide = [
+				{ w: wMin, disp: niceHousingUnitsLabel(wMin) },
+				{ w: wMidWide, disp: niceHousingUnitsLabel(wMidWide) },
+				{ w: wMax, disp: niceHousingUnitsLabel(wMax) }
+			];
+			const boxPad = sizeBoxPad;
+			const sizeBoxW = legendColW;
+			const sizeBoxH = sizeBoxHWide;
+			const sizeBoxX = innerWidth - sizeBoxW - 6;
+			const sizeBoxY = innerHeight - insetH - 6 - 8 - sizeBoxH;
+			const sizeGwide = chart
+				.append('g')
+				.attr('class', 'tod-intensity-size-legend')
+				.attr('pointer-events', 'none')
+				.attr('transform', `translate(${sizeBoxX},${sizeBoxY})`);
+			sizeGwide
+				.append('rect')
+				.attr('x', 0)
+				.attr('y', 0)
+				.attr('width', sizeBoxW)
+				.attr('height', sizeBoxH)
+				.attr('rx', 4)
+				.attr('fill', 'var(--bg-card)')
+				.attr('fill-opacity', 0.94)
+				.attr('stroke', 'var(--border)')
+				.attr('stroke-width', 0.75);
+			const innerXw = boxPad;
+			let tyw = boxPad + 9;
+			sizeGwide
+				.append('text')
+				.attr('x', innerXw)
+				.attr('y', tyw)
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '7.5px')
+				.attr('font-weight', '600')
+				.text('Dot size (population)');
+			tyw += 11;
+			sizeGwide
+				.append('text')
+				.attr('x', innerXw)
+				.attr('y', tyw)
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '6.5px')
+				.text(`Area ∝ housing units (${startY})`);
+			const sizeRowYw = tyw + 8;
+			const innerWw = sizeBoxW - 2 * boxPad;
+			const colWw = innerWw / 3;
+			sizeSamplesWide.forEach((s, i) => {
+				const cx = innerXw + colWw * i + colWw / 2;
+				const rr = rScale(s.w);
+				sizeGwide
+					.append('circle')
+					.attr('cx', cx)
+					.attr('cy', sizeRowYw + rr)
+					.attr('r', rr)
+					.attr('fill', 'color-mix(in srgb, var(--bg-hover) 85%, var(--text-muted))')
+					.attr('stroke', 'var(--border)')
+					.attr('stroke-width', 0.6);
+				sizeGwide
+					.append('text')
+					.attr('x', cx)
+					.attr('y', sizeRowYw + rr * 2 + 8)
+					.attr('text-anchor', 'middle')
+					.attr('fill', 'var(--text-muted)')
+					.attr('font-size', '6.5px')
+					.attr('font-variant-numeric', 'tabular-nums')
+					.text(`${huFmt(s.disp)}`);
+			});
+			const miniYw = sizeRowYw + 36;
+			sizeGwide
+				.append('rect')
+				.attr('x', innerXw)
+				.attr('y', miniYw)
+				.attr('width', 8)
+				.attr('height', 8)
+				.attr('rx', 2)
+				.attr('fill', GREY_MINIMAL);
+			const miniLabelw = sizeGwide
+				.append('text')
+				.attr('x', innerXw + 12)
+				.attr('y', miniYw + 7)
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '6.5px');
+			miniLabelw.append('tspan').text('Minimal development');
+			miniLabelw
+				.append('tspan')
+				.attr('x', innerXw + 12)
+				.attr('dy', '1.1em')
+				.text('(grey, no WLS fit)');
 		}
 
 		const cbG = svg
@@ -701,171 +884,6 @@
 			.attr('font-size', '7px')
 			.text(`TOD cut: ${d3.format('.0%')(cut)}`);
 
-		/* Size + minimal-development legend: default = centered under plot; wide = stacked in the right column */
-		const wMid = (wMin + wMax) / 2;
-		const sizeSamples = [
-			{ w: wMin, disp: niceHousingUnitsLabel(wMin) },
-			{ w: wMid, disp: niceHousingUnitsLabel(wMid) },
-			{ w: wMax, disp: niceHousingUnitsLabel(wMax) }
-		];
-
-		if (wideLayout) {
-			const boxPad = 8;
-			const sizeBoxW = legendColW;
-			const sizeBoxX = marginLeft + innerWidth + 8;
-			const sizeTop = chartOffsetTop + innerHeight + 8;
-			const innerW = sizeBoxW - 2 * boxPad;
-			const titleBlockH = 22;
-			const dotsRowH = 30;
-			const miniRowH = 14;
-			const sizeBoxH = boxPad + titleBlockH + 6 + dotsRowH + 6 + miniRowH + boxPad;
-
-			const sizeG = svg.append('g').attr('class', 'tod-intensity-size-legend').attr('pointer-events', 'none');
-			sizeG
-				.append('rect')
-				.attr('x', sizeBoxX)
-				.attr('y', sizeTop)
-				.attr('width', sizeBoxW)
-				.attr('height', sizeBoxH)
-				.attr('rx', 4)
-				.attr('fill', 'var(--bg-card)')
-				.attr('fill-opacity', 0.94)
-				.attr('stroke', 'var(--border)')
-				.attr('stroke-width', 0.75);
-
-			const innerX = sizeBoxX + boxPad;
-			let ty = sizeTop + boxPad + 9;
-			sizeG
-				.append('text')
-				.attr('x', innerX)
-				.attr('y', ty)
-				.attr('fill', 'var(--text-muted)')
-				.attr('font-size', '7.5px')
-				.attr('font-weight', '600')
-				.text('Dot size (population)');
-			ty += 11;
-			sizeG
-				.append('text')
-				.attr('x', innerX)
-				.attr('y', ty)
-				.attr('fill', 'var(--text-muted)')
-				.attr('font-size', '6.5px')
-				.text(`Area ∝ housing units (${startY})`);
-
-			const sizeRowY = ty + 8;
-			const colW = innerW / 3;
-			sizeSamples.forEach((s, i) => {
-				const cx = innerX + colW * i + colW / 2;
-				const rr = rScale(s.w);
-				sizeG
-					.append('circle')
-					.attr('cx', cx)
-					.attr('cy', sizeRowY + rr)
-					.attr('r', rr)
-					.attr('fill', 'color-mix(in srgb, var(--bg-hover) 85%, var(--text-muted))')
-					.attr('stroke', 'var(--border)')
-					.attr('stroke-width', 0.6);
-				sizeG
-					.append('text')
-					.attr('x', cx)
-					.attr('y', sizeRowY + rr * 2 + 8)
-					.attr('text-anchor', 'middle')
-					.attr('fill', 'var(--text-muted)')
-					.attr('font-size', '6.5px')
-					.attr('font-variant-numeric', 'tabular-nums')
-					.text(`${huFmt(s.disp)}`);
-			});
-
-			const miniY = sizeRowY + 36;
-			sizeG
-				.append('rect')
-				.attr('x', innerX)
-				.attr('y', miniY)
-				.attr('width', 8)
-				.attr('height', 8)
-				.attr('rx', 2)
-				.attr('fill', GREY_MINIMAL);
-			sizeG
-				.append('text')
-				.attr('x', innerX + 12)
-				.attr('y', miniY + 7)
-				.attr('fill', 'var(--text-muted)')
-				.attr('font-size', '6.5px')
-				const miniLabel = sizeG.append('text')
-					.attr('x', innerX + 12)
-					.attr('y', miniY + 7)
-					.attr('fill', 'var(--text-muted)')
-					.attr('font-size', '6.5px');
-				miniLabel.append('tspan')
-					.text('Minimal development');
-				miniLabel.append('tspan')
-					.attr('x', innerX + 12)
-					.attr('dy', '1.1em')
-					.text('(grey, no WLS fit)');
-		} else {
-			const sizeY = chartOffsetTop + innerHeight + 46;
-			const sizeG = svg.append('g').attr('class', 'tod-intensity-size-legend').attr('pointer-events', 'none');
-			const titleX = marginLeft + innerWidth / 2;
-			sizeG
-				.append('text')
-				.attr('x', titleX)
-				.attr('y', sizeY)
-				.attr('text-anchor', 'middle')
-				.attr('fill', 'var(--text-muted)')
-				.attr('font-size', '7.5px')
-				.attr('font-weight', '600')
-				.text('# of Housing Units');
-			sizeG
-				.append('text')
-				.attr('x', titleX)
-				.attr('y', sizeY + 9)
-				.attr('text-anchor', 'middle')
-				.attr('fill', 'var(--text-muted)')
-				.attr('font-size', '6.5px')
-				.text(`Dot size ∝ (${startY})`);
-
-			const sizeRowY = sizeY + 18;
-			const span = Math.min(132, innerWidth - 36);
-			const x0s = marginLeft + (innerWidth - span) / 2;
-			const cbColX = marginLeft + innerWidth + 12;
-			sizeSamples.forEach((s, i) => {
-				const cx = x0s + (i * span) / 2;
-				const rr = rScale(s.w);
-				sizeG
-					.append('circle')
-					.attr('cx', cx)
-					.attr('cy', sizeRowY + rr)
-					.attr('r', rr)
-					.attr('fill', 'color-mix(in srgb, var(--bg-hover) 85%, var(--text-muted))')
-					.attr('stroke', 'var(--border)')
-					.attr('stroke-width', 0.6);
-				sizeG
-					.append('text')
-					.attr('x', cx)
-					.attr('y', sizeRowY + rr * 2 + 9)
-					.attr('text-anchor', 'middle')
-					.attr('fill', 'var(--text-muted)')
-					.attr('font-size', '6.5px')
-					.text(`${huFmt(s.disp)}`);
-			});
-
-			const miniTop = sizeRowY - 2;
-			sizeG
-				.append('rect')
-				.attr('x', cbColX)
-				.attr('y', miniTop)
-				.attr('width', 8)
-				.attr('height', 8)
-				.attr('rx', 2)
-				.attr('fill', GREY_MINIMAL);
-			sizeG
-				.append('text')
-				.attr('x', cbColX + 11)
-				.attr('y', miniTop + 7)
-				.attr('fill', 'var(--text-muted)')
-				.attr('font-size', '6.5px')
-				.text('Minimal dev. (no fit)');
-		}
 	});
 
 	$effect(() => {
@@ -932,7 +950,8 @@
 	}
 
 	.tod-intensity-chart {
-		min-height: 120px;
+		/* 1.5× previous 120px; keeps container floor proportional to taller SVG */
+		min-height: 180px;
 	}
 
 	.trim-check {

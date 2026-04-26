@@ -17,6 +17,7 @@
 		developmentMultifamilyShare,
 		developmentMbtaProximity,
 		isDevelopmentTransitAccessible,
+		popWeightKey,
 		transitDistanceMiToMetres,
 		transitModeUiLabel
 	} from '$lib/utils/derived.js';
@@ -28,7 +29,8 @@
 		MBTA_GREEN,
 		MBTA_MAP_NEUTRAL,
 		MBTA_ORANGE,
-		MBTA_RED
+		MBTA_RED,
+		MBTA_YELLOW
 	} from '$lib/utils/mbtaColors.js';
 
 	/**
@@ -157,6 +159,10 @@
 	const MINIMAL_TRACT_STROKE = '#94a3b8';
 	/** Tan fill for tracts excluded from the analysis (limited data / below pop density). */
 	const EXCLUDED_TRACT_FILL = '#e7e0d5';
+	/**
+	 * Lighter bus-yellow for hover / tooltip-only ``tract-interaction`` ring; selected tracts use full ``MBTA_YELLOW``.
+	 */
+	const TRACT_HOVER_OUTLINE = `color-mix(in srgb, ${MBTA_YELLOW} 42%, #ffffff 58%)`;
 	/** High access + low growth — softer violet (thick edges read calmer than pure #7B61FF). */
 	const MISMATCH_STROKE_HA = '#8A78E0';
 	/** High growth + low access — lighter, dashed. */
@@ -960,6 +966,40 @@
 		devAggMap = aggregateDevsByTract(devsForMetrics, tractMap, panelState.timePeriod, panelState);
 	}
 
+	/**
+	 * Population-weighted mean for NHGIS-style rows (weights = tract population at period start).
+	 *
+	 * Parameters
+	 * ----------
+	 * rows : Array<object>
+	 *     Rows with ``gisjoin``; Y comes from ``getY``.
+	 * tractByGj : Map<string, object>
+	 *     GISJOIN → tract row including ``weightKey`` (e.g. ``pop_2000``).
+	 * weightKey : string
+	 *     Tract field for weights, typically from ``popWeightKey(timePeriod)``.
+	 * getY : (row: object, tract: object | undefined) => number
+	 *     Outcome; non-finite values skip the row.
+	 *
+	 * Returns
+	 * -------
+	 * number | null
+	 *     Weighted mean, or null when no row has positive weight and finite Y.
+	 */
+	function popWeightedMeanForRows(rows, tractByGj, weightKey, getY) {
+		let sumW = 0;
+		let sumWY = 0;
+		for (const row of rows) {
+			const tract = tractByGj.get(row.gisjoin);
+			const w = tract ? Number(tract[weightKey]) : NaN;
+			if (!Number.isFinite(w) || w <= 0) continue;
+			const y = getY(row, tract);
+			if (!Number.isFinite(y)) continue;
+			sumW += w;
+			sumWY += w * y;
+		}
+		return sumW > 0 ? sumWY / sumW : null;
+	}
+
 	function rebuildSVG() {
 		if (!containerEl) return;
 		const root = d3.select(containerEl);
@@ -1051,7 +1091,8 @@
 		// Per-tract <g>: choropleth fill, then two edge paths — ``tract-edge-clip`` for
 		// TOD green/orange and mismatch purple (interior rim via clipPath); ``tract-edge-plain``
 		// for neutral grey boundaries (centered stroke, no clip — classic map shell).
-		// ``tract-interaction`` stays clipped for white hover / purple selection rings.
+		// ``tract-interaction`` stays clipped: full ``MBTA_YELLOW`` = selection; lighter yellow = hover / tooltip
+		// focus when the tract is not in the map selection.
 		const tractGroup = zoomLayer.append('g').attr('class', 'tract-layer');
 
 		const tractGs = tractGroup
@@ -1770,8 +1811,9 @@
 		selRoot.selectAll('path.tract-interaction')
 			.attr('stroke', (d) => {
 				const id = d.properties?.gisjoin;
-				if (id === effectiveHoveredId) return '#ffffff';
-				if (selectedSet.has(id)) return 'var(--cat-a, #6366f1)';
+				// Map selection: full bus yellow. Hover / last-clicked ring (when not selected): same hue, lighter.
+				if (selectedSet.has(id)) return MBTA_YELLOW;
+				if (id === effectiveHoveredId) return TRACT_HOVER_OUTLINE;
 				return 'none';
 			})
 			.attr('stroke-dasharray', (d) => {
@@ -1783,8 +1825,9 @@
 				const id = d.properties?.gisjoin;
 				const row = rowByGj?.get(id);
 				const dc = row?.devClass;
-				if (id === effectiveHoveredId) return dc === 'minimal' ? 4 : 7.2;
+				// Slightly stronger ring on selected tracts; a touch wider for hover / tooltip-only focus.
 				if (selectedSet.has(id)) return dc === 'minimal' ? 3.4 : 6;
+				if (id === effectiveHoveredId) return dc === 'minimal' ? 4 : 7.2;
 				return 0;
 			})
 			.attr('stroke-opacity', (d) => {
@@ -2074,33 +2117,28 @@
 			return;
 		}
 
-		// If clicking the already-pinned tract, unpin.
-		if (pinnedTractId === id) {
-			pinnedTractId = null;
-			pinnedTooltip = null;
-			panelState.setHovered(null);
-			tooltip = { ...tooltip, visible: false };
-			return;
-		}
-
-		// If another tract was pinned, unpin and deselect it first.
-		if (pinnedTractId) {
-			panelState.clearSelection();
-			pinnedTractId = null;
-			pinnedTooltip = null;
-		}
 		if (pinnedDevKey) {
 			pinnedDevKey = null;
 			pinnedDevTooltip = null;
 		}
 
-		// Pin this tract: freeze tooltip at current position.
 		cancelHoverRest();
-		pinnedTractId = id;
-		panelState.setHovered(id);
+		// One click = toggle map selection; re-click the same tract to remove it. Tooltip/pin
+		// always tracks the last-clicked tract, independent of whether it is still selected.
 		panelState.toggleTract(id);
-		showTractTooltip(id, event.clientX, event.clientY);
-		pinnedTooltip = { ...tooltip };
+		if (!panelState.selectedTracts.size) {
+			pinnedTractId = null;
+			pinnedTooltip = null;
+			// Resets lastInteractedGisjoin; selectedTracts is already empty from toggle.
+			panelState.clearSelection();
+			panelState.setHovered(null);
+			tooltip = { ...tooltip, visible: false };
+		} else {
+			pinnedTractId = id;
+			panelState.setHovered(id);
+			showTractTooltip(id, event.clientX, event.clientY);
+			pinnedTooltip = { ...tooltip };
+		}
 
 		if (event.shiftKey) panelState.toggleComparisonTract(id);
 	}
@@ -2329,25 +2367,21 @@
 				avgStockIncrease: null
 			};
 		}
-		const huVals = rows
-			.map((row) => Number(row.census_hu_pct_change))
-			.filter(Number.isFinite);
-		const metricVals = rows
-			.map((row) => tractTodMetricsMap?.get(row.gisjoin))
-			.filter(Boolean);
-		const todShares = metricVals
-			.map((m) => Number(m.todFraction))
-			.filter(Number.isFinite);
-		const stockIncreases = metricVals
-			.map((m) => Number(m.pctStockIncrease))
-			.filter(Number.isFinite);
+		const weightKey = popWeightKey(panelState.timePeriod);
+		const tractByGj = new Map((tractList ?? []).map((t) => [t.gisjoin, t]));
 		return {
 			label: cohortLabel(spotlight),
 			description: spotlightDescription(spotlight),
 			count: rows.length,
-			avgHuGrowth: huVals.length ? d3.mean(huVals) : null,
-			avgTodShare: todShares.length ? d3.mean(todShares) : null,
-			avgStockIncrease: stockIncreases.length ? d3.mean(stockIncreases) : null
+			avgHuGrowth: popWeightedMeanForRows(rows, tractByGj, weightKey, (r) => Number(r.census_hu_pct_change)),
+			avgTodShare: popWeightedMeanForRows(rows, tractByGj, weightKey, (r) => {
+				const m = tractTodMetricsMap?.get(r.gisjoin);
+				return m ? Number(m.todFraction) : NaN;
+			}),
+			avgStockIncrease: popWeightedMeanForRows(rows, tractByGj, weightKey, (r) => {
+				const m = tractTodMetricsMap?.get(r.gisjoin);
+				return m ? Number(m.pctStockIncrease) : NaN;
+			})
 		};
 	});
 
@@ -2368,10 +2402,11 @@
 		const metric = tractTodMetricsMap?.get(gisjoin) ?? null;
 		const devClass = row?.devClass ?? null;
 		const cohortRows = (nhgisRows ?? []).filter((r) => r?.devClass === devClass && passesGrowthFilter(r));
-		const cohortHu = cohortRows
-			.map((r) => Number(r.census_hu_pct_change))
-			.filter(Number.isFinite);
-		const cohortAvgHu = cohortHu.length ? d3.mean(cohortHu) : null;
+		const weightKey = popWeightKey(panelState.timePeriod);
+		const tractByGj = new Map((tractList ?? []).map((t) => [t.gisjoin, t]));
+		const cohortAvgHu = popWeightedMeanForRows(cohortRows, tractByGj, weightKey, (r) =>
+			Number(r.census_hu_pct_change)
+		);
 		const county = tract?.county && String(tract.county) !== 'County Name' ? String(tract.county) : null;
 		return {
 			gisjoin,
@@ -2389,16 +2424,24 @@
 
 	const selectionComparison = $derived.by(() => {
 		const selectedIds = [...panelState.selectedTracts];
+		const weightKey = popWeightKey(panelState.timePeriod);
+		const tractByGj = new Map((tractList ?? []).map((t) => [t.gisjoin, t]));
 		const metricValue = (rows) => {
-			const huVals = rows.map((row) => Number(row.census_hu_pct_change)).filter(Number.isFinite);
-			const metricVals = rows.map((row) => tractTodMetricsMap?.get(row.gisjoin)).filter(Boolean);
-			const todShares = metricVals.map((m) => Number(m.todFraction) * 100).filter(Number.isFinite);
-			const stockIncreases = metricVals.map((m) => Number(m.pctStockIncrease)).filter(Number.isFinite);
-			return comparisonMetric === 'hu_growth'
-				? (huVals.length ? d3.mean(huVals) : null)
-				: comparisonMetric === 'tod_share'
-					? (todShares.length ? d3.mean(todShares) : null)
-					: (stockIncreases.length ? d3.mean(stockIncreases) : null);
+			if (comparisonMetric === 'hu_growth') {
+				return popWeightedMeanForRows(rows, tractByGj, weightKey, (row) =>
+					Number(row.census_hu_pct_change)
+				);
+			}
+			if (comparisonMetric === 'tod_share') {
+				return popWeightedMeanForRows(rows, tractByGj, weightKey, (row) => {
+					const m = tractTodMetricsMap?.get(row.gisjoin);
+					return m ? Number(m.todFraction) * 100 : NaN;
+				});
+			}
+			return popWeightedMeanForRows(rows, tractByGj, weightKey, (row) => {
+				const m = tractTodMetricsMap?.get(row.gisjoin);
+				return m ? Number(m.pctStockIncrease) : NaN;
+			});
 		};
 		/** @type {Array<{ key: string; label: string; value: number | null; count: number }>} */
 		let rows;
@@ -2472,7 +2515,7 @@
 			return { label: 'Avg. TOD share', suffix: '%', formatter: d3.format('.1f') };
 		}
 		if (comparisonMetric === 'stock_increase') {
-			return { label: 'Avg. housing stock increase', suffix: '%', formatter: d3.format('.1f') };
+			return { label: 'Avg. stock increase', suffix: '%', formatter: d3.format('.1f') };
 		}
 		return { label: 'Avg. housing growth', suffix: '%', formatter: d3.format('.1f') };
 	});
@@ -3220,7 +3263,7 @@
 	<div class="poc-scrolly">
 		<div class="poc-scrolly-map">
 			{#if !guidedMode}
-			<div class="poc-methods poc-methods--lead card-key" role="note" aria-label="TOD definitions">
+			<!-- <div class="poc-methods poc-methods--lead card-key" role="note" aria-label="TOD definitions">
 				<p class="poc-methods__title">Key definitions</p>
 				<p class="poc-methods__text">
 					<strong>TOD developments</strong> are projects within <strong>{d3.format('.2~f')(panelState.transitDistanceMi ?? 0.5)} miles</strong> of an MBTA stop; all others count as <strong>non-TOD</strong>.
@@ -3228,8 +3271,8 @@
 					<strong>Non-TOD-dominated tracts</strong> clear the same growth threshold but fall below that TOD share.
 					<strong>Minimal development</strong> tracts stay below the stock-growth threshold.
 				</p>
-			</div>
-			<div class="poc-methods poc-methods--encoding card-key" role="note" aria-label="Design decisions">
+			</div> -->
+			<!-- <div class="poc-methods poc-methods--encoding card-key" role="note" aria-label="Design decisions">
 				<p class="poc-methods__title">Why We Designed It This Way</p>
 				<ul class="poc-methods__list poc-methods__list--encoding">
 					<li>
@@ -3253,28 +3296,42 @@
 						Income, selected-tract details, and comparisons live in side panels and tooltips rather than being encoded directly on the map. That keeps the main view readable while still giving the reader a path to more detail when they want it.
 					</li>
 				</ul>
-			</div>
+			</div> -->
 			<div class="poc-methods poc-methods--assumptions card-key" role="note" aria-label="Assumptions used">
-				<p class="poc-methods__title">Assumptions we use</p>
+				<p class="poc-methods__title">Key definitions</p>
 				<ul class="poc-methods__list">
 					<li>
-						<span class="poc-methods__label">TOD access assumption:</span>
-						MBTA access is approximated with a fixed cutoff of
-						<strong> {d3.format('.2~f')(panelState.transitDistanceMi ?? 0.5)} miles</strong>.
+						<span class="poc-methods__label">TOD access:</span>
+						"Transit access" is defined as being within
+						<strong> {d3.format('.2~f')(panelState.transitDistanceMi ?? 0.5)} miles</strong> of an MBTA stop.
 					</li>
 					<li>
-						<span class="poc-methods__label">Tract grouping assumption:</span>
-						Tracts are grouped using
+						<span class="poc-methods__label">Tract groupings:</span>
+						<ul style="padding-left: 1.5em;">
+							<li>
+								Minimal Development: All tracts with less than
+								<strong> {d3.format('.1f')(panelState.sigDevMinPctStockIncrease ?? 2)}%</strong> housing stock increase.
+							</li>
+							<li>
+								TOD-Dominated: Remaining tracts with more than
+								<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> of new units being TOD.
+							</li>
+							<li>
+								Non-TOD-Dominated: Remaining tracts with less than
+								<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> of new units being TOD.
+							</li>
+							<li>
+								Ignored: Tan tracts mark places where data is missing or unreliable.
+							</li>
+						</ul>
+
+						<!-- Tracts are grouped using
 						<strong> {d3.format('.1f')(panelState.sigDevMinPctStockIncrease ?? 2)}%</strong> housing stock increase as the significant-development floor and
-						<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> TOD share as the TOD-dominated cutoff.
+						<strong> {d3.format('.0f')((panelState.todFractionCutoff ?? 0.5) * 100)}%</strong> TOD share as the TOD-dominated cutoff. -->
 					</li>
 					<li>
-						<span class="poc-methods__label">Aggregation assumption:</span>
-						Averages shown here are simple tract means, so every tract counts equally rather than being weighted by population or units.
-					</li>
-					<li>
-						<span class="poc-methods__label">Data quality assumption:</span>
-						Tan tracts mark places where % change is missing or unreliable.
+						<span class="poc-methods__label">Aggregation averages:</span>
+						Cohort summaries and comparison bars use population-weighted means.
 					</li>
 				</ul>
 			</div>
@@ -3393,7 +3450,13 @@
 								<button
 									type="button"
 									class="poc-detail__btn poc-detail__btn--ghost"
-									onclick={() => panelState.clearSelection()}
+									onclick={() => {
+										panelState.clearSelection();
+										pinnedTractId = null;
+										pinnedTooltip = null;
+										panelState.setHovered(null);
+										tooltip = { ...tooltip, visible: false };
+									}}
 								>
 									Clear
 									</button>

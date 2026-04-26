@@ -38,7 +38,8 @@
 	const LEGEND_COL_W = 54;
 	const marginBottom = 52;
 	const innerWidth = 380;
-	const innerHeight = 340;
+	/** 70% of prior 340px default for a slightly shorter afford. plot. */
+	const innerHeight = 238;
 
 	const plotKey = $derived(
 		JSON.stringify({

@@ -89,8 +89,7 @@
 			<div class="card playground-panel">
 				<h2>Controls</h2>
 				<p class="playground-note">
-					Everything here updates the map directly. Use the overlay and development settings to compare
-					growth, TOD patterns, and projects in the same view.
+					Directly control all plots by using the overlay, filter, and development settings.
 				</p>
 				<FilterPanel panelState={playgroundPanel} allowedXKeys={ALLOWED_X_KEYS} />
 			</div>
@@ -115,10 +114,10 @@
 					<p class="playground-map-kicker">Interactive map</p>
 					<h2>Choropleth playground</h2>
 				</div>
-				<p class="playground-map-note">
+				<!-- <p class="playground-map-note">
 					Blue means stronger housing growth, red means weaker or negative growth, and overlays can be
 					switched on and off as needed.
-				</p>
+				</p> -->
 			</div>
 
 			<div class="playground-map-wrap">

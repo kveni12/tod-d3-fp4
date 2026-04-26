@@ -241,6 +241,9 @@
 
 	.scatter-container--playground {
 		min-width: 0;
+		/* 60% of card width — SVGs are responsive so plot scales to ~60% in both dimensions. */
+		width: 60%;
+		margin-inline: auto;
 	}
 
 	/* Cohort summary strip (``ExploreTractSection``) */
@@ -298,13 +301,14 @@
 		color: var(--accent);
 	}
 
+	/* Non-TOD cohort: MBTA Orange Line (``MBTA_ORANGE`` / non-TOD fit in ``TodIntensityScatter``). */
 	.cohort-pill--ctrl {
-		background: color-mix(in srgb, #64748b 8%, var(--paper));
-		border-color: color-mix(in srgb, #64748b 28%, var(--line, #d8d2c7));
+		background: color-mix(in srgb, #ed8b00 10%, var(--paper));
+		border-color: color-mix(in srgb, #ed8b00 35%, var(--line, #d8d2c7));
 	}
 
 	.cohort-pill--ctrl .cohort-pill-value {
-		color: #64748b;
+		color: #ed8b00;
 	}
 
 	.cohort-pill--minimal {
@@ -317,12 +321,12 @@
 	}
 
 	.cohort-pill--picked {
-		background: color-mix(in srgb, #b91c1c 10%, var(--paper));
-		border-color: color-mix(in srgb, #b91c1c 32%, var(--line, #d8d2c7));
+		background: color-mix(in srgb, #facc15 18%, var(--paper));
+		border-color: color-mix(in srgb, #facc15 38%, var(--line, #d8d2c7));
 	}
 
 	.cohort-pill--picked .cohort-pill-value {
-		color: #b91c1c;
+		color: #be9a07;
 	}
 
 	.cohort-pill-label {
