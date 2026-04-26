@@ -268,24 +268,122 @@
 		return buildCohortDevelopmentSplit(tractData, tractPanelConfig, developments);
 	});
 
-	const cohortRowsByY = $derived.by(() => {
-		if (!meta.yVariables?.length) return [];
-		const weightKey = popWeightKey(tractTimePeriod);
-		return meta.yVariables.map((v) => {
-			const yKey = `${v.key}_${tractTimePeriod}`;
-			const raw = cohortYMeansForYKey(cohortDevSplit, yKey, weightKey);
-			const kind = yMetricDisplayKind(v);
-			return {
-				key: v.key,
-				fmtTod: formatYMetricSummary(raw.meanTod, kind),
-				fmtCtrl: formatYMetricSummary(raw.meanNonTod, kind),
-				fmtMinimal: formatYMetricSummary(raw.meanMinimal, kind)
-			};
-		});
-	});
+	/**
+	 * Display kind for a Y key when ``meta`` is not loaded yet: matches ``meta.json`` / ``yMetricDisplayKind`` rules.
+	 *
+	 * @param {string} vKey
+	 * @returns {'pp' | 'pct' | 'min'}
+	 */
+	function yKindForStoryKey(vKey) {
+		const v = meta.yVariables?.find((x) => x.key === vKey);
+		if (v) return yMetricDisplayKind(v);
+		if (vKey === 'bachelors_pct_change') return 'pp';
+		if (vKey === 'median_income_change_pct') return 'pct';
+		return 'pct';
+	}
 
-	const incomeRow = $derived(cohortRowsByY.find((r) => r.key === 'median_income_change_pct'));
-	const eduRow = $derived(cohortRowsByY.find((r) => r.key === 'bachelors_pct_change'));
+	/**
+	 * Cohort means for a single story metric (independent of ``meta.yVariables`` being populated).
+	 *
+	 * @param {string} vKey
+	 */
+	function buildStoryCohortRow(vKey) {
+		const weightKey = popWeightKey(tractTimePeriod);
+		const yKey = `${vKey}_${tractTimePeriod}`;
+		const raw = cohortYMeansForYKey(cohortDevSplit, yKey, weightKey);
+		const kind = yKindForStoryKey(vKey);
+		return {
+			key: vKey,
+			kind,
+			meanTod: raw.meanTod,
+			meanNonTod: raw.meanNonTod,
+			meanMinimal: raw.meanMinimal,
+			fmtTod: formatYMetricSummary(raw.meanTod, kind),
+			fmtCtrl: formatYMetricSummary(raw.meanNonTod, kind),
+			fmtMinimal: formatYMetricSummary(raw.meanMinimal, kind)
+		};
+	}
+
+	const incomeRow = $derived(buildStoryCohortRow('median_income_change_pct'));
+	const eduRow = $derived(buildStoryCohortRow('bachelors_pct_change'));
+
+	/**
+	 * Layout for a compact three-cohort bar chart (same population-weighted means as body copy / scatter Y).
+	 *
+	 * @param { { meanTod: number, meanNonTod: number, meanMinimal: number, kind: 'pp' | 'pct' | 'min' } | undefined } row
+	 * @param {{ w?: number, h?: number }} [opts]
+	 */
+	function cohortMiniBarLayout(row, opts) {
+		if (!row) return null;
+		const W = opts?.w ?? 268;
+		const H = opts?.h ?? 96;
+		// Extra top margin so value labels (above bar tops) stay inside the viewBox
+		const m = { t: 16, r: 8, b: 20, l: 36 };
+		const items = [
+			{ id: 'tod', shortLabel: 'TOD', v: row.meanTod, fill: '#0f766e' },
+			{ id: 'nontod', shortLabel: 'Non-TOD', v: row.meanNonTod, fill: '#64748b' },
+			{ id: 'minimal', shortLabel: 'Minimal', v: row.meanMinimal, fill: '#94a3b8' }
+		];
+		const finite = items.filter((d) => Number.isFinite(d.v));
+		if (finite.length === 0) return null;
+		const minV = d3.min(finite, (d) => d.v) ?? 0;
+		const maxV = d3.max(finite, (d) => d.v) ?? 0;
+		const y0 = Math.min(0, minV);
+		const y1 = Math.max(0, maxV);
+		const span = y1 - y0;
+		const pad = span > 0 ? span * 0.08 : 0.5;
+		const yDomain = [y0 - pad, y1 + pad];
+		const iw = W - m.l - m.r;
+		const ih = H - m.t - m.b;
+		const x = d3.scaleBand().domain(items.map((d) => d.id)).range([0, iw]).padding(0.22);
+		const y = d3.scaleLinear().domain(yDomain).range([ih, 0]);
+		/** @param {number} v */
+		const toSvgY = (v) => m.t + y(v);
+		const y0px = toSvgY(0);
+		const tickFmt =
+			row.kind === 'pp'
+				? d3.format('.1f')
+				: row.kind === 'min'
+					? d3.format('.1f')
+					: d3.format('.0f');
+		const yTicks = d3
+			.ticks(yDomain[0], yDomain[1], 3)
+			.filter((t) => t >= yDomain[0] - 1e-9 && t <= yDomain[1] + 1e-9);
+		const bars = items.map((d) => {
+			if (!Number.isFinite(d.v)) {
+				return {
+					...d,
+					xPx: (x(d.id) ?? 0) + m.l,
+					yPx: y0px,
+					wPx: x.bandwidth(),
+					hPx: 0,
+					valueLabel: '—',
+					labelY: y0px - 4
+				};
+			}
+			const yV = toSvgY(d.v);
+			const top = Math.min(y0px, yV);
+			const hPx = Math.abs(yV - y0px);
+			const valueLabel = formatYMetricSummary(d.v, row.kind);
+			// Alphabetic baseline: a few px above the top of the bar (smaller y = higher on screen)
+			const labelY = top - 4;
+			return { ...d, xPx: (x(d.id) ?? 0) + m.l, yPx: top, wPx: x.bandwidth(), hPx, valueLabel, labelY };
+		});
+		const yAxisTicks = yTicks.map((t) => ({
+			t,
+			yPx: toSvgY(t),
+			label:
+				row.kind === 'pp'
+					? `${tickFmt(t)}`
+					: row.kind === 'min'
+						? `${tickFmt(t)}`
+						: `${tickFmt(t)}%`
+		}));
+		return { W, H, m, mInner: iw, ih, y0px, bars, yDomain, yAxisTicks, unitKind: row.kind };
+	}
+
+	const incomeMiniBar = $derived(cohortMiniBarLayout(incomeRow));
+	const eduMiniBar = $derived(cohortMiniBarLayout(eduRow));
 
 	function makeTodScatterPanelState(yVar) {
 		return {
@@ -671,20 +769,112 @@
 					<h2>Income analysis</h2>
 					<p>
 						We can get a sense of the socioeconomic distribution of people by looking at the median income
-						of a neighborhood.
-						{#if incomeRow}
-							In census tracts dominated by TOD, the median income changes by
-							<strong>{incomeRow.fmtTod}</strong>, while in non-TOD dominated tracts it changes by
-							<strong>{incomeRow.fmtCtrl}</strong>, and in minimal development tracts by
-							<strong>{incomeRow.fmtMinimal}</strong>.
-						{/if}
-						This is one proxy for neighborhood change and possible market pressure, though it should not be
-						read as direct evidence that TOD itself caused these shifts.
+						of a neighborhood. In census tracts dominated by TOD, the median income changes by
+						<strong>{incomeRow.fmtTod}</strong>, while in non-TOD dominated tracts it changes by
+						<strong>{incomeRow.fmtCtrl}</strong>, and in minimal development tracts by
+						<strong>{incomeRow.fmtMinimal}</strong>. This is one proxy for neighborhood change and possible
+						market pressure, though it should not be read as direct evidence that TOD itself caused these
+						shifts.
 					</p>
 					<p>
 						If TOD-dominated tracts show larger income increases, that is consistent with stronger
 						socioeconomic sorting or housing-market pressure, though other urban factors may also contribute.
 					</p>
+					{#if incomeMiniBar}
+						<figure class="cohort-mini-bar">
+							<svg
+								width={incomeMiniBar.W}
+								height={incomeMiniBar.H}
+								viewBox="0 0 {incomeMiniBar.W} {incomeMiniBar.H}"
+								role="img"
+								aria-label="Bar chart: population-weighted mean median income change in percent for TOD-dominated, non-TOD-dominated, and minimal-development tracts, matching the summary values above."
+							>
+								<line
+									x1={incomeMiniBar.m.l - 0.5}
+									y1={incomeMiniBar.m.t}
+									x2={incomeMiniBar.m.l - 0.5}
+									y2={incomeMiniBar.m.t + incomeMiniBar.ih}
+									stroke="#cbd5e1"
+									stroke-width="1"
+								/>
+								{#each incomeMiniBar.yAxisTicks as tick (tick.t)}
+									<line
+										x1={incomeMiniBar.m.l}
+										y1={tick.yPx}
+										x2={incomeMiniBar.m.l + incomeMiniBar.mInner}
+										y2={tick.yPx}
+										stroke="#f1f5f9"
+										stroke-width="1"
+									/>
+									<text
+										x={incomeMiniBar.m.l - 5}
+										y={tick.yPx}
+										text-anchor="end"
+										dominant-baseline="middle"
+										fill="var(--muted, #5e6573)"
+										font-size="9"
+									>
+										{tick.label}
+									</text>
+								{/each}
+								<line
+									x1={incomeMiniBar.m.l}
+									y1={incomeMiniBar.y0px}
+									x2={incomeMiniBar.m.l + incomeMiniBar.mInner}
+									y2={incomeMiniBar.y0px}
+									stroke="#94a3b8"
+									stroke-width="1"
+									stroke-dasharray="3 2"
+									opacity="0.85"
+								/>
+								{#each incomeMiniBar.bars as b (b.id)}
+									<rect
+										x={b.xPx}
+										y={b.yPx}
+										width={b.wPx}
+										height={b.hPx}
+										fill={b.fill}
+										rx="1"
+									>
+										<title
+											>{b.shortLabel}: {formatYMetricSummary(b.v, incomeRow.kind)} (population-weighted mean)</title
+										>
+									</rect>
+									<text
+										x={b.xPx + b.wPx / 2}
+										y={b.labelY}
+										text-anchor="middle"
+										font-size="9"
+										font-weight="600"
+										fill="var(--ink, #1f2430)"
+									>
+										{b.valueLabel}
+									</text>
+									<text
+										x={b.xPx + b.wPx / 2}
+										y={incomeMiniBar.m.t + incomeMiniBar.ih + 13}
+										text-anchor="middle"
+										fill="var(--ink, #1f2430)"
+										font-size="9"
+									>
+										{b.shortLabel}
+									</text>
+								{/each}
+							</svg>
+							<figcaption class="cohort-mini-bar__cap">
+								Population-weighted tract means (same cohorts as the scatter); axis uses median income change
+								({incomeRow.kind === 'pp' ? 'percentage points' : 'percent'}).
+							</figcaption>
+						</figure>
+					{:else}
+						<figure class="cohort-mini-bar cohort-mini-bar--empty">
+							<p class="cohort-mini-bar__cap">
+								Bar chart of population-weighted means will appear when tract data includes enough
+								non-missing values for this metric.
+							</p>
+						</figure>
+					{/if}
+
 				</section>
 
 				<section class="chart-card card story-chart-plot">
@@ -705,15 +895,107 @@
 					<h2>Education analysis</h2>
 					<p>
 						Another indicator of socioeconomic change is the percentage of people who are college-educated.
-						{#if eduRow}
-							In TOD-dominated tracts, the bachelor's degree share changes by
-							<strong>{eduRow.fmtTod}</strong>, compared to
-							<strong>{eduRow.fmtCtrl}</strong> in non-TOD dominated tracts and
-							<strong>{eduRow.fmtMinimal}</strong> in minimal development tracts.
-						{/if}
-						This is another proxy for neighborhood change. Because most adults do not gain bachelor's degrees
-						rapidly within a decade, changes often reflect turnover, replacement, or selective in-migration.
+						In TOD-dominated tracts, the bachelor's degree share changes by
+						<strong>{eduRow.fmtTod}</strong>, compared to
+						<strong>{eduRow.fmtCtrl}</strong> in non-TOD dominated tracts and
+						<strong>{eduRow.fmtMinimal}</strong> in minimal development tracts. This is another proxy for
+						neighborhood change. Because most adults do not gain bachelor's degrees rapidly within a decade,
+						changes often reflect turnover, replacement, or selective in-migration.
 					</p>
+					{#if eduMiniBar}
+						<figure class="cohort-mini-bar">
+							<svg
+								width={eduMiniBar.W}
+								height={eduMiniBar.H}
+								viewBox="0 0 {eduMiniBar.W} {eduMiniBar.H}"
+								role="img"
+								aria-label="Bar chart: population-weighted mean change in bachelor degree share (percentage points) for TOD-dominated, non-TOD-dominated, and minimal-development tracts, matching the summary values above."
+							>
+								<line
+									x1={eduMiniBar.m.l - 0.5}
+									y1={eduMiniBar.m.t}
+									x2={eduMiniBar.m.l - 0.5}
+									y2={eduMiniBar.m.t + eduMiniBar.ih}
+									stroke="#cbd5e1"
+									stroke-width="1"
+								/>
+								{#each eduMiniBar.yAxisTicks as tick (tick.t)}
+									<line
+										x1={eduMiniBar.m.l}
+										y1={tick.yPx}
+										x2={eduMiniBar.m.l + eduMiniBar.mInner}
+										y2={tick.yPx}
+										stroke="#f1f5f9"
+										stroke-width="1"
+									/>
+									<text
+										x={eduMiniBar.m.l - 5}
+										y={tick.yPx}
+										text-anchor="end"
+										dominant-baseline="middle"
+										fill="var(--muted, #5e6573)"
+										font-size="9"
+									>
+										{tick.label}
+									</text>
+								{/each}
+								<line
+									x1={eduMiniBar.m.l}
+									y1={eduMiniBar.y0px}
+									x2={eduMiniBar.m.l + eduMiniBar.mInner}
+									y2={eduMiniBar.y0px}
+									stroke="#94a3b8"
+									stroke-width="1"
+									stroke-dasharray="3 2"
+									opacity="0.85"
+								/>
+								{#each eduMiniBar.bars as b (b.id)}
+									<rect
+										x={b.xPx}
+										y={b.yPx}
+										width={b.wPx}
+										height={b.hPx}
+										fill={b.fill}
+										rx="1"
+									>
+										<title
+											>{b.shortLabel}: {formatYMetricSummary(b.v, eduRow.kind)} (population-weighted mean)</title
+										>
+									</rect>
+									<text
+										x={b.xPx + b.wPx / 2}
+										y={b.labelY}
+										text-anchor="middle"
+										font-size="9"
+										font-weight="600"
+										fill="var(--ink, #1f2430)"
+									>
+										{b.valueLabel}
+									</text>
+									<text
+										x={b.xPx + b.wPx / 2}
+										y={eduMiniBar.m.t + eduMiniBar.ih + 13}
+										text-anchor="middle"
+										fill="var(--ink, #1f2430)"
+										font-size="9"
+									>
+										{b.shortLabel}
+									</text>
+								{/each}
+							</svg>
+							<figcaption class="cohort-mini-bar__cap">
+								Population-weighted tract means (same cohorts as the scatter); axis shows bachelor’s share
+								change ({eduRow.kind === 'pp' ? 'percentage points' : 'other units'}).
+							</figcaption>
+						</figure>
+					{:else}
+						<figure class="cohort-mini-bar cohort-mini-bar--empty">
+							<p class="cohort-mini-bar__cap">
+								Bar chart of population-weighted means will appear when tract data includes enough
+								non-missing values for this metric.
+							</p>
+						</figure>
+					{/if}
 				</section>
 
 				<section class="chart-card card story-chart-plot">
@@ -1501,6 +1783,25 @@
 	.story-chart-text {
 		margin: 0;
 		max-width: 34em;
+	}
+
+	/* Compact cohort means bar: mirrors population-weighted values in the paragraph and scatter */
+	.cohort-mini-bar {
+		margin: 12px 0 0;
+		max-width: 280px;
+	}
+
+	.cohort-mini-bar svg {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+
+	.cohort-mini-bar__cap {
+		font-size: 0.75rem;
+		color: var(--muted);
+		margin: 6px 0 0;
+		line-height: 1.45;
 	}
 
 	.story-chart-plot {
