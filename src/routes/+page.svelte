@@ -955,12 +955,12 @@
 			<!-- Income / education tract analysis (reinstated from earlier POC story layout) -->
 			<div class="story-chart-row story-chart-row--tract full-width">
 				<section class="story card story-chart-text">
-					<h2>Income analysis</h2>
+					<h2>Where income is rising fastest</h2>
 					<p>
-						TOD-dominated tracts show larger income increases than the non-TOD comparison group. Read this as a pressure signal: the places where TOD is most concentrated also tend to be the places where incomes are changing faster.
+						TOD-heavy tracts tend to show bigger income increases than the non-TOD comparison group.
 					</p>
 					<p>
-						Average income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
+						That does not prove TOD caused the change. It does suggest that the places absorbing more TOD often look more like places under market pressure. On average, income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
 					{#if incomeMiniBar}
 						<figure class="cohort-mini-bar">
@@ -1048,8 +1048,7 @@
 								{/each}
 							</svg>
 							<figcaption class="cohort-mini-bar__cap">
-								Population-weighted tract means (same cohorts as the scatter); axis uses median income change
-								({incomeRow.kind === 'pp' ? 'percentage points' : 'percent'}).
+								Average change by tract group.
 							</figcaption>
 						</figure>
 					{:else}
@@ -1064,21 +1063,21 @@
 				</section>
 
 				<section class="chart-card card story-chart-plot">
-					<h3>TOD intensity vs median income change</h3>
+					<h3>More TOD often lines up with faster income change</h3>
 					<p class="chart-note">
-						What to notice: as TOD intensity rises, tracts are more likely to appear in the higher-income-change part of the plot.
+						Each dot is a tract. The main pattern to look for is simple: tracts with more TOD tend to appear higher on the chart.
 					</p>
 					<div class="scatter-container scatter-container--compact">
-						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} />
+						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} storyMode />
 					</div>
 				</section>
 			</div>
 
 			<div class="story-chart-row story-chart-row--tract full-width">
 				<section class="story card story-chart-text">
-					<h2>Education analysis</h2>
+					<h2>Where education levels are rising fastest</h2>
 					<p>
-						TOD-dominated tracts also tend to post larger increases in the share of adults with bachelor’s degrees or higher.
+						TOD-dominated tracts also tend to show bigger increases in the share of adults with bachelor’s degrees or higher.
 					</p>
 					<p>
 						That pattern is often read as another sign of neighborhood turnover or selective in-migration. The average change is <strong>{eduRow.fmtTod}</strong> in TOD-dominated tracts, compared with <strong>{eduRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
@@ -1169,7 +1168,7 @@
 								{/each}
 							</svg>
 							<figcaption class="cohort-mini-bar__cap">
-								Summary: average change in median income (%) for each tract category, weighted by population.
+								Average change by tract group.
 							</figcaption>
 						</figure>
 					{:else}
@@ -1182,12 +1181,12 @@
 				</section>
 
 				<section class="chart-card card story-chart-plot">
-					<h3>TOD intensity vs bachelor's degree share change</h3>
+					<h3>More TOD often lines up with bigger education gains</h3>
 					<p class="chart-note">
-						What to notice: the pattern is similar here too. More TOD tends to line up with bigger increases in college-educated share.
+						This chart tells a similar story. Tracts with more TOD are more likely to sit higher on the education-change axis.
 					</p>
 					<div class="scatter-container scatter-container--compact">
-						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} />
+						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} storyMode />
 					</div>
 				</section>
 			</div>
@@ -1203,11 +1202,11 @@
 			<section class="story card full-width afford-compare">
 				<h2>How affordability could help</h2>
 				<p>
-					Among TOD-dominated tracts, we split places by whether at least half of new TOD units are affordable. The goal is simple: do TOD-heavy places with more affordability also show weaker signs of market pressure?
+					Here we narrow the question. Among TOD-heavy tracts, do places with more affordable housing show weaker signs of market pressure?
 				</p>
 				{#if affIncomeSplit && affEduSplit}
 					<p>
-						In the higher-affordability TOD group, median income changes by <strong>{affIncomeSplit.fmtHi}</strong> on average, versus <strong>{affIncomeSplit.fmtLo}</strong> in the lower-affordability group. For education, the comparison is <strong>{affEduSplit.fmtHi}</strong> versus <strong>{affEduSplit.fmtLo}</strong>.
+						The broad pattern is encouraging: TOD-heavy places with more affordability tend to show smaller increases in both income and college-degree share. That does not solve everything, but it suggests affordability can soften some of the pressure.
 					</p>
 				{/if}
 
@@ -1225,9 +1224,9 @@
 						<h3 class="afford-four-cell__title">Income Change vs Affordability</h3>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
-								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} />
+								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} storyMode />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">Tracts with greater affordability trend towards smaller income increases.</figcaption>
+							<figcaption class="cohort-mini-bar__cap">More affordability generally lines up with smaller income increases.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -1363,9 +1362,9 @@
 						<h3 class="afford-four-cell__title">Education Change vs Affordability</h3>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
-								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} />
+								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} storyMode />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">Tracts with greater affordability trend towards smaller education changes.</figcaption>
+							<figcaption class="cohort-mini-bar__cap">The education pattern points in the same direction.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">

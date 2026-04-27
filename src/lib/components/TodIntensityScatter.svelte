@@ -23,6 +23,8 @@
 		panelState,
 		domainOverride = null,
 		wideLayout = false,
+		/** Story embeds: keep the chart readable, hide more technical chart chrome. */
+		storyMode = false,
 		/** When false, hide the axis-trim checkbox and plot full data extent (POC income/education embeds). */
 		showTrimControl = true,
 		/**
@@ -276,7 +278,7 @@
 		let sizeLegY0;
 		let regLegY0;
 		let chartOffsetTop;
-		if (wideLayout) {
+		if (wideLayout && !storyMode) {
 			chartOffsetTop = firstTitleBaseline + scatterTitleLines.length * 16 + 6;
 			sizeLegY0 = 0;
 			regLegY0 = 0;
@@ -849,52 +851,54 @@
 				.text('(grey, no WLS fit)');
 		}
 
-		const cbG = svg
-			.append('g')
-			.attr('class', 'tod-intensity-colorbar')
-			.attr('transform', `translate(${marginLeft + innerWidth + 12}, ${chartOffsetTop})`)
-			.attr('pointer-events', 'none');
+		if (!storyMode) {
+			const cbG = svg
+				.append('g')
+				.attr('class', 'tod-intensity-colorbar')
+				.attr('transform', `translate(${marginLeft + innerWidth + 12}, ${chartOffsetTop})`)
+				.attr('pointer-events', 'none');
 
-		cbG
-			.append('text')
-			.attr('x', 0)
-			.attr('y', -11)
-			.attr('fill', 'var(--text-muted)')
-			.attr('font-size', '8px')
-			.attr('font-weight', '600')
-			.text('TOD share (bins)');
-
-		const swatchH = innerHeight / TOD_COLOR_STEPS.length;
-		const swatchW = 11;
-		const todLabels = ['0-20%', '20-40%', '40-60%', '60-80%', '80-100%'];
-		TOD_COLOR_STEPS.forEach((color, i) => {
-			const y0 = i * swatchH;
-			cbG
-				.append('rect')
-				.attr('x', 0)
-				.attr('y', y0)
-				.attr('width', swatchW)
-				.attr('height', swatchH)
-				.attr('fill', color)
-				.attr('stroke', 'var(--border)')
-				.attr('stroke-width', 0.35);
 			cbG
 				.append('text')
-				.attr('x', swatchW + 6)
-				.attr('y', y0 + swatchH / 2)
-				.attr('dy', '0.35em')
+				.attr('x', 0)
+				.attr('y', -11)
 				.attr('fill', 'var(--text-muted)')
 				.attr('font-size', '8px')
-				.text(todLabels[i]);
-		});
+				.attr('font-weight', '600')
+				.text('TOD share (bins)');
 
-		cbG
-			.append('text')
-			.attr('x', 0)
-			.attr('y', innerHeight + 14)
-			.attr('fill', 'var(--accent)')
-			.attr('font-size', '7px')
-			.text(`TOD cut: ${d3.format('.0%')(cut)}`);
+			const swatchH = innerHeight / TOD_COLOR_STEPS.length;
+			const swatchW = 11;
+			const todLabels = ['0-20%', '20-40%', '40-60%', '60-80%', '80-100%'];
+			TOD_COLOR_STEPS.forEach((color, i) => {
+				const y0 = i * swatchH;
+				cbG
+					.append('rect')
+					.attr('x', 0)
+					.attr('y', y0)
+					.attr('width', swatchW)
+					.attr('height', swatchH)
+					.attr('fill', color)
+					.attr('stroke', 'var(--border)')
+					.attr('stroke-width', 0.35);
+				cbG
+					.append('text')
+					.attr('x', swatchW + 6)
+					.attr('y', y0 + swatchH / 2)
+					.attr('dy', '0.35em')
+					.attr('fill', 'var(--text-muted)')
+					.attr('font-size', '8px')
+					.text(todLabels[i]);
+			});
+
+			cbG
+				.append('text')
+				.attr('x', 0)
+				.attr('y', innerHeight + 14)
+				.attr('fill', 'var(--accent)')
+				.attr('font-size', '7px')
+				.text(`TOD cut: ${d3.format('.0%')(cut)}`);
+		}
 
 	});
 
@@ -933,15 +937,17 @@
 				<span>Trim axes (exclude &gt;10σ on significant tracts)</span>
 			</label>
 		{/if}
-		<button
-			type="button"
-			class="scatter-clear-sel"
-			disabled={panelState.selectedTracts.size === 0}
-			onclick={clearTractSelection}
-			aria-label="Clear selected tracts from the map and charts"
-		>
-			Clear selection
-		</button>
+		{#if !storyMode}
+			<button
+				type="button"
+				class="scatter-clear-sel"
+				disabled={panelState.selectedTracts.size === 0}
+				onclick={clearTractSelection}
+				aria-label="Clear selected tracts from the map and charts"
+			>
+				Clear selection
+			</button>
+		{/if}
 	</div>
 	<div bind:this={containerEl} class="tod-intensity-chart"></div>
 	{#if tooltip.visible}

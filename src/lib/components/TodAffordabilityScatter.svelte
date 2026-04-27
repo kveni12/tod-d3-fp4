@@ -20,6 +20,8 @@
 	let {
 		panelState,
 		domainOverride = null,
+		/** Story embeds: keep the chart readable, hide more technical chart chrome. */
+		storyMode = false,
 		/** When false, hide the trim/selection toolbar (compact embeds, e.g. main story). */
 		showTrimControl = true,
 		/**
@@ -283,73 +285,75 @@
 		});
 
 		const regLegY0 = firstTitleBaseline + scatterTitleLines.length * 16 + 8;
-		const slopeFmt = d3.format('.4f');
-		const wlsLegend = svg.append('g').attr('class', 'tod-aff-wls-legend').attr('pointer-events', 'none');
-		const wlsRow = wlsLegend.append('g').attr('transform', `translate(${marginLeft}, ${regLegY0})`);
-		wlsRow
-			.append('line')
-			.attr('x1', 0)
-			.attr('y1', 5)
-			.attr('x2', 18)
-			.attr('y2', 5)
-			.attr('stroke', LINE_FIT)
-			.attr('stroke-width', 2.4)
-			.attr('stroke-linecap', 'round');
-		wlsRow
-			.append('text')
-			.attr('x', 34)
-			.attr('y', 8)
-			.attr('fill', 'var(--text)')
-			.attr('font-size', '9px')
-			.attr('font-weight', '600')
-			.text('WLS fit (weighted by housing units)');
-		wlsRow
-			.append('text')
-			.attr('x', 34)
-			.attr('y', 19)
-			.attr('fill', 'var(--text-muted)')
-			.attr('font-size', '7.5px')
-			.text(
-				`Slope ${Number.isFinite(wls.slope) ? slopeFmt(wls.slope) : '—'} · R² ${Number.isFinite(wls.r2) ? wls.r2.toFixed(3) : '—'} · n=${points.length}`
-			);
-		if (lowN) {
-			wlsLegend
-				.append('text')
-				.attr('x', marginLeft + 34)
-				.attr('y', regLegY0 + 26)
-				.attr('fill', 'var(--accent)')
-				.attr('font-size', '7px')
-				.text('Low sample size — interpret slope cautiously.');
-		}
-
-		if (showSelReg) {
-			const selLeg = wlsLegend.append('g').attr('transform', `translate(${marginLeft}, ${regLegY0 + (lowN ? 38 : 26)})`);
-			selLeg
+		if (!storyMode) {
+			const slopeFmt = d3.format('.4f');
+			const wlsLegend = svg.append('g').attr('class', 'tod-aff-wls-legend').attr('pointer-events', 'none');
+			const wlsRow = wlsLegend.append('g').attr('transform', `translate(${marginLeft}, ${regLegY0})`);
+			wlsRow
 				.append('line')
 				.attr('x1', 0)
 				.attr('y1', 5)
 				.attr('x2', 18)
 				.attr('y2', 5)
-				.attr('stroke', LINE_SELECTED)
+				.attr('stroke', LINE_FIT)
 				.attr('stroke-width', 2.4)
 				.attr('stroke-linecap', 'round');
-			selLeg
+			wlsRow
 				.append('text')
 				.attr('x', 34)
 				.attr('y', 8)
 				.attr('fill', 'var(--text)')
 				.attr('font-size', '9px')
 				.attr('font-weight', '600')
-				.text('Selected tracts (WLS)');
-			selLeg
+				.text('WLS fit (weighted by housing units)');
+			wlsRow
 				.append('text')
 				.attr('x', 34)
 				.attr('y', 19)
 				.attr('fill', 'var(--text-muted)')
 				.attr('font-size', '7.5px')
 				.text(
-					`Slope ${Number.isFinite(wRegSel.slope) ? slopeFmt(wRegSel.slope) : '—'} · R² ${Number.isFinite(wRegSel.r2) ? wRegSel.r2.toFixed(3) : '—'} · n=${selPts.length}`
+					`Slope ${Number.isFinite(wls.slope) ? slopeFmt(wls.slope) : '—'} · R² ${Number.isFinite(wls.r2) ? wls.r2.toFixed(3) : '—'} · n=${points.length}`
 				);
+			if (lowN) {
+				wlsLegend
+					.append('text')
+					.attr('x', marginLeft + 34)
+					.attr('y', regLegY0 + 26)
+					.attr('fill', 'var(--accent)')
+					.attr('font-size', '7px')
+					.text('Low sample size — interpret slope cautiously.');
+			}
+
+			if (showSelReg) {
+				const selLeg = wlsLegend.append('g').attr('transform', `translate(${marginLeft}, ${regLegY0 + (lowN ? 38 : 26)})`);
+				selLeg
+					.append('line')
+					.attr('x1', 0)
+					.attr('y1', 5)
+					.attr('x2', 18)
+					.attr('y2', 5)
+					.attr('stroke', LINE_SELECTED)
+					.attr('stroke-width', 2.4)
+					.attr('stroke-linecap', 'round');
+				selLeg
+					.append('text')
+					.attr('x', 34)
+					.attr('y', 8)
+					.attr('fill', 'var(--text)')
+					.attr('font-size', '9px')
+					.attr('font-weight', '600')
+					.text('Selected tracts (WLS)');
+				selLeg
+					.append('text')
+					.attr('x', 34)
+					.attr('y', 19)
+					.attr('fill', 'var(--text-muted)')
+					.attr('font-size', '7.5px')
+					.text(
+						`Slope ${Number.isFinite(wRegSel.slope) ? slopeFmt(wRegSel.slope) : '—'} · R² ${Number.isFinite(wRegSel.r2) ? wRegSel.r2.toFixed(3) : '—'} · n=${selPts.length}`
+					);
+			}
 		}
 
 		const chart = svg.append('g').attr('transform', `translate(${marginLeft},${chartOffsetTop})`);
@@ -492,104 +496,106 @@
 				panelState.toggleTract(d.tract.gisjoin);
 			});
 
-		const cbW = 11;
-		const cbG = svg
-			.append('g')
-			.attr('class', 'tod-aff-colorbar')
-			.attr('transform', `translate(${marginLeft + innerWidth + 12}, ${chartOffsetTop})`)
-			.attr('pointer-events', 'none');
+		if (!storyMode) {
+			const cbW = 11;
+			const cbG = svg
+				.append('g')
+				.attr('class', 'tod-aff-colorbar')
+				.attr('transform', `translate(${marginLeft + innerWidth + 12}, ${chartOffsetTop})`)
+				.attr('pointer-events', 'none');
 
-		cbG
-			.append('text')
-			.attr('x', 0)
-			.attr('y', -11)
-			.attr('fill', 'var(--text-muted)')
-			.attr('font-size', '8px')
-			.attr('font-weight', '600')
-			.text('Stock Δ (colour)');
+			cbG
+				.append('text')
+				.attr('x', 0)
+				.attr('y', -11)
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '8px')
+				.attr('font-weight', '600')
+				.text('Stock Δ (colour)');
 
-		cbG
-			.append('rect')
-			.attr('x', 0)
-			.attr('y', 0)
-			.attr('width', cbW)
-			.attr('height', innerHeight)
-			.attr('rx', 2)
-			.attr('fill', `url(#${gradId})`)
-			.attr('stroke', 'var(--border)')
-			.attr('stroke-width', 0.5);
-
-		const stockAxis = d3.scaleLinear().domain([cDomLo, cHi]).range([innerHeight, 0]);
-		cbG
-			.append('g')
-			.attr('transform', `translate(${cbW + 4}, 0)`)
-			.call(
-				d3
-					.axisRight(stockAxis)
-					.ticks(5)
-					.tickFormat((d) => `${d3.format('.0f')(d)}%`)
-			)
-			.call((g) => g.selectAll('path,line').attr('stroke', 'var(--border)'))
-			.call((g) => g.selectAll('text').attr('fill', 'var(--text-muted)').attr('font-size', '8px'));
-
-		cbG
-			.append('text')
-			.attr('x', 0)
-			.attr('y', innerHeight + 14)
-			.attr('fill', 'var(--text-muted)')
-			.attr('font-size', '7px')
-			.text(`(${huSrcLabel})`);
-
-		const sizeY = chartOffsetTop + innerHeight + 48;
-		const sizeG = svg.append('g').attr('class', 'tod-aff-size-legend').attr('pointer-events', 'none');
-
-		const wMid = (wMin + wMax) / 2;
-		const sizeSamples = [
-			{ w: wMin, disp: niceHousingUnitsLabel(wMin) },
-			{ w: wMid, disp: niceHousingUnitsLabel(wMid) },
-			{ w: wMax, disp: niceHousingUnitsLabel(wMax) }
-		];
-		const titleX = marginLeft + innerWidth / 2;
-		sizeG
-			.append('text')
-			.attr('x', titleX)
-			.attr('y', sizeY)
-			.attr('text-anchor', 'middle')
-			.attr('fill', 'var(--text-muted)')
-			.attr('font-size', '7.5px')
-			.attr('font-weight', '600')
-			.text('# of Housing Units');
-		sizeG
-			.append('text')
-			.attr('x', titleX)
-			.attr('y', sizeY + 9)
-			.attr('text-anchor', 'middle')
-			.attr('fill', 'var(--text-muted)')
-			.attr('font-size', '6.5px')
-			.text(`Dot size ∝ (${startY})`);
-		const sizeRowY = sizeY + 18;
-		const span = Math.min(132, innerWidth - 36);
-		const x0s = marginLeft + (innerWidth - span) / 2;
-		sizeSamples.forEach((s, i) => {
-			const cx = x0s + (i * span) / 2;
-			const rr = rScale(s.w);
-			sizeG
-				.append('circle')
-				.attr('cx', cx)
-				.attr('cy', sizeRowY + rr)
-				.attr('r', rr)
-				.attr('fill', 'color-mix(in srgb, var(--bg-hover) 85%, var(--text-muted))')
+			cbG
+				.append('rect')
+				.attr('x', 0)
+				.attr('y', 0)
+				.attr('width', cbW)
+				.attr('height', innerHeight)
+				.attr('rx', 2)
+				.attr('fill', `url(#${gradId})`)
 				.attr('stroke', 'var(--border)')
-				.attr('stroke-width', 0.6);
+				.attr('stroke-width', 0.5);
+
+			const stockAxis = d3.scaleLinear().domain([cDomLo, cHi]).range([innerHeight, 0]);
+			cbG
+				.append('g')
+				.attr('transform', `translate(${cbW + 4}, 0)`)
+				.call(
+					d3
+						.axisRight(stockAxis)
+						.ticks(5)
+						.tickFormat((d) => `${d3.format('.0f')(d)}%`)
+				)
+				.call((g) => g.selectAll('path,line').attr('stroke', 'var(--border)'))
+				.call((g) => g.selectAll('text').attr('fill', 'var(--text-muted)').attr('font-size', '8px'));
+
+			cbG
+				.append('text')
+				.attr('x', 0)
+				.attr('y', innerHeight + 14)
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '7px')
+				.text(`(${huSrcLabel})`);
+
+			const sizeY = chartOffsetTop + innerHeight + 48;
+			const sizeG = svg.append('g').attr('class', 'tod-aff-size-legend').attr('pointer-events', 'none');
+
+			const wMid = (wMin + wMax) / 2;
+			const sizeSamples = [
+				{ w: wMin, disp: niceHousingUnitsLabel(wMin) },
+				{ w: wMid, disp: niceHousingUnitsLabel(wMid) },
+				{ w: wMax, disp: niceHousingUnitsLabel(wMax) }
+			];
+			const titleX = marginLeft + innerWidth / 2;
 			sizeG
 				.append('text')
-				.attr('x', cx)
-				.attr('y', sizeRowY + rr * 2 + 9)
+				.attr('x', titleX)
+				.attr('y', sizeY)
+				.attr('text-anchor', 'middle')
+				.attr('fill', 'var(--text-muted)')
+				.attr('font-size', '7.5px')
+				.attr('font-weight', '600')
+				.text('# of Housing Units');
+			sizeG
+				.append('text')
+				.attr('x', titleX)
+				.attr('y', sizeY + 9)
 				.attr('text-anchor', 'middle')
 				.attr('fill', 'var(--text-muted)')
 				.attr('font-size', '6.5px')
-				.text(`${huFmt(s.disp)}`);
-		});
+				.text(`Dot size ∝ (${startY})`);
+			const sizeRowY = sizeY + 18;
+			const span = Math.min(132, innerWidth - 36);
+			const x0s = marginLeft + (innerWidth - span) / 2;
+			sizeSamples.forEach((s, i) => {
+				const cx = x0s + (i * span) / 2;
+				const rr = rScale(s.w);
+				sizeG
+					.append('circle')
+					.attr('cx', cx)
+					.attr('cy', sizeRowY + rr)
+					.attr('r', rr)
+					.attr('fill', 'color-mix(in srgb, var(--bg-hover) 85%, var(--text-muted))')
+					.attr('stroke', 'var(--border)')
+					.attr('stroke-width', 0.6);
+				sizeG
+					.append('text')
+					.attr('x', cx)
+					.attr('y', sizeRowY + rr * 2 + 9)
+					.attr('text-anchor', 'middle')
+					.attr('fill', 'var(--text-muted)')
+					.attr('font-size', '6.5px')
+					.text(`${huFmt(s.disp)}`);
+			});
+		}
 	});
 
 	$effect(() => {
@@ -622,15 +628,17 @@
 				<input type="checkbox" bind:checked={panelState.trimOutliers} />
 				<span>Trim axes (exclude &gt;10σ)</span>
 			</label>
-			<button
-				type="button"
-				class="scatter-clear-sel"
-				disabled={panelState.selectedTracts.size === 0}
-				onclick={clearTractSelection}
-				aria-label="Clear selected tracts from the map and charts"
-			>
-				Clear selection
-			</button>
+			{#if !storyMode}
+				<button
+					type="button"
+					class="scatter-clear-sel"
+					disabled={panelState.selectedTracts.size === 0}
+					onclick={clearTractSelection}
+					aria-label="Clear selected tracts from the map and charts"
+				>
+					Clear selection
+				</button>
+			{/if}
 		</div>
 	{/if}
 	<div bind:this={containerEl} class="tod-aff-chart"></div>
