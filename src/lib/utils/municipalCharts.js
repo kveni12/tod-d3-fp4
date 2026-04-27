@@ -972,40 +972,99 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	}
 
 	const vulnerabilityMedian = d3.median(domainRows, (d) => d.under125) || 0;
-	const highVulnerability = new Set(
-		domainRows.filter((d) => d.under125 >= vulnerabilityMedian).map((d) => d.municipality)
+	const sortedIncomeShares = domainRows
+		.map((d) => Number(d.under125))
+		.filter((d) => Number.isFinite(d))
+		.sort(d3.ascending);
+	const q1 = d3.quantileSorted(sortedIncomeShares, 0.25) ?? 0;
+	const q2 = d3.quantileSorted(sortedIncomeShares, 0.5) ?? vulnerabilityMedian;
+	const q3 = d3.quantileSorted(sortedIncomeShares, 0.75) ?? 0;
+
+	function incomeBand(under125) {
+		if (!Number.isFinite(under125)) return 'midHigh';
+		if (under125 <= q1) return 'highIncome';
+		if (under125 <= q2) return 'midHigh';
+		if (under125 <= q3) return 'midLow';
+		return 'lowIncome';
+	}
+
+	const muniMeta = new Map(
+		domainRows.map((d) => [
+			d.municipality,
+			{
+				under125: Number(d.under125),
+				band: incomeBand(Number(d.under125)),
+				isHigherVulnerability: Number(d.under125) >= vulnerabilityMedian
+			}
+		])
 	);
+
 	const totalUnits = d3.sum(projectRows, (d) => d.units) || 0;
-	const highUnits = d3.sum(
-		projectRows.filter((d) => highVulnerability.has(d.municipality)),
-		(d) => d.units
-	);
-	const lowUnits = Math.max(0, totalUnits - highUnits);
-	const highShare = totalUnits ? highUnits / totalUnits : 0;
-	const lowShare = totalUnits ? lowUnits / totalUnits : 0;
+	const grouped = [
+		{
+			id: 'highIncome',
+			label: 'Higher-income places',
+			fill: '#e7f0ff',
+			outline: '#1849b5',
+			count: 0
+		},
+		{
+			id: 'midHigh',
+			label: 'Upper-middle places',
+			fill: '#c6dcff',
+			outline: '#1849b5',
+			count: 0
+		},
+		{
+			id: 'midLow',
+			label: 'Lower-middle places',
+			fill: '#ccecd7',
+			outline: '#0b8a43',
+			count: 0
+		},
+		{
+			id: 'lowIncome',
+			label: 'Lower-income places',
+			fill: '#91d3a7',
+			outline: '#0b8a43',
+			count: 0
+		}
+	];
+	const groupedById = new Map(grouped.map((d) => [d.id, d]));
+	for (const row of projectRows) {
+		const units = Number(row.units) || 0;
+		const metaRow = muniMeta.get(row.municipality);
+		const bucket = groupedById.get(metaRow?.band ?? 'midHigh');
+		if (bucket) bucket.count += units;
+	}
+	const groupedWithShares = grouped.map((d) => ({
+		...d,
+		share: totalUnits ? d.count / totalUnits : 0
+	}));
+	const higherVulnerabilityShare = totalUnits
+		? d3.sum(
+				projectRows.filter((d) => muniMeta.get(d.municipality)?.isHigherVulnerability),
+				(d) => d.units
+			) / totalUnits
+		: 0;
 
 	root
 		.append('div')
 		.attr('class', 'chart-note')
 		.style('margin-bottom', '8px')
 		.text(
-			`${fmtPct(highShare)} of selected-period units landed in higher-vulnerability municipalities, versus ${fmtPct(lowShare)} in lower-vulnerability municipalities.`
+			`${fmtPct(higherVulnerabilityShare)} of selected-period units landed in municipalities above the regional median share of households earning less than $125k.`
 		);
 
-	addHtmlLegend(root, [
-		{
+	addHtmlLegend(
+		root,
+		grouped.map((d) => ({
 			type: 'outline',
-			color: '#0b8a43',
-			fill: '#dff3e8',
-			label: 'Higher-vulnerability municipalities'
-		},
-		{
-			type: 'outline',
-			color: '#1849b5',
-			fill: '#deebff',
-			label: 'Lower-vulnerability municipalities'
-		}
-	]);
+			color: d.outline,
+			fill: d.fill,
+			label: d.label
+		}))
+	);
 
 	const width = Math.max(320, root.node().clientWidth || 520);
 	const height = 372;
@@ -1022,13 +1081,28 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const gridH = cell * rows;
 	const offsetX = (innerW - gridW) / 2;
 	const offsetY = 14;
-	const highDots = Math.round(highShare * 100);
-	const dots = d3.range(100).map((i) => ({
-		i,
-		group: i < highDots ? 'high' : 'low',
-		col: i % cols,
-		row: rows - 1 - Math.floor(i / cols)
-	}));
+	const dotAssignments = [];
+	let cursor = 0;
+	groupedWithShares.forEach((group, groupIndex) => {
+		const rawCount = groupIndex === groupedWithShares.length - 1
+			? 100 - cursor
+			: Math.round(group.share * 100);
+		const count = Math.max(0, Math.min(100 - cursor, rawCount));
+		for (let i = 0; i < count; i += 1) {
+			dotAssignments.push(group.id);
+		}
+		cursor += count;
+	});
+	while (dotAssignments.length < 100) dotAssignments.push(groupedWithShares[groupedWithShares.length - 1].id);
+	const dots = d3.range(100).map((i) => {
+		const group = groupedById.get(dotAssignments[i]) ?? grouped[0];
+		return {
+			i,
+			group,
+			col: i % cols,
+			row: rows - 1 - Math.floor(i / cols)
+		};
+	});
 
 	g.selectAll('.growth-capture-dot')
 		.data(dots)
@@ -1037,32 +1111,18 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		.attr('cx', (d) => offsetX + d.col * cell + cell / 2)
 		.attr('cy', (d) => offsetY + d.row * cell + cell / 2)
 		.attr('r', dotR)
-		.attr('fill', (d) => (d.group === 'high' ? '#dff3e8' : '#deebff'))
-		.attr('stroke', (d) => (d.group === 'high' ? '#0b8a43' : '#1849b5'))
+		.attr('fill', (d) => d.group.fill)
+		.attr('stroke', (d) => d.group.outline)
 		.attr('stroke-width', 3)
 		.attr('opacity', 1)
 		.append('title')
-		.text((d) =>
-			d.group === 'high'
-				? 'Unit share: higher-vulnerability municipality'
-				: 'Unit share: lower-vulnerability municipality'
-		);
+		.text((d) => `Unit share: ${d.group.label}`);
 
 	g.append('text')
-		.attr('x', innerW * 0.25)
+		.attr('x', innerW / 2)
 		.attr('y', offsetY + gridH + 36)
 		.attr('text-anchor', 'middle')
-		.attr('fill', '#0b8a43')
-		.attr('font-size', 14)
-		.attr('font-weight', 700)
-		.text(`${fmtPct(highShare)} high-vulnerability`);
-
-	g.append('text')
-		.attr('x', innerW * 0.75)
-		.attr('y', offsetY + gridH + 36)
-		.attr('text-anchor', 'middle')
-		.attr('fill', '#1849b5')
-		.attr('font-size', 14)
-		.attr('font-weight', 700)
-		.text(`${fmtPct(lowShare)} lower-vulnerability`);
+		.attr('fill', 'var(--text-muted)')
+		.attr('font-size', 13)
+		.text('Blue outlines = below-median share under $125k · Green outlines = above-median share under $125k');
 }

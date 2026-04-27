@@ -707,36 +707,22 @@
 			<div class="story-chart-panel__text">
 				<h2>Where is development most concentrated?</h2>
 				<p>
-					Although lower-income residents are the most at risk of displacement, municipalities with more lower income households (&lt; $125k/year) are also often the ones seeing the most new development. This suggests that equitable implementation matters most in the places already under the most pressure.
+					One of the clearest regional questions is whether new housing is landing mostly in wealthier places, or in municipalities where more households are already below roughly middle-income levels.
 				</p>
 				<p>
-					Here, <strong>higher-vulnerability</strong> municipalities are the ones above the median share of households earning less than $125k, while <strong>lower-vulnerability</strong> municipalities fall below that median. The comparison is meant to show where new housing production is landing relative to that income pressure.
+					This view treats municipal income context as a spectrum, not just a binary split. Fills move from higher-income places to lower-income places, while the blue-versus-green outline still shows whether a municipality falls below or above the regional median share of households earning less than $125k.
 				</p>
 			</div>
 			<div class="story-chart-panel__chart">
 				<h3>For every 100 new units, where do they land?</h3>
 				<p class="chart-note">
-					Each dot represents roughly one percent of all units added in the selected years, colored by whether that unit landed in a higher- or lower-vulnerability municipality.
+					Each dot is about one percent of all units added in the selected years. Read the fill as a rough income band and the outline as whether that municipality sits above or below the region-wide $125k vulnerability midpoint.
 				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
 			</div>
 		</div>
 	</section>
 
-	<section class="story card">
-		<h2>What kinds of change tend to accompany TOD?</h2>
-		<p>
-			We use a few familiar proxy measures to track neighborhood change around development. None of them proves displacement on its own, but together they can point to rising market pressure.
-		</p>
-		<ul class="story-list">
-			<li>Sharp increases in median income, often used as a <strong>risk indicator for rising housing costs</strong></li>
-			<li>Rapid increases in the percentage of residents with bachelor's degrees or higher</li>
-			<li>Shifts from owner-occupied housing toward higher-turnover rental housing [analysis coming soon]</li>
-		</ul>
-		<p>
-			Read these as warning signs, not a causal estimate.
-		</p>
-	</section>
 	<!-- <section class="story card">
 		<h2>What is the status of TOD in Massachusetts?	</h2>
 		<p class="chart-note">
@@ -792,15 +778,22 @@
 
 	
 	<section class="story card full-width">
-		<h2>A tract-level view of TOD</h2>
+		<p class="story-eyebrow">Why we zoom in</p>
+		<h2>What to look for in the tract-level map</h2>
 		<p>
-			Municipal summaries are useful, but they smooth over a lot of local variation. Census tracts let us compare transit access, housing growth, and neighborhood change at a finer scale.
+			Municipal summaries help us see the regional pattern, but they smooth over a lot of local variation. Census tracts let us look more closely at where transit access is strongest, where housing growth is actually happening, and where TOD is concentrated or missing.
+		</p>
+		<p>
+			They also let us track a few familiar signs of neighborhood change around development. None of these measures proves displacement on its own, but together they can point to rising market pressure.
 		</p>
 		<ul class="story-list">
-			<li>Where is transit accessible?</li>
-			<li>Which regions have seen the most development, and which present the most opportunity for TOD?</li>
-			<li>Where has TOD already occured, and where has it not?</li>
+			<li><strong>Median income change</strong>, which can signal rising housing costs and changing who can afford to live in an area</li>
+			<li><strong>Bachelor’s degree share change</strong>, which can signal turnover or selective in-migration</li>
+			<li><strong>Owner-to-renter shifts</strong>, which we plan to add as another way to track neighborhood change</li>
 		</ul>
+		<p>
+			Read these as warning signs, not proof. The point of the tract map is to see how transit, growth, and neighborhood change line up on the ground.
+		</p>
 	</section>
 	
 	<section class="tract-section">
