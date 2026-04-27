@@ -1474,6 +1474,40 @@
 					TOD can still be a powerful housing strategy. But in this prototype, the places with the most transit-oriented growth also tend to show stronger signs of neighborhood change. That makes affordability less of an add-on and more of the core equity safeguard.
 				</p>
 			</section>
+
+			<section class="story card recommendation-card">
+				<p class="story-eyebrow">What planners could do with this</p>
+				<h2>Planning implications from the patterns above</h2>
+				<p>
+					This prototype does not tell planners exactly what to build in every place. It does suggest a few practical ways to use transit, growth, and affordability data together.
+				</p>
+				<div class="recommendation-grid">
+					<div class="recommendation-item">
+						<h3>Target high-access, low-growth tracts first</h3>
+						<p>
+							Where the map shows strong transit access but little housing growth, planners could treat those tracts as priority areas for zoning review, public land review, or station-area housing strategies.
+						</p>
+					</div>
+					<div class="recommendation-item">
+						<h3>Measure TOD by affordability, not just unit count</h3>
+						<p>
+							If most new units near transit are still market-rate, then a TOD strategy should be evaluated partly by whether it expands access for lower-income households, not only by how many units it adds.
+						</p>
+					</div>
+					<div class="recommendation-item">
+						<h3>Watch for pressure where TOD is strongest</h3>
+						<p>
+							Income and education shifts do not prove displacement, but they can help flag places where growth near transit may need stronger affordability protections or anti-displacement tools.
+						</p>
+					</div>
+					<div class="recommendation-item">
+						<h3>Use tract-level monitoring alongside municipal goals</h3>
+						<p>
+							Municipal totals are useful, but the tract map shows why local variation matters. A city can meet broad production goals while still missing the tracts where transit-linked opportunity is strongest.
+						</p>
+					</div>
+				</div>
+			</section>
 		{/if}
 	</section>
 
@@ -1533,11 +1567,11 @@
 <style>
 	/* ── Warm editorial theme (matches static/municipal/index.html) ── */
 	.poc-root {
-		--bg: #f5f2eb;
-		--paper: #fffdf8;
+		--bg: #f8f5ef;
+		--paper: #fffefb;
 		--ink: #1f2430;
 		--muted: #5e6573;
-		--line: #d8d2c7;
+		--line: #ddd7cb;
 		--accent: #00843d;
 		--accent-soft: #d8efe2;
 		--warning: #ed8b00;
@@ -1547,7 +1581,7 @@
 		--blue-3: #6fa8dc;
 		--blue-4: #2f6ea6;
 		--blue-5: #003da5;
-		--shadow: 0 14px 34px rgba(31, 36, 48, 0.08);
+		--shadow: 0 10px 24px rgba(31, 36, 48, 0.05);
 		--radius: 18px;
 
 		/* Light-mode tokens for embedded charts (TodIntensityScatter, D3) — darker than app :root dark theme */
@@ -1578,7 +1612,7 @@
 		background: var(--bg);
 		max-width: var(--poc-max-width);
 		margin: 0 auto;
-		padding: 18px 22px 36px;
+		padding: 18px 24px 44px;
 	}
 
 	/* 75% of the main column max width — keeps long-form narrative readable; explore map stays wide below. */
@@ -1633,7 +1667,7 @@
 		color: #fff;
 		font-weight: 700;
 		text-decoration: none;
-		box-shadow: 0 6px 18px rgba(0, 132, 61, 0.18);
+		box-shadow: none;
 	}
 
 	.explore-gate__button:hover {
@@ -1939,7 +1973,7 @@
 	/* ── Story / narrative cards ──────────────────────── */
 	.story {
 		padding: 24px 0;
-		border-top: 1px solid rgba(120, 114, 102, 0.14);
+		border-top: 1px solid rgba(120, 114, 102, 0.12);
 	}
 
 	.story h2 {
@@ -2159,10 +2193,10 @@
 		max-width: 48rem;
 		margin: 8px auto 16px;
 		padding: 12px 14px;
-		border-top: 1px solid rgba(15, 128, 64, 0.28);
-		border-bottom: 1px solid rgba(15, 128, 64, 0.18);
+		border-top: 1px solid rgba(15, 128, 64, 0.22);
+		border-bottom: 1px solid rgba(15, 128, 64, 0.14);
 		color: var(--ink);
-		background: rgba(236, 247, 239, 0.72);
+		background: rgba(236, 247, 239, 0.44);
 		line-height: 1.55;
 		text-align: center;
 	}
@@ -2725,8 +2759,9 @@
 	}
 
 	.annotation-card {
-		padding: 0;
+		padding: 10px 0 0;
 		border: 0;
+		border-top: 1px solid rgba(120, 114, 102, 0.14);
 		border-radius: 0;
 		background: transparent;
 		display: grid;
@@ -2754,10 +2789,11 @@
 	}
 
 	.takeaway-card {
-		padding: 12px;
-		border-radius: 10px;
+		padding: 10px 0 0;
+		border-radius: 0;
 		background: transparent;
-		border: 1px solid var(--line);
+		border: 0;
+		border-top: 1px solid rgba(120, 114, 102, 0.14);
 	}
 
 	.takeaway-label {
@@ -2925,7 +2961,7 @@
 	}
 
 	.framing-block {
-		padding: 16px 0 0;
+		padding: 14px 0 0;
 		border: 0;
 		border-top: 1px solid rgba(120, 114, 102, 0.14);
 		border-radius: 0;
@@ -3027,6 +3063,44 @@
 		text-align: center;
 	}
 
+	.recommendation-card {
+		max-width: 58rem;
+		margin-inline: auto;
+		text-align: center;
+	}
+
+	.recommendation-card h2,
+	.recommendation-card > p {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+
+	.recommendation-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 16px 24px;
+		margin-top: 16px;
+		text-align: left;
+	}
+
+	.recommendation-item {
+		padding-top: 12px;
+		border-top: 1px solid rgba(120, 114, 102, 0.14);
+	}
+
+	.recommendation-item h3 {
+		margin: 0 0 8px;
+		font-size: 1rem;
+		line-height: 1.25;
+	}
+
+	.recommendation-item p {
+		margin: 0;
+		font-size: 0.98rem;
+		line-height: 1.62;
+		color: var(--muted);
+	}
+
 	.conclusion-card h2,
 	.conclusion-card p {
 		max-width: 42rem;
@@ -3035,6 +3109,10 @@
 
 	@media (max-width: 700px) {
 		.afford-metric-row {
+			grid-template-columns: 1fr;
+		}
+
+		.recommendation-grid {
 			grid-template-columns: 1fr;
 		}
 	}
