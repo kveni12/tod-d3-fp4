@@ -4524,10 +4524,13 @@
 										<summary>More info</summary>
 										<div class="poc-stepper-more__body">
 											{#if step.legend}
-												<p class="poc-stepper-card-note"><strong>How to read it:</strong> {step.legend}</p>
+												<p class="poc-stepper-card-note"><strong>What changes here:</strong> {step.legend}</p>
 											{/if}
 											{#if step.why}
 												<p class="poc-stepper-card-note"><strong>Why it matters:</strong> {step.why}</p>
+											{/if}
+											{#if step.prompt && i !== 2 && i !== 3 && i !== 8 && i !== 9}
+												<p class="poc-stepper-card-note"><strong>What to notice next:</strong> {step.prompt}</p>
 											{/if}
 										</div>
 									</details>
@@ -4739,14 +4742,6 @@
 											</div>
 										{/if}
 									</div>
-								{/if}
-								{#if guidedMode && step.prompt && i !== 2 && i !== 3 && i !== 8 && i !== 9}
-									<details class="poc-stepper-more">
-										<summary>Optional prompt</summary>
-										<div class="poc-stepper-more__body">
-											<p class="poc-stepper-card-note"><strong>Try this:</strong> {step.prompt}</p>
-										</div>
-									</details>
 								{/if}
 							</section>
 						{/each}
