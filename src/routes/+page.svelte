@@ -1666,6 +1666,7 @@
 		padding: 18px 0 28px;
 		margin-bottom: 18px;
 		border-bottom: 1px solid rgba(120, 114, 102, 0.2);
+		text-align: center;
 	}
 
 	.eyebrow {
@@ -1687,6 +1688,7 @@
 		margin-bottom: 0;
 		font-size: 1.16rem;
 		max-width: 46rem;
+		margin-inline: auto;
 	}
 
 	/* ── Dashboard layout ─────────────────────────────── */
@@ -1916,6 +1918,7 @@
 		margin-bottom: 14px;
 		letter-spacing: -0.01em;
 		color: var(--ink);
+		max-width: 32rem;
 	}
 	.story p {
 		color: var(--muted);
@@ -2058,6 +2061,10 @@
 
 	/* ── Chart cards ──────────────────────────────────── */
 	.chart-card { padding: 16px 0 0; }
+	.chart-card {
+		display: grid;
+		justify-items: center;
+	}
 
 	.chart-card h2 { font-size: 1.15rem; margin-bottom: 8px; }
 	.chart-card h3 {
@@ -2065,6 +2072,8 @@
 		margin-bottom: 10px;
 		color: var(--ink);
 		letter-spacing: -0.01em;
+		text-align: center;
+		max-width: 34rem;
 	}
 
 	.chart-note {
@@ -2072,6 +2081,8 @@
 		line-height: 1.6;
 		font-size: 0.93rem;
 		margin-bottom: 10px;
+		text-align: center;
+		max-width: 42rem;
 	}
 
 	.chart-toolbar {
@@ -2164,6 +2175,7 @@
 		width: 100%;
 		max-width: none;
 		justify-self: stretch;
+		text-align: center;
 	}
 
 	.story-chart-panel--stacked .story-chart-panel__chart {
@@ -2175,6 +2187,8 @@
 	.story-chart-panel__text h2 {
 		font-size: 1.7rem;
 		margin-bottom: 14px;
+		max-width: 32rem;
+		margin-inline: auto;
 	}
 
 	.story-chart-panel__text p {
@@ -2183,6 +2197,7 @@
 		margin-bottom: 14px;
 		font-size: 1.03rem;
 		max-width: 44rem;
+		margin-inline: auto;
 	}
 
 	.story-chart-panel__text p:last-child {
@@ -2200,6 +2215,7 @@
 		font-size: 1.18rem;
 		margin-bottom: 10px;
 		color: var(--ink);
+		text-align: center;
 	}
 
 	.story-chart-panel__chart .chart-wrap.small-chart.compact-side-chart {
@@ -2219,15 +2235,18 @@
 	.story-chart-row--tract {
 		grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
 		align-items: start;
+		justify-items: center;
 	}
 
 	.story-chart-row--tract .story-chart-text {
 		max-width: 40em;
+		justify-self: center;
 	}
 
 	.story-chart-row--tract .story-chart-plot {
 		max-width: 100%;
 		width: 100%;
+		justify-self: center;
 	}
 
 	.story-chart-text {
@@ -2567,6 +2586,7 @@
 		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 		gap: 12px;
 		margin-top: 12px;
+		align-items: start;
 	}
 
 	.annotation-card {
@@ -2764,6 +2784,7 @@
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 18px;
+		align-items: start;
 	}
 
 	.framing-block {
@@ -2799,6 +2820,7 @@
 		flex-direction: column;
 		gap: 28px;
 		margin-top: 14px;
+		align-items: center;
 	}
 
 	.afford-metric-row {
@@ -2806,6 +2828,7 @@
 		grid-template-columns: 3fr 2fr;
 		gap: 10px 12px;
 		align-items: start;
+		width: 100%;
 	}
 
 	.afford-four-cell {
