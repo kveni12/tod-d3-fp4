@@ -1116,9 +1116,9 @@
 		left: 10px;
 		z-index: 8;
 		display: grid;
-		gap: 8px;
-		width: min(320px, calc(100% - 20px));
-		padding: 10px 12px;
+		gap: 10px;
+		width: min(352px, calc(100% - 20px));
+		padding: 13px 14px;
 		backdrop-filter: blur(8px);
 	}
 
@@ -1141,28 +1141,29 @@
 	.map-stepper__hint,
 	.map-stepper__body-copy {
 		margin: 0;
-		font-size: 0.74rem;
-		line-height: 1.4;
+		font-size: 0.8rem;
+		line-height: 1.45;
 		color: var(--text-muted);
 	}
 
 	.map-stepper__rail {
 		display: grid;
-		gap: 6px;
-		max-height: 210px;
+		gap: 10px;
+		max-height: 292px;
 		overflow-y: auto;
 		scroll-snap-type: y proximity;
-		padding-right: 2px;
+		padding: 2px 4px 12px 1px;
 	}
 
 	.map-stepper__card {
 		display: grid;
-		gap: 8px;
+		gap: 10px;
 		width: 100%;
-		padding: 7px 9px;
-		border-radius: 8px;
-		border: 1px solid var(--border);
-		background: color-mix(in srgb, var(--bg-card) 95%, white);
+		padding: 12px 13px;
+		border-radius: 12px;
+		border: 1px solid color-mix(in srgb, var(--border) 88%, white);
+		background: color-mix(in srgb, var(--bg-card) 97%, white);
+		box-shadow: 0 2px 10px rgb(15 23 42 / 0.05);
 		text-align: left;
 		color: var(--text);
 		scroll-snap-align: center;
@@ -1171,14 +1172,15 @@
 
 	.map-stepper__card--active {
 		border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-		background: color-mix(in srgb, var(--accent) 9%, var(--bg-card));
+		background: color-mix(in srgb, var(--accent) 10%, var(--bg-card));
+		box-shadow: 0 8px 24px rgb(15 23 42 / 0.09);
 	}
 
 	.map-stepper__card-top {
 		display: grid;
-		grid-template-columns: 26px minmax(0, 1fr);
-		gap: 8px;
-		align-items: center;
+		grid-template-columns: 30px minmax(0, 1fr);
+		gap: 10px;
+		align-items: start;
 	}
 
 	.map-stepper__card-copy {
@@ -1191,11 +1193,11 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 26px;
-		height: 26px;
+		width: 30px;
+		height: 30px;
 		border-radius: 999px;
 		border: 1px solid var(--border);
-		font-size: 0.78rem;
+		font-size: 0.82rem;
 		font-weight: 700;
 	}
 
@@ -1205,16 +1207,16 @@
 	}
 
 	.map-stepper__title {
-		font-size: 0.75rem;
-		font-weight: 600;
-		line-height: 1.25;
+		font-size: 0.9rem;
+		font-weight: 700;
+		line-height: 1.24;
 		color: var(--text);
 	}
 
 	.map-stepper__card-body {
 		margin: 0;
-		font-size: 0.73rem;
-		line-height: 1.45;
+		font-size: 0.82rem;
+		line-height: 1.52;
 		color: var(--text-muted);
 	}
 
