@@ -1573,7 +1573,7 @@
 
 		--poc-max-width: 1680px;
 
-		font-family: Georgia, "Times New Roman", Times, serif;
+		font-family: var(--font-body);
 		color: var(--ink);
 		background: var(--bg);
 		max-width: var(--poc-max-width);
@@ -1642,15 +1642,16 @@
 
 	h1, h2, h3 {
 		margin-top: 0;
-		font-family: Georgia, "Times New Roman", Times, serif;
-		font-weight: 600;
+		font-family: var(--font-body);
+		font-weight: 700;
 	}
 
 	h1 {
 		margin-bottom: 14px;
-		font-size: clamp(2rem, 4vw, 3.4rem);
-		line-height: 1.02;
+		font-size: clamp(2.3rem, 4.6vw, 4.1rem);
+		line-height: 0.98;
 		letter-spacing: -0.03em;
+		max-width: 12ch;
 	}
 
 	.card {
@@ -1669,14 +1670,14 @@
 
 	.eyebrow {
 		display: inline-block;
-		margin-bottom: 8px;
+		margin-bottom: 12px;
 		padding: 0;
 		border-radius: 0;
 		background: transparent;
 		color: var(--accent);
 		font-weight: 700;
-		font-size: 0.74rem;
-		letter-spacing: 0.08em;
+		font-size: 0.78rem;
+		letter-spacing: 0.12em;
 		text-transform: uppercase;
 	}
 
@@ -1684,7 +1685,7 @@
 		color: var(--muted);
 		line-height: 1.72;
 		margin-bottom: 0;
-		font-size: 1.12rem;
+		font-size: 1.16rem;
 		max-width: 46rem;
 	}
 
@@ -1911,15 +1912,16 @@
 	}
 
 	.story h2 {
-		font-size: 1.55rem;
-		margin-bottom: 12px;
+		font-size: 1.7rem;
+		margin-bottom: 14px;
 		letter-spacing: -0.01em;
+		color: var(--ink);
 	}
 	.story p {
 		color: var(--muted);
 		line-height: 1.72;
 		margin-bottom: 14px;
-		font-size: 1.06rem;
+		font-size: 1.03rem;
 		max-width: 44rem;
 	}
 	.story p:last-child { margin-bottom: 0; }
@@ -2058,13 +2060,18 @@
 	.chart-card { padding: 16px 0 0; }
 
 	.chart-card h2 { font-size: 1.15rem; margin-bottom: 8px; }
-	.chart-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+	.chart-card h3 {
+		font-size: 1.18rem;
+		margin-bottom: 10px;
+		color: var(--ink);
+		letter-spacing: -0.01em;
+	}
 
 	.chart-note {
 		color: var(--muted);
-		line-height: 1.55;
-		font-size: 0.9rem;
-		margin-bottom: 8px;
+		line-height: 1.6;
+		font-size: 0.93rem;
+		margin-bottom: 10px;
 	}
 
 	.chart-toolbar {
@@ -2166,15 +2173,15 @@
 	}
 
 	.story-chart-panel__text h2 {
-		font-size: 1.55rem;
-		margin-bottom: 12px;
+		font-size: 1.7rem;
+		margin-bottom: 14px;
 	}
 
 	.story-chart-panel__text p {
 		color: var(--muted);
 		line-height: 1.72;
 		margin-bottom: 14px;
-		font-size: 1.05rem;
+		font-size: 1.03rem;
 		max-width: 44rem;
 	}
 
@@ -2190,8 +2197,9 @@
 	}
 
 	.story-chart-panel__chart h3 {
-		font-size: 1.08rem;
-		margin-bottom: 8px;
+		font-size: 1.18rem;
+		margin-bottom: 10px;
+		color: var(--ink);
 	}
 
 	.story-chart-panel__chart .chart-wrap.small-chart.compact-side-chart {
@@ -2251,7 +2259,8 @@
 	}
 
 	.story-chart-plot h3 {
-		font-size: 1rem;
+		font-size: 1.12rem;
+		color: var(--ink);
 	}
 
 	.story-chart-row--tract .scatter-container--compact {
@@ -2520,9 +2529,10 @@
 
 	.signal-line {
 		margin: 0;
-		font-size: 1.05rem;
-		line-height: 1.55;
+		font-size: 1.12rem;
+		line-height: 1.62;
 		color: var(--ink);
+		max-width: 48rem;
 	}
 
 	.guide-figures {
@@ -2808,11 +2818,13 @@
 
 	.afford-four-cell__title {
 		margin: 0 0 6px;
-		font-size: 0.78rem;
+		font-size: 0.84rem;
 		font-weight: 700;
 		line-height: 1.25;
 		color: var(--muted);
 		text-align: center;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
 	}
 
 	.afford-scatter-embed-figure {
