@@ -667,7 +667,7 @@
 			<p>Loading municipal data…</p>
 		</div>
 	{:else}
-	<section class="story card">
+	<section class="story card story--centered">
 		<h2>How much new housing is actually transit-oriented?</h2>
 		<p>
 			TOD has grown over time, but it is still not the dominant pattern. A large share of new housing is still being built outside the strongest transit context.
@@ -1674,10 +1674,11 @@
 
 	h1 {
 		margin-bottom: 14px;
-		font-size: clamp(2.3rem, 4.6vw, 4.1rem);
-		line-height: 0.98;
+		font-size: clamp(2.6rem, 6vw, 4.7rem);
+		line-height: 0.96;
 		letter-spacing: -0.03em;
-		max-width: 12ch;
+		max-width: 9.6ch;
+		margin-inline: auto;
 	}
 
 	.card {
@@ -1689,7 +1690,7 @@
 
 	/* ── Hero ─────────────────────────────────────────── */
 	.hero-full {
-		padding: 18px 0 28px;
+		padding: clamp(12px, 2vw, 22px) 0 28px;
 		margin-bottom: 18px;
 		border-bottom: 1px solid rgba(120, 114, 102, 0.2);
 		text-align: center;
@@ -1711,9 +1712,9 @@
 	.subtitle {
 		color: var(--muted);
 		line-height: 1.72;
-		margin-bottom: 0;
-		font-size: 1.16rem;
-		max-width: 46rem;
+		margin: 0 auto;
+		font-size: clamp(1.02rem, 1.8vw, 1.16rem);
+		max-width: min(46rem, 92vw);
 		margin-inline: auto;
 	}
 
@@ -2107,6 +2108,7 @@
 	.chart-card {
 		display: grid;
 		justify-items: center;
+		width: 100%;
 	}
 
 	.chart-card__headline {
@@ -2166,6 +2168,8 @@
 	.chart-wrap {
 		position: relative;
 		min-height: 420px;
+		width: min(100%, 860px);
+		margin-inline: auto;
 	}
 
 	.small-grid {
@@ -2247,8 +2251,7 @@
 	}
 
 	.story-chart-panel--stacked .story-chart-panel__chart {
-		/* Same track sizing intent as minmax(300px, 1.05fr) in the two-column card */
-		width: min(100%, max(300px, calc(100% * 1.05 / 2.05)));
+		width: min(100%, 860px);
 		margin-inline: auto;
 	}
 
@@ -2375,6 +2378,24 @@
 		.takeaway-grid--three {
 			grid-template-columns: 1fr;
 		}
+	}
+
+	.story--signal,
+	.story--centered,
+	.hero-full,
+	.story-chart-panel--stacked {
+		text-align: center;
+	}
+
+	.story--signal h2,
+	.story--signal p,
+	.story--centered h2,
+	.story--centered p {
+		margin-inline: auto;
+	}
+
+	.signal-line {
+		max-width: 48rem;
 	}
 
 	:global(.poc-root .mpc-map-zoom-hint) {
