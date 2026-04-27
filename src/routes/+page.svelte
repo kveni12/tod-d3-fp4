@@ -856,13 +856,17 @@
 			</div>
 		{:else}
 			<section class="chart-card card full-width">
-				<h3>Transit access and new housing growth do not consistently align across Greater Boston tracts</h3>
+				<p class="story-eyebrow story-eyebrow--center">Guided map story</p>
+				<h2 class="chart-card__headline">Transit access and new housing growth do not consistently align across Greater Boston tracts</h2>
 				<p class="chart-note">
-					The map moves from transit access, to housing growth, to mismatch, and then to lower-income context. Blue means stronger housing growth, red means weaker or negative growth, and purple outlines mark places where access and growth pull apart.
+					The walkthrough starts broad and then gets more specific: first where transit is strongest, then where housing grew, then where those two patterns split apart, and finally where that mismatch matters most for lower-income tracts.
 				</p>
 				<p class="chart-note">
 					For readability, example cards use short names like <strong>“Tract in Suffolk County”</strong> instead of full census identifiers.
 				</p>
+				<div class="takeaway-strip" aria-label="Main takeaway from the guided map">
+					<strong>Main takeaway:</strong> the region is adding housing, but not consistently in the places with the strongest transit access or in ways that clearly expand access for lower-income residents.
+				</div>
 				<div class="chart-wrap chart-tall chart-wrap--poc-map chart-wrap--poc-map--main-tall">
 					<PocNhgisTractMap
 						panelState={pocMapPanel}
@@ -925,12 +929,34 @@
 				</ul>
 			</section>
 
+			<section class="story card story--brief">
+				<p class="story-eyebrow">What the tract charts are for</p>
+				<h2>The next charts ask a simpler question</h2>
+				<p>
+					Once we separate TOD-heavy tracts from the rest, do they also show stronger signs of neighborhood change? The point is not to prove that TOD caused those changes, but to see whether the places absorbing more TOD also look different on income, education, and affordability.
+				</p>
+				<div class="takeaway-grid takeaway-grid--three">
+					<div class="takeaway-card">
+						<p class="takeaway-label">Income</p>
+						<p class="takeaway-meta">TOD-heavy tracts tend to show larger median income increases.</p>
+					</div>
+					<div class="takeaway-card">
+						<p class="takeaway-label">Education</p>
+						<p class="takeaway-meta">They also tend to show larger increases in bachelor’s degree share.</p>
+					</div>
+					<div class="takeaway-card">
+						<p class="takeaway-label">Affordability</p>
+						<p class="takeaway-meta">Where a larger share of new units is affordable, those pressure signals are weaker.</p>
+					</div>
+				</div>
+			</section>
+
 			<!-- Income / education tract analysis (reinstated from earlier POC story layout) -->
 			<div class="story-chart-row story-chart-row--tract full-width">
 				<section class="story card story-chart-text">
 					<h2>Income analysis</h2>
 					<p>
-						TOD-dominated tracts show larger income increases than the non-TOD comparison group. That does not prove causation, but it is consistent with stronger neighborhood change in the places where TOD is most concentrated.
+						TOD-dominated tracts show larger income increases than the non-TOD comparison group. Read this as a pressure signal: the places where TOD is most concentrated also tend to be the places where incomes are changing faster.
 					</p>
 					<p>
 						Average income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
@@ -1039,7 +1065,7 @@
 				<section class="chart-card card story-chart-plot">
 					<h3>TOD intensity vs median income change</h3>
 					<p class="chart-note">
-						Higher TOD intensity generally lines up with larger income increases in the tract sample.
+						What to notice: as TOD intensity rises, tracts are more likely to appear in the higher-income-change part of the plot.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} />
@@ -1157,7 +1183,7 @@
 				<section class="chart-card card story-chart-plot">
 					<h3>TOD intensity vs bachelor's degree share change</h3>
 					<p class="chart-note">
-						The same relationship appears in education: more TOD tends to align with larger increases in college-educated share.
+						What to notice: the pattern is similar here too. More TOD tends to line up with bigger increases in college-educated share.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} />
@@ -1929,6 +1955,23 @@
 	}
 	.story p:last-child { margin-bottom: 0; }
 
+	.story-eyebrow {
+		margin: 0 0 10px;
+		font-size: 0.74rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.story-eyebrow--center {
+		text-align: center;
+	}
+
+	.story--brief h2 {
+		max-width: 40rem;
+	}
+
 	.hero-plan-note {
 		margin-top: 14px;
 		font-size: 0.95rem;
@@ -2066,6 +2109,15 @@
 		justify-items: center;
 	}
 
+	.chart-card__headline {
+		font-size: 1.9rem;
+		line-height: 1.15;
+		margin: 0 0 10px;
+		max-width: 44rem;
+		text-align: center;
+		letter-spacing: -0.02em;
+	}
+
 	.chart-card h2 { font-size: 1.15rem; margin-bottom: 8px; }
 	.chart-card h3 {
 		font-size: 1.18rem;
@@ -2083,6 +2135,22 @@
 		margin-bottom: 10px;
 		text-align: center;
 		max-width: 42rem;
+	}
+
+	.takeaway-strip {
+		max-width: 48rem;
+		margin: 8px auto 16px;
+		padding: 12px 14px;
+		border-top: 1px solid rgba(15, 128, 64, 0.28);
+		border-bottom: 1px solid rgba(15, 128, 64, 0.18);
+		color: var(--ink);
+		background: rgba(236, 247, 239, 0.72);
+		line-height: 1.55;
+		text-align: center;
+	}
+
+	.takeaway-grid--three {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
 	.chart-toolbar {
@@ -2302,6 +2370,10 @@
 		.story-chart-panel .compact-side-chart {
 			max-height: none;
 			min-height: 260px;
+		}
+
+		.takeaway-grid--three {
+			grid-template-columns: 1fr;
 		}
 	}
 

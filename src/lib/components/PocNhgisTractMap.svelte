@@ -96,6 +96,7 @@
 		anchorY: null,
 		eyebrow: '',
 		title: '',
+		summary: '',
 		badge: '',
 		badgeTone: '',
 		primaryRows: [],
@@ -2411,6 +2412,18 @@
 			});
 		}
 
+		const summary =
+			mismatchEyebrow === 'High access, low growth'
+				? 'Why it matters: transit access is strong here, but housing growth has stayed weak.'
+				: mismatchEyebrow === 'High growth, low access'
+					? 'Why it matters: housing growth is happening faster here than transit access is improving.'
+					: devClass === 'tod_dominated'
+						? 'Why it matters: most significant development in this tract has been concentrated near transit.'
+						: devClass === 'nontod_dominated'
+							? 'Why it matters: most significant development in this tract has happened outside the stronger transit geography.'
+							: devClass === 'minimal'
+								? 'Why it matters: this tract has seen relatively little development in the selected period.'
+								: '';
 		tooltip = {
 			visible: true,
 			x,
@@ -2419,6 +2432,7 @@
 			anchorY: anchor?.y ?? null,
 			eyebrow: mismatchEyebrow ?? 'Census tract',
 			title: county && String(county) !== 'County Name' ? `Tract in ${tractPlace}` : `Tract: ${tractPlace}`,
+			summary,
 			badge: tier,
 			badgeTone,
 			primaryRows,
@@ -2713,6 +2727,9 @@
 		});
 		secondaryRows.push({ label: 'Type', value: d.mixed_use ? 'Mixed-use' : 'Residential' });
 		if (d.rdv) secondaryRows.push({ label: 'Redevelopment', value: 'Yes' });
+		const summary = access
+			? 'Why it matters: this project adds housing in a transit-accessible location.'
+			: 'Why it matters: this project adds housing in a location with weaker transit access.';
 		tooltip = {
 			visible: true,
 			x,
@@ -2721,6 +2738,7 @@
 			anchorY: anchor?.y ?? null,
 			eyebrow: 'MassBuilds project',
 			title: `Development: ${d.name || 'Unnamed project'}`,
+			summary,
 			badge: access ? 'Transit-accessible' : 'Not transit-accessible',
 			badgeTone: access ? 'tod' : 'minimal',
 			primaryRows,
@@ -4278,6 +4296,9 @@
 									<span class="map-tooltip__badge map-tooltip__badge--{activeTooltip.badgeTone}">{activeTooltip.badge}</span>
 								{/if}
 							</div>
+							{#if activeTooltip.summary}
+								<p class="map-tooltip__summary">{activeTooltip.summary}</p>
+							{/if}
 							{#if activeTooltip.primaryRows.length > 0}
 								<div
 									class="map-tooltip__primary"
@@ -6395,6 +6416,15 @@
 		font-weight: 700;
 		line-height: 1.2;
 		color: var(--text);
+	}
+
+	.map-tooltip__summary {
+		margin: 0 0 8px;
+		font-size: 0.74rem;
+		line-height: 1.45;
+		color: var(--text);
+		padding-bottom: 8px;
+		border-bottom: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
 	}
 
 	.map-tooltip__badge {
