@@ -1486,7 +1486,7 @@
 				</div>
 			</section>
 
-			<section class="story card">
+			<section class="story card conclusion-card">
 				<h2>What does this tell us?</h2>
 				<p>
 					TOD can still be a powerful housing strategy. But in this prototype, the places with the most transit-oriented growth also tend to show stronger signs of neighborhood change. That makes affordability less of an add-on and more of the core equity safeguard.
@@ -1610,6 +1610,9 @@
 		margin-top: 14px;
 		display: grid;
 		gap: 18px;
+		max-width: 58rem;
+		margin-inline: auto;
+		width: 100%;
 	}
 
 	.explore-gate {
@@ -1617,18 +1620,21 @@
 		display: grid;
 		gap: 10px;
 		border-top: 1px solid rgba(120, 114, 102, 0.2);
+		text-align: center;
 	}
 
 	.explore-gate h2 {
 		margin: 0;
-		font-size: 1.2rem;
+		font-size: 1.35rem;
+		line-height: 1.15;
 	}
 
 	.explore-gate p {
 		margin: 0;
 		color: var(--muted);
-		line-height: 1.55;
-		max-width: 58rem;
+		line-height: 1.62;
+		max-width: 42rem;
+		margin-inline: auto;
 	}
 
 	.explore-gate__cta {
@@ -1654,6 +1660,19 @@
 
 	.sources-card {
 		margin-top: 6px;
+		text-align: center;
+	}
+
+	.sources-card h2,
+	.sources-card > p {
+		max-width: 46rem;
+		margin-inline: auto;
+	}
+
+	.sources-list {
+		max-width: 50rem;
+		margin-inline: auto;
+		text-align: left;
 	}
 
 	* { box-sizing: border-box; }
@@ -3009,6 +3028,18 @@
 		max-width: 252px;
 		margin-left: auto;
 		margin-right: auto;
+	}
+
+	.conclusion-card {
+		max-width: 52rem;
+		margin-inline: auto;
+		text-align: center;
+	}
+
+	.conclusion-card h2,
+	.conclusion-card p {
+		max-width: 42rem;
+		margin-inline: auto;
 	}
 
 	@media (max-width: 700px) {

@@ -233,7 +233,13 @@
 			.nice()
 			.range([innerHeight, 0]);
 
-		const titleFull = `${yLabel} vs affordable TOD share (TOD-dominated tracts)`;
+		const viewerTitle =
+			yBase === 'median_income_change_pct'
+				? 'Income change vs affordable share in TOD-heavy tracts'
+				: yBase === 'bachelors_pct_change'
+					? "Bachelor's degree change vs affordable share in TOD-heavy tracts"
+					: `${yLabel} vs affordable share in TOD-heavy tracts`;
+		const titleFull = viewerTitle;
 		const scatterTitleLines = splitChartTitle(titleFull, 42);
 		const titleAnchorX = marginLeft + innerWidth / 2;
 		const firstTitleBaseline = 18;
