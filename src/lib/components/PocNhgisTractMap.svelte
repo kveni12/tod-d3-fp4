@@ -3077,6 +3077,35 @@
 		});
 	});
 
+	const guidedLowerIncomeSummary = $derived.by(() => {
+		if (!guidedMode) return null;
+		const lowIncomeRows = (nhgisRows ?? []).filter((row) => mismatchFlagsByGj.get(row?.gisjoin)?.isLowIncome);
+		const total = lowIncomeRows.length || 0;
+		if (!total) return null;
+
+		const count = (fn) => lowIncomeRows.filter(fn).length;
+		const mismatchHa = count((row) => mismatchFlagsByGj.get(row.gisjoin)?.isHighAccessLowGrowth);
+		const mismatchHg = count((row) => mismatchFlagsByGj.get(row.gisjoin)?.isHighGrowthLowAccess);
+		const mismatchAny = count((row) => {
+			const flag = mismatchFlagsByGj.get(row.gisjoin);
+			return flag?.isHighAccessLowGrowth || flag?.isHighGrowthLowAccess;
+		});
+
+		const cohortTod = count((row) => row?.devClass === 'tod_dominated');
+		const cohortNonTod = count((row) => row?.devClass === 'nontod_dominated');
+		const cohortMinimal = count((row) => row?.devClass === 'minimal');
+
+		return {
+			total,
+			mismatchAny,
+			mismatchHa,
+			mismatchHg,
+			cohortTod,
+			cohortNonTod,
+			cohortMinimal
+		};
+	});
+
 	const guidedContrastExamples = $derived.by(() => {
 		if (!guidedMode) return [];
 		const tractByGj = new Map((tractList ?? []).map((t) => [t.gisjoin, t]));
@@ -4672,6 +4701,43 @@
 												<strong>What this shows:</strong> the purple mismatch outlines show where lower-income tracts sit inside the access-versus-growth disconnect, either as high-access/low-growth places or higher-growth/weaker-access places.
 											{/if}
 										</p>
+										{#if guidedLowerIncomeSummary}
+											<div class="poc-stepper-lower-income-summary" aria-label="Lower-income tract summary">
+												{#if guidedLowerIncomeOverlay === 'cohort'}
+													<div class="poc-stepper-lower-income-summary__card">
+														<span class="poc-stepper-lower-income-summary__label">TOD-dominated</span>
+														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortTod / guidedLowerIncomeSummary.total)}</strong>
+														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+													</div>
+													<div class="poc-stepper-lower-income-summary__card">
+														<span class="poc-stepper-lower-income-summary__label">Non-TOD-dominated</span>
+														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortNonTod / guidedLowerIncomeSummary.total)}</strong>
+														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+													</div>
+													<div class="poc-stepper-lower-income-summary__card">
+														<span class="poc-stepper-lower-income-summary__label">Minimal development</span>
+														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortMinimal / guidedLowerIncomeSummary.total)}</strong>
+														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+													</div>
+												{:else}
+													<div class="poc-stepper-lower-income-summary__card">
+														<span class="poc-stepper-lower-income-summary__label">Any mismatch</span>
+														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchAny / guidedLowerIncomeSummary.total)}</strong>
+														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+													</div>
+													<div class="poc-stepper-lower-income-summary__card">
+														<span class="poc-stepper-lower-income-summary__label">High access, low growth</span>
+														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchHa / guidedLowerIncomeSummary.total)}</strong>
+														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+													</div>
+													<div class="poc-stepper-lower-income-summary__card">
+														<span class="poc-stepper-lower-income-summary__label">High growth, low access</span>
+														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchHg / guidedLowerIncomeSummary.total)}</strong>
+														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+													</div>
+												{/if}
+											</div>
+										{/if}
 									</div>
 								{/if}
 								{#if guidedMode && step.prompt && i !== 2 && i !== 3 && i !== 8 && i !== 9}
@@ -5123,6 +5189,42 @@
 		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
 	}
 
+	.poc-stepper-lower-income-summary {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.55rem;
+	}
+
+	.poc-stepper-lower-income-summary__card {
+		display: grid;
+		gap: 0.18rem;
+		padding: 0.68rem 0.72rem;
+		border-radius: 12px;
+		border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+		background: color-mix(in srgb, var(--bg-card) 95%, white 5%);
+	}
+
+	.poc-stepper-lower-income-summary__label {
+		font-size: 0.7rem;
+		font-weight: 700;
+		line-height: 1.3;
+		color: var(--text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
+
+	.poc-stepper-lower-income-summary__value {
+		font-size: 1.08rem;
+		line-height: 1.05;
+		color: var(--text);
+	}
+
+	.poc-stepper-lower-income-summary__meta {
+		font-size: 0.72rem;
+		line-height: 1.35;
+		color: var(--text-muted);
+	}
+
 	.poc-stepper-examples-title {
 		margin: 0;
 		max-width: 30ch;
@@ -5334,6 +5436,10 @@
 	}
 
 	@media (max-width: 900px) {
+		.poc-stepper-lower-income-summary {
+			grid-template-columns: 1fr;
+		}
+
 		.poc-scrolly-shell {
 			grid-template-columns: 1fr;
 			gap: 16px;
