@@ -993,13 +993,23 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		);
 
 	addHtmlLegend(root, [
-		{ color: 'var(--accent)', label: 'Higher-vulnerability municipalities' },
-		{ color: 'var(--blue-5)', label: 'Lower-vulnerability municipalities' }
+		{
+			type: 'outline',
+			color: '#0b8a43',
+			fill: '#dff3e8',
+			label: 'Higher-vulnerability municipalities'
+		},
+		{
+			type: 'outline',
+			color: '#1849b5',
+			fill: '#deebff',
+			label: 'Lower-vulnerability municipalities'
+		}
 	]);
 
 	const width = Math.max(320, root.node().clientWidth || 520);
-	const height = 320;
-	const margin = { top: 18, right: 20, bottom: 30, left: 20 };
+	const height = 372;
+	const margin = { top: 18, right: 20, bottom: 62, left: 20 };
 	const innerW = width - margin.left - margin.right;
 	const innerH = height - margin.top - margin.bottom;
 	const svg = root.append('svg').attr('viewBox', `0 0 ${width} ${height}`);
@@ -1027,8 +1037,10 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		.attr('cx', (d) => offsetX + d.col * cell + cell / 2)
 		.attr('cy', (d) => offsetY + d.row * cell + cell / 2)
 		.attr('r', dotR)
-		.attr('fill', (d) => (d.group === 'high' ? 'var(--accent)' : 'var(--blue-5)'))
-		.attr('opacity', 0.95)
+		.attr('fill', (d) => (d.group === 'high' ? '#dff3e8' : '#deebff'))
+		.attr('stroke', (d) => (d.group === 'high' ? '#0b8a43' : '#1849b5'))
+		.attr('stroke-width', 3)
+		.attr('opacity', 1)
 		.append('title')
 		.text((d) =>
 			d.group === 'high'
@@ -1038,18 +1050,18 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 
 	g.append('text')
 		.attr('x', innerW * 0.25)
-		.attr('y', offsetY + gridH + 22)
+		.attr('y', offsetY + gridH + 36)
 		.attr('text-anchor', 'middle')
-		.attr('fill', 'var(--accent)')
+		.attr('fill', '#0b8a43')
 		.attr('font-size', 14)
 		.attr('font-weight', 700)
 		.text(`${fmtPct(highShare)} high-vulnerability`);
 
 	g.append('text')
 		.attr('x', innerW * 0.75)
-		.attr('y', offsetY + gridH + 22)
+		.attr('y', offsetY + gridH + 36)
 		.attr('text-anchor', 'middle')
-		.attr('fill', 'var(--blue-5)')
+		.attr('fill', '#1849b5')
 		.attr('font-size', 14)
 		.attr('font-weight', 700)
 		.text(`${fmtPct(lowShare)} lower-vulnerability`);
