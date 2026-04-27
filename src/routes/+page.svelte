@@ -707,16 +707,16 @@
 			<div class="story-chart-panel__text">
 				<h2>Where is development most concentrated?</h2>
 				<p>
-					One of the clearest regional questions is whether new housing is landing mostly in wealthier places, or in municipalities where more households are already below roughly middle-income levels.
+					One of the clearest regional questions is whether new housing is landing mostly in wealthier municipalities, or in municipalities where more households are already below roughly middle-income levels.
 				</p>
 				<p>
-					This view treats municipal income context as a spectrum, not just a binary split. Fills move from higher-income places to lower-income places, while the blue-versus-green outline still shows whether a municipality falls below or above the regional median share of households earning less than $125k.
+					This view treats municipal income context as a spectrum, not just a binary split. Dot fills move from higher-income municipalities to lower-income municipalities. Blue outlines mark municipalities below the regional median share of households earning less than $125k; green outlines mark municipalities above it.
 				</p>
 			</div>
 			<div class="story-chart-panel__chart">
 				<h3>For every 100 new units, where do they land?</h3>
 				<p class="chart-note">
-					Each dot is about one percent of all units added in the selected years. Read the fill as a rough income band and the outline as whether that municipality sits above or below the region-wide $125k vulnerability midpoint.
+					Each dot is about one percent of all units added in the selected years. Read the fill as an income band: dark green for higher-income municipalities, lighter green for upper-middle municipalities, orange for lower-middle municipalities, and red for lower-income municipalities. The outline shows whether that municipality sits above or below the region-wide $125k vulnerability midpoint.
 				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
 			</div>
@@ -789,10 +789,9 @@
 		<ul class="story-list">
 			<li><strong>Median income change</strong>, which can signal rising housing costs and changing who can afford to live in an area</li>
 			<li><strong>Bachelor’s degree share change</strong>, which can signal turnover or selective in-migration</li>
-			<li><strong>Owner-to-renter shifts</strong>, which we plan to add as another way to track neighborhood change</li>
 		</ul>
 		<p>
-			Read these as warning signs, not proof. The point of the tract map is to see how transit, growth, and neighborhood change line up on the ground.
+			Read these as warning signs, not proof. This version focuses on the two signals we can show clearly here: income change and education change. The point of the tract map is to see how transit, growth, and neighborhood change line up on the ground.
 		</p>
 	</section>
 	
@@ -2143,6 +2142,7 @@
 		margin-bottom: 10px;
 		text-align: center;
 		max-width: 42rem;
+		margin-inline: auto;
 	}
 
 	.takeaway-strip {
@@ -2226,7 +2226,7 @@
 
 	/* Narrative + chart in one white card (municipal affordability & vulnerability) */
 	.story-chart-panel {
-		padding: 24px 0;
+		padding: 28px 0;
 		border-top: 1px solid rgba(120, 114, 102, 0.14);
 	}
 
@@ -2239,7 +2239,7 @@
 
 	.story-chart-panel__grid {
 		display: grid;
-		gap: 14px;
+		gap: 18px;
 		align-items: start;
 		grid-template-columns: minmax(0, 1fr) minmax(300px, 1.05fr);
 	}
@@ -2251,29 +2251,31 @@
 
 	.story-chart-panel--stacked .story-chart-panel__text {
 		width: 100%;
-		max-width: none;
+		max-width: 48rem;
 		justify-self: stretch;
 		text-align: center;
+		margin-inline: auto;
 	}
 
 	.story-chart-panel--stacked .story-chart-panel__chart {
-		width: min(100%, 860px);
+		width: min(100%, 920px);
 		margin-inline: auto;
 	}
 
 	.story-chart-panel__text h2 {
-		font-size: 1.7rem;
-		margin-bottom: 14px;
-		max-width: 32rem;
+		font-size: clamp(1.8rem, 2vw, 2.15rem);
+		margin-bottom: 16px;
+		max-width: 36rem;
 		margin-inline: auto;
+		line-height: 1.12;
 	}
 
 	.story-chart-panel__text p {
 		color: var(--muted);
-		line-height: 1.72;
+		line-height: 1.68;
 		margin-bottom: 14px;
-		font-size: 1.03rem;
-		max-width: 44rem;
+		font-size: 1.05rem;
+		max-width: 42rem;
 		margin-inline: auto;
 	}
 
@@ -2289,15 +2291,16 @@
 	}
 
 	.story-chart-panel__chart h3 {
-		font-size: 1.18rem;
-		margin-bottom: 10px;
+		font-size: 1.25rem;
+		margin-bottom: 12px;
 		color: var(--ink);
 		text-align: center;
+		line-height: 1.2;
 	}
 
 	.story-chart-panel__chart .chart-wrap.small-chart.compact-side-chart {
 		flex: 0 0 auto;
-		min-height: 320px;
+		min-height: 360px;
 		height: auto;
 		width: 100%;
 	}
@@ -2402,6 +2405,29 @@
 
 	.signal-line {
 		max-width: 48rem;
+	}
+
+	.story.card.full-width > h2,
+	.story.card.full-width > p,
+	.story.card.full-width > ul {
+		max-width: 52rem;
+		margin-inline: auto;
+	}
+
+	.story.card.full-width > h2 {
+		font-size: clamp(1.75rem, 2vw, 2.05rem);
+		line-height: 1.14;
+		margin-bottom: 14px;
+		text-align: center;
+	}
+
+	.story.card.full-width > p {
+		text-align: center;
+		line-height: 1.7;
+	}
+
+	.story.card.full-width > ul {
+		text-align: left;
 	}
 
 	:global(.poc-root .mpc-map-zoom-hint) {
@@ -2882,8 +2908,10 @@
 	.framing-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 18px;
+		gap: 24px;
 		align-items: start;
+		max-width: 70rem;
+		margin-inline: auto;
 	}
 
 	.framing-block {
@@ -2896,13 +2924,17 @@
 
 	.framing-block h2 {
 		margin: 0 0 10px;
-		font-size: 1.05rem;
+		font-size: 1.14rem;
+		text-align: center;
 	}
 
 	.framing-block p {
 		margin: 0;
 		color: var(--muted);
 		line-height: 1.6;
+		max-width: 31rem;
+		margin-inline: auto;
+		text-align: center;
 	}
 
 	.framing-block p + p {

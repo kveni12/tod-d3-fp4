@@ -1003,29 +1003,29 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const grouped = [
 		{
 			id: 'highIncome',
-			label: 'Higher-income places',
-			fill: '#e7f0ff',
+			label: 'Higher-income municipalities',
+			fill: '#16803c',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midHigh',
-			label: 'Upper-middle places',
-			fill: '#c6dcff',
+			label: 'Upper-middle municipalities',
+			fill: '#7ccf95',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midLow',
-			label: 'Lower-middle places',
-			fill: '#ccecd7',
+			label: 'Lower-middle municipalities',
+			fill: '#f3b256',
 			outline: '#0b8a43',
 			count: 0
 		},
 		{
 			id: 'lowIncome',
-			label: 'Lower-income places',
-			fill: '#91d3a7',
+			label: 'Lower-income municipalities',
+			fill: '#d65245',
 			outline: '#0b8a43',
 			count: 0
 		}
