@@ -704,20 +704,20 @@
 	<section class="card story-chart-panel story-chart-panel--stacked">
 		<div class="story-chart-panel__grid">
 			<div class="story-chart-panel__text">
-				<h2>Which municipalities combine lower-income pressure and new growth?</h2>
+				<h2>Where is development most concentrated?</h2>
 				<p>
-					New housing is not landing evenly across the state. Some municipalities combine larger lower-income shares with a lot of new production, while others do not.
+					Although lower-income residents are the most at risk of displacement, municipalities with more lower income households (&lt; $125k/year) are also often the ones seeing the most new development. This suggests that equitable implementation matters most in the places already under the most pressure.
 				</p>
 				<p>
-					The point is not to sort towns into good and bad buckets. It is to see where growth pressure and lower-income geography overlap.
+					Here, <strong>higher-vulnerability</strong> municipalities are the ones above the median share of households earning less than $125k, while <strong>lower-vulnerability</strong> municipalities fall below that median. The comparison is meant to show where new housing production is landing relative to that income pressure.
 				</p>
 			</div>
 			<div class="story-chart-panel__chart">
-				<h3>Some of the strongest recent growth sits in municipalities with larger lower-income shares</h3>
+				<h3>For every 100 new units, where do they land?</h3>
 				<p class="chart-note">
-					X-axis: households under $125k. Y-axis: new housing added in the selected years. The dashed lines mark statewide averages.
+					Each dot represents roughly one percent of all units added in the selected years, colored by whether that unit landed in a higher- or lower-vulnerability municipality.
 				</p>
-				<div class="chart-wrap small-chart compact-side-chart" bind:this={elScatter}></div>
+				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
 			</div>
 		</div>
 	</section>

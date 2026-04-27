@@ -967,7 +967,7 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const root = d3.select(el);
 	root.selectAll('*').remove();
 	if (!projectRows.length || !domainRows.length) {
-		root.append('div').attr('class', 'empty').text('Change filters to compare where yearly growth is landing.');
+		root.append('div').attr('class', 'empty').text('Change filters to compare where growth is landing.');
 		return;
 	}
 
@@ -975,139 +975,82 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const highVulnerability = new Set(
 		domainRows.filter((d) => d.under125 >= vulnerabilityMedian).map((d) => d.municipality)
 	);
+	const totalUnits = d3.sum(projectRows, (d) => d.units) || 0;
+	const highUnits = d3.sum(
+		projectRows.filter((d) => highVulnerability.has(d.municipality)),
+		(d) => d.units
+	);
+	const lowUnits = Math.max(0, totalUnits - highUnits);
+	const highShare = totalUnits ? highUnits / totalUnits : 0;
+	const lowShare = totalUnits ? lowUnits / totalUnits : 0;
 
-	const series = d3.range(state.yearStart, state.yearEnd + 1).map((year) => {
-		const rows = projectRows.filter((d) => d.year === year);
-		const total = d3.sum(rows, (d) => d.units);
-		const highUnits = d3.sum(
-			rows.filter((d) => highVulnerability.has(d.municipality)),
-			(d) => d.units
+	root
+		.append('div')
+		.attr('class', 'chart-note')
+		.style('margin-bottom', '8px')
+		.text(
+			`${fmtPct(highShare)} of selected-period units landed in higher-vulnerability municipalities, versus ${fmtPct(lowShare)} in lower-vulnerability municipalities.`
 		);
-		const lowUnits = total - highUnits;
-		return {
-			year,
-			highShare: total ? highUnits / total : 0,
-			lowShare: total ? lowUnits / total : 0,
-			total
-		};
-	});
-
-	const latest = [...series].reverse().find((d) => d.total > 0);
-	if (latest) {
-		root
-			.append('div')
-			.attr('class', 'chart-note')
-			.style('margin-bottom', '8px')
-			.text(
-				`${latest.year}: ${fmtPct(latest.highShare)} of new units landed in higher-vulnerability municipalities, versus ${fmtPct(latest.lowShare)} in lower-vulnerability municipalities.`
-			);
-	}
 
 	addHtmlLegend(root, [
 		{ color: 'var(--accent)', label: 'Higher-vulnerability municipalities' },
 		{ color: 'var(--blue-5)', label: 'Lower-vulnerability municipalities' }
 	]);
 
-	const width = root.node().clientWidth || 520;
+	const width = Math.max(320, root.node().clientWidth || 520);
 	const height = 320;
-	const margin = { top: 18, right: 18, bottom: 34, left: 58 };
+	const margin = { top: 18, right: 20, bottom: 30, left: 20 };
 	const innerW = width - margin.left - margin.right;
 	const innerH = height - margin.top - margin.bottom;
 	const svg = root.append('svg').attr('viewBox', `0 0 ${width} ${height}`);
 	const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
-	const x = d3
-		.scaleBand()
-		.domain(series.map((d) => String(d.year)))
-		.range([0, innerW])
-		.paddingInner(0.14)
-		.paddingOuter(0.04);
-	const yScale = d3.scaleLinear().domain([-0.5, 0.5]).range([innerH, 0]);
+	const cols = 10;
+	const rows = 10;
+	const cell = Math.min(innerW / cols, innerH / rows);
+	const dotR = Math.max(8, Math.min(13, cell * 0.34));
+	const gridW = cell * cols;
+	const gridH = cell * rows;
+	const offsetX = (innerW - gridW) / 2;
+	const offsetY = 14;
+	const highDots = Math.round(highShare * 100);
+	const dots = d3.range(100).map((i) => ({
+		i,
+		group: i < highDots ? 'high' : 'low',
+		col: i % cols,
+		row: rows - 1 - Math.floor(i / cols)
+	}));
 
-	g.append('g')
-		.attr('transform', `translate(0,${innerH})`)
-		.call(
-			d3
-				.axisBottom(x)
-				.ticks(Math.min(7, series.length))
-				.tickValues(
-					series
-						.filter((_, idx) => idx % Math.ceil(series.length / 7) === 0)
-						.map((d) => String(d.year))
-				)
-				.tickFormat((d) => d)
-		);
-	g.append('g')
-		.call(
-			d3.axisLeft(yScale)
-				.tickValues([-0.5, -0.25, 0, 0.25, 0.5])
-				.tickFormat((d) => d3.format('.0%')(Math.abs(d)))
-		);
-
-	g.append('line')
-		.attr('x1', 0)
-		.attr('x2', innerW)
-		.attr('y1', yScale(0))
-		.attr('y2', yScale(0))
-		.attr('stroke', '#b7b0a3')
-		.attr('stroke-dasharray', '4 4');
-
-	const groups = g
-		.selectAll('.growth-capture-bar')
-		.data(series)
-		.join('g')
-		.attr('class', 'growth-capture-bar')
-		.attr('transform', (d) => `translate(${x(String(d.year))},0)`);
-
-	groups
-		.append('rect')
-		.attr('x', 0)
-		.attr('y', (d) => yScale(Math.max(0, d.highShare - 0.5)))
-		.attr('width', x.bandwidth())
-		.attr('height', (d) => {
-			const delta = d.highShare >= 0.5 ? d.highShare - 0.5 : d.lowShare - 0.5;
-			return Math.abs(yScale(delta) - yScale(0));
-		})
-		.attr('rx', 3)
-		.attr('fill', (d) => (d.highShare >= 0.5 ? 'var(--accent)' : 'var(--blue-5)'));
-
-	groups
+	g.selectAll('.growth-capture-dot')
+		.data(dots)
+		.join('circle')
+		.attr('class', 'growth-capture-dot')
+		.attr('cx', (d) => offsetX + d.col * cell + cell / 2)
+		.attr('cy', (d) => offsetY + d.row * cell + cell / 2)
+		.attr('r', dotR)
+		.attr('fill', (d) => (d.group === 'high' ? 'var(--accent)' : 'var(--blue-5)'))
+		.attr('opacity', 0.95)
 		.append('title')
-		.text(
-			(d) =>
-				`${d.year}\nHigher-vulnerability municipalities: ${fmtPct1(d.highShare)}\nLower-vulnerability municipalities: ${fmtPct1(d.lowShare)}`
+		.text((d) =>
+			d.group === 'high'
+				? 'Unit share: higher-vulnerability municipality'
+				: 'Unit share: lower-vulnerability municipality'
 		);
 
-	if (latest) {
-		const latestX = (x(String(latest.year)) ?? 0) + x.bandwidth() / 2;
-		g.append('text')
-			.attr('x', latestX)
-			.attr('y', latest.highShare >= 0.5 ? yScale(latest.highShare - 0.5) - 10 : yScale(0.5 - latest.lowShare) + 22)
-			.attr('text-anchor', 'middle')
-			.attr('fill', '#1f2430')
-			.attr('font-size', 11)
-			.attr('font-weight', 700)
-			.text(
-				latest.highShare >= 0.5
-					? `${fmtPct(latest.highShare)} high`
-					: `${fmtPct(latest.lowShare)} low`
-			);
-	}
-
 	g.append('text')
-		.attr('x', innerW - 4)
-		.attr('y', yScale(0.38))
-		.attr('text-anchor', 'end')
+		.attr('x', innerW * 0.25)
+		.attr('y', offsetY + gridH + 22)
+		.attr('text-anchor', 'middle')
 		.attr('fill', 'var(--accent)')
-		.attr('font-size', 11)
+		.attr('font-size', 14)
 		.attr('font-weight', 700)
-		.text('Higher-vulnerability majority');
+		.text(`${fmtPct(highShare)} high-vulnerability`);
 
 	g.append('text')
-		.attr('x', innerW - 4)
-		.attr('y', yScale(-0.38))
-		.attr('text-anchor', 'end')
+		.attr('x', innerW * 0.75)
+		.attr('y', offsetY + gridH + 22)
+		.attr('text-anchor', 'middle')
 		.attr('fill', 'var(--blue-5)')
-		.attr('font-size', 11)
+		.attr('font-size', 14)
 		.attr('font-weight', 700)
-		.text('Lower-vulnerability majority');
+		.text(`${fmtPct(lowShare)} lower-vulnerability`);
 }
