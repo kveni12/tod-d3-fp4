@@ -707,7 +707,7 @@
 			<div class="story-chart-panel__chart">
 				<h3>For every 100 new units, where do they land?</h3>
 				<p class="chart-note">
-					Each dot is about one percent of all units added in the selected years. Fill color moves from higher-income municipalities to lower-income municipalities. The outline shows whether that municipality sits above or below the regional midpoint for households earning under $125k.
+					Each housing icon is about one percent of all units added in the selected years. Fill color moves from higher-income municipalities to lower-income municipalities, based on the share of households earning under $125k. The outline shows whether that municipality sits above or below the regional midpoint.
 				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
 			</div>

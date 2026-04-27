@@ -1000,31 +1000,34 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	);
 
 	const totalUnits = d3.sum(projectRows, (d) => d.units) || 0;
+	const q1Label = fmtPct1(q1);
+	const q2Label = fmtPct1(q2);
+	const q3Label = fmtPct1(q3);
 	const grouped = [
 		{
 			id: 'highIncome',
-			label: 'Higher-income municipalities',
+			label: `Higher-income municipalities (<${q1Label} under $125k)`,
 			fill: '#16803c',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midHigh',
-			label: 'Upper-middle municipalities',
+			label: `Upper-middle municipalities (${q1Label}-${q2Label})`,
 			fill: '#7ccf95',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midLow',
-			label: 'Lower-middle municipalities',
+			label: `Lower-middle municipalities (${q2Label}-${q3Label})`,
 			fill: '#f3b256',
 			outline: '#0b8a43',
 			count: 0
 		},
 		{
 			id: 'lowIncome',
-			label: 'Lower-income municipalities',
+			label: `Lower-income municipalities (>${q3Label} under $125k)`,
 			fill: '#d65245',
 			outline: '#0b8a43',
 			count: 0
@@ -1076,11 +1079,19 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const cols = 10;
 	const rows = 10;
 	const cell = Math.min(innerW / cols, innerH / rows);
-	const dotR = Math.max(8, Math.min(13, cell * 0.34));
+	const houseW = Math.max(14, Math.min(20, cell * 0.7));
+	const houseH = houseW * 0.9;
 	const gridW = cell * cols;
 	const gridH = cell * rows;
 	const offsetX = (innerW - gridW) / 2;
 	const offsetY = 14;
+	function unitPath(cx, cy) {
+		const halfW = houseW / 2;
+		const roofY = cy - houseH / 2;
+		const shoulderY = roofY + houseH * 0.36;
+		const baseY = cy + houseH / 2;
+		return `M ${cx} ${roofY} L ${cx + halfW} ${shoulderY} L ${cx + halfW} ${baseY} L ${cx - halfW} ${baseY} L ${cx - halfW} ${shoulderY} Z`;
+	}
 	const dotAssignments = [];
 	let cursor = 0;
 	groupedWithShares.forEach((group, groupIndex) => {
@@ -1106,14 +1117,13 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 
 	g.selectAll('.growth-capture-dot')
 		.data(dots)
-		.join('circle')
+		.join('path')
 		.attr('class', 'growth-capture-dot')
-		.attr('cx', (d) => offsetX + d.col * cell + cell / 2)
-		.attr('cy', (d) => offsetY + d.row * cell + cell / 2)
-		.attr('r', dotR)
+		.attr('d', (d) => unitPath(offsetX + d.col * cell + cell / 2, offsetY + d.row * cell + cell / 2))
 		.attr('fill', (d) => d.group.fill)
 		.attr('stroke', (d) => d.group.outline)
-		.attr('stroke-width', 3)
+		.attr('stroke-width', 2.2)
+		.attr('stroke-linejoin', 'round')
 		.attr('opacity', 1)
 		.append('title')
 		.text((d) => `Unit share: ${d.group.label}`);
