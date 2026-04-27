@@ -642,12 +642,7 @@
 		<h1>Massachusetts is building more near transit. Who benefits?</h1>
 		<p class="byline">By Krishna Parvataneni, Allison Eto, Hanna Chen, and Supriya Lall</p>
 		<p class="subtitle">
-			Transit-oriented development can add housing, reduce car dependence, and connect more people to jobs and services.
-			But it also raises a harder question: <strong>are those gains reaching lower-income residents, or making transit-rich places harder to stay in?</strong>
-		</p>
-		<p class="subtitle">
-			This story follows where new housing is landing, how closely it tracks transit access,
-			and what kinds of neighborhood change show up in TOD-heavy places.
+			If you rely on transit to reach work, school, or childcare, the question is not just whether more housing is being built. It is whether that housing is showing up in places people can actually reach and afford. <strong>This story follows where new housing is landing, how closely it tracks transit access, and what kinds of neighborhood change tend to appear in TOD-heavy places.</strong>
 		</p>
 		<p class="hero-plan-note">
 			For methods, design choices, and the project plan:
@@ -673,6 +668,7 @@
 		<p>
 			TOD has grown over time, but it is still not the dominant pattern. A large share of new housing is still being built outside the strongest transit context.
 		</p>
+		<p class="chart-source">Source: MassBuilds development records, summarized by year and transit access.</p>
 
 		<section class="chart-card card">
 			<h3>TOD vs non-TOD mix by year</h3>
@@ -685,12 +681,9 @@
 			<div class="story-chart-panel__text">
 				<h2>Who benefits from TOD?</h2>
 				<p>
-					The usual promise of TOD is more housing near good transit. But new housing does not automatically mean affordable housing.
+					The usual promise of TOD is more housing near good transit. But new housing does not automatically mean affordable housing. In recent years, affordability has lagged behind total production, which means transit-rich growth can still come with rising pressure.
 				</p>
-
-				<p>
-					In recent years, affordability has lagged behind total production. That matters because market-rate growth can still raise pressure in already desirable neighborhoods.
-				</p>
+				<p class="chart-source">Source: MassBuilds unit counts and listed affordable-unit fields.</p>
 			</div>
 			<div class="story-chart-panel__chart">
 				<h3>Most new housing is still market-rate</h3>
@@ -707,16 +700,14 @@
 			<div class="story-chart-panel__text">
 				<h2>Where is development most concentrated?</h2>
 				<p>
-					One of the clearest regional questions is whether new housing is landing mostly in wealthier municipalities, or in municipalities where more households are already below roughly middle-income levels.
+					This chart asks a simple question: when the region adds new housing, does it land more often in higher-income municipalities or in municipalities where more households are already below roughly middle-income levels?
 				</p>
-				<p>
-					This view treats municipal income context as a spectrum, not just a binary split. Dot fills move from higher-income municipalities to lower-income municipalities. Blue outlines mark municipalities below the regional median share of households earning less than $125k; green outlines mark municipalities above it.
-				</p>
+				<p class="chart-source">Source: MassBuilds development records and ACS income summaries, aggregated to municipalities.</p>
 			</div>
 			<div class="story-chart-panel__chart">
 				<h3>For every 100 new units, where do they land?</h3>
 				<p class="chart-note">
-					Each dot is about one percent of all units added in the selected years. Read the fill as an income band: dark green for higher-income municipalities, lighter green for upper-middle municipalities, orange for lower-middle municipalities, and red for lower-income municipalities. The outline shows whether that municipality sits above or below the region-wide $125k vulnerability midpoint.
+					Each dot is about one percent of all units added in the selected years. Fill color moves from higher-income municipalities to lower-income municipalities. The outline shows whether that municipality sits above or below the regional midpoint for households earning under $125k.
 				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
 			</div>
@@ -781,18 +772,13 @@
 		<p class="story-eyebrow">Why we zoom in</p>
 		<h2>What to look for in the tract-level map</h2>
 		<p>
-			Municipal summaries help us see the regional pattern, but they smooth over a lot of local variation. Census tracts let us look more closely at where transit access is strongest, where housing growth is actually happening, and where TOD is concentrated or missing.
-		</p>
-		<p>
-			They also let us track a few familiar signs of neighborhood change around development. None of these measures proves displacement on its own, but together they can point to rising market pressure.
+			Municipal summaries help us see the regional pattern, but they smooth over a lot of local variation. Census tracts let us look more closely at where transit access is strongest, where housing growth is actually happening, and where signs of neighborhood change tend to appear.
 		</p>
 		<ul class="story-list">
-			<li><strong>Median income change</strong>, which can signal rising housing costs and changing who can afford to live in an area</li>
-			<li><strong>Bachelor’s degree share change</strong>, which can signal turnover or selective in-migration</li>
+			<li><strong>Median income change</strong>, a common warning sign for rising housing costs</li>
+			<li><strong>Bachelor’s degree share change</strong>, a common warning sign for turnover or selective in-migration</li>
 		</ul>
-		<p>
-			Read these as warning signs, not proof. This version focuses on the two signals we can show clearly here: income change and education change. The point of the tract map is to see how transit, growth, and neighborhood change line up on the ground.
-		</p>
+		<p class="chart-note">Read these as warning signs, not proof. Source: NHGIS / U.S. Census tract measures, MBTA stop access, and MassBuilds development records.</p>
 	</section>
 	
 	<section class="tract-section">
@@ -852,10 +838,7 @@
 				<p class="story-eyebrow story-eyebrow--center">Guided map story</p>
 				<h2 class="chart-card__headline">Transit access and new housing growth do not consistently align across Greater Boston tracts</h2>
 				<p class="chart-note">
-					The walkthrough starts broad and then gets more specific: where transit is strongest, where housing grew, where those two patterns split apart, and where that mismatch matters most for lower-income tracts.
-				</p>
-				<p class="chart-note">
-					For readability, example cards use short names like <strong>“Tract in Suffolk County”</strong> instead of full census identifiers. Tooltip summaries mirror the story cards, and you can open <strong>More info</strong> for the details.
+					The walkthrough starts broad and then gets more specific: where transit is strongest, where housing grew, where those patterns split apart, and where that mismatch matters most for lower-income tracts. Example cards use short names like <strong>“Tract in Suffolk County”</strong> for readability, and tooltips keep the same main takeaway with <strong>More info</strong> for extra detail.
 				</p>
 				<div class="takeaway-strip" aria-label="Main takeaway from the guided map">
 					<strong>Main takeaway:</strong> the region is adding housing, but not consistently in the places with the strongest transit access or in ways that clearly expand access for lower-income residents.
@@ -881,19 +864,15 @@
 				<div class="annotation-grid">
 					<div class="annotation-card">
 						<h3>Boston and Cambridge</h3>
-						<p>The strongest rapid-transit geography in the region.</p>
-						<p>These tracts show the clearest version of the expected case: strong access and substantial growth in the same place.</p>
-						<p>But even here, growth is uneven.</p>
+						<p>The strongest rapid-transit geography in the region, and the clearest version of the expected case: strong access and substantial growth in the same place.</p>
 					</div>
 					<div class="annotation-card">
 						<h3>Quincy and Revere</h3>
-						<p>Transit is still present here, but the pattern is less consistent.</p>
-						<p>Nearby tracts can share similar access and still end up with different housing outcomes.</p>
+						<p>Transit is still present here, but nearby tracts with similar access can still end up with different housing outcomes.</p>
 					</div>
 					<div class="annotation-card">
 						<h3>Outer-ring tracts west of Boston</h3>
-						<p>Some tracts far from the strongest MBTA access still show meaningful growth.</p>
-						<p>They reveal the other side of the mismatch story: housing can grow even where transit remains limited.</p>
+						<p>Some tracts far from the strongest MBTA access still show meaningful growth, revealing the other side of the mismatch story.</p>
 					</div>
 				</div>
 			</section>
@@ -926,7 +905,7 @@
 				<p class="story-eyebrow">What the tract charts are for</p>
 				<h2>The next charts ask a simpler question</h2>
 				<p>
-					Once we separate TOD-heavy tracts from the rest, do they also show stronger signs of neighborhood change? The point is not to prove that TOD caused those changes, but to see whether the places absorbing more TOD also look different on income, education, and affordability.
+					Once we separate TOD-heavy tracts from the rest, do they also show stronger signs of neighborhood change? The point is not to prove causation. It is to see whether the places absorbing more TOD also look different on income, education, and affordability.
 				</p>
 				<div class="takeaway-grid takeaway-grid--three">
 					<div class="takeaway-card">
@@ -952,8 +931,9 @@
 						TOD-heavy tracts tend to show bigger income increases than the non-TOD comparison group.
 					</p>
 					<p>
-						That does not prove TOD caused the change. It does suggest that the places absorbing more TOD often look more like places under market pressure. On average, income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
+						On average, income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
+					<p class="chart-source">Source: NHGIS tract income measures and MassBuilds-derived TOD tract groupings.</p>
 					{#if incomeMiniBar}
 						<figure class="cohort-mini-bar">
 							<svg
@@ -1072,8 +1052,9 @@
 						TOD-dominated tracts also tend to show bigger increases in the share of adults with bachelor’s degrees or higher.
 					</p>
 					<p>
-						That pattern is often read as another sign of neighborhood turnover or selective in-migration. The average change is <strong>{eduRow.fmtTod}</strong> in TOD-dominated tracts, compared with <strong>{eduRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
+						The average change is <strong>{eduRow.fmtTod}</strong> in TOD-dominated tracts, compared with <strong>{eduRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
+					<p class="chart-source">Source: NHGIS tract education measures and MassBuilds-derived TOD tract groupings.</p>
 					{#if eduMiniBar}
 						<figure class="cohort-mini-bar">
 							<svg
@@ -1198,9 +1179,10 @@
 				</p>
 				{#if affIncomeSplit && affEduSplit}
 					<p>
-						The broad pattern is encouraging: TOD-heavy places with more affordability tend to show smaller increases in both income and college-degree share. That does not solve everything, but it suggests affordability can soften some of the pressure.
+						The broad pattern is encouraging: TOD-heavy places with more affordability tend to show smaller increases in both income and college-degree share.
 					</p>
 				{/if}
+				<p class="chart-source">Source: MassBuilds affordable-unit fields paired with NHGIS tract income and education change measures.</p>
 
 				<div
 					class="afford-comparison-stack"
@@ -2162,6 +2144,15 @@
 		text-align: center;
 		max-width: 42rem;
 		margin-inline: auto;
+	}
+
+	.chart-source {
+		margin: 8px auto 0;
+		max-width: 42rem;
+		font-size: 0.82rem;
+		line-height: 1.45;
+		color: color-mix(in srgb, var(--muted) 90%, white);
+		text-align: center;
 	}
 
 	.takeaway-strip {

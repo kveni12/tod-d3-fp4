@@ -4521,7 +4521,7 @@
 								{/if}
 								{#if guidedMode && (step.legend || step.why)}
 									<details class="poc-stepper-more">
-										<summary>More context</summary>
+										<summary>More info</summary>
 										<div class="poc-stepper-more__body">
 											{#if step.legend}
 												<p class="poc-stepper-card-note"><strong>How to read it:</strong> {step.legend}</p>
