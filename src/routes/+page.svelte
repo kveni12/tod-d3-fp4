@@ -694,7 +694,7 @@
 			<div class="story-chart-panel__chart">
 				<h3>Most new housing is still market-rate</h3>
 				<p class="chart-note">
-					The affordable share rises occasionally, but for most of the timeline the bulk of new units are still market-rate.
+					The affordable share rises occasionally, but for most years the bulk of new units are still market-rate.
 				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elAffordableTrend}></div>
 			</div>
@@ -704,17 +704,20 @@
 	<section class="card story-chart-panel story-chart-panel--stacked">
 		<div class="story-chart-panel__grid">
 			<div class="story-chart-panel__text">
-				<h2>Where is development most concentrated?</h2>
+				<h2>Which municipalities combine lower-income pressure and new growth?</h2>
 				<p>
-					New housing is not landing evenly across the state. A substantial share is concentrated in municipalities with larger lower-income populations.
+					New housing is not landing evenly across the state. Some municipalities combine larger lower-income shares with a lot of new production, while others do not.
 				</p>
 				<p>
-					Here, <strong>higher-vulnerability</strong> means places above the statewide median share of households earning less than $125,000. The point is to show where growth pressure is landing, not to assign a fixed label forever.
+					The point is not to sort towns into good and bad buckets. It is to see where growth pressure and lower-income geography overlap.
 				</p>
 			</div>
 			<div class="story-chart-panel__chart">
-				<h3>New development is often concentrated in higher-vulnerability municipalities</h3>
-				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
+				<h3>Some of the strongest recent growth sits in municipalities with larger lower-income shares</h3>
+				<p class="chart-note">
+					X-axis: households under $125k. Y-axis: new housing added in the selected years. The dashed lines mark statewide averages.
+				</p>
+				<div class="chart-wrap small-chart compact-side-chart" bind:this={elScatter}></div>
 			</div>
 		</div>
 	</section>
@@ -791,9 +794,6 @@
 		<h2>A tract-level view of TOD</h2>
 		<p>
 			Municipal summaries are useful, but they smooth over a lot of local variation. Census tracts let us compare transit access, housing growth, and neighborhood change at a finer scale.
-		</p>
-		<p>
-			The walkthrough below asks three simple questions:
 		</p>
 		<ul class="story-list">
 			<li>Where is transit accessible?</li>

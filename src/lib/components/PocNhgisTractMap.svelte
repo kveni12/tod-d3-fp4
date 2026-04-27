@@ -4378,7 +4378,7 @@
 								Use the arrows or menu to step through five map layers.
 							</p>
 						{:else if guidedMode}
-							<p class="poc-stepper-inline-hint">When you scroll here, the map adds one layer at a time.</p>
+							<p class="poc-stepper-inline-hint">Scroll here to move through the story one layer at a time.</p>
 						{:else}
 							<p class="poc-stepper-inline-hint">When you scroll here, the map adds one layer at a time.</p>
 						{/if}
@@ -4474,11 +4474,18 @@
 										<p class="poc-stepper-waypoint__label">Scroll to focus on Boston, Cambridge, Quincy, and Revere.</p>
 									</div>
 								{/if}
-								{#if guidedMode && step.legend}
-									<p class="poc-stepper-card-note"><strong>How to read it:</strong> {step.legend}</p>
-								{/if}
-								{#if guidedMode && step.why}
-									<p class="poc-stepper-card-note"><strong>Why it matters:</strong> {step.why}</p>
+								{#if guidedMode && (step.legend || step.why)}
+									<details class="poc-stepper-more">
+										<summary>More context</summary>
+										<div class="poc-stepper-more__body">
+											{#if step.legend}
+												<p class="poc-stepper-card-note"><strong>How to read it:</strong> {step.legend}</p>
+											{/if}
+											{#if step.why}
+												<p class="poc-stepper-card-note"><strong>Why it matters:</strong> {step.why}</p>
+											{/if}
+										</div>
+									</details>
 								{/if}
 								{#if guidedMode && i === 2 && guidedContrastExamples.length}
 									<div
@@ -4652,7 +4659,12 @@
 									</div>
 								{/if}
 								{#if guidedMode && step.prompt && i !== 2 && i !== 3 && i !== 8 && i !== 9}
-									<p class="poc-stepper-card-note"><strong>Try this:</strong> {step.prompt}</p>
+									<details class="poc-stepper-more">
+										<summary>Optional prompt</summary>
+										<div class="poc-stepper-more__body">
+											<p class="poc-stepper-card-note"><strong>Try this:</strong> {step.prompt}</p>
+										</div>
+									</details>
 								{/if}
 							</section>
 						{/each}
@@ -4727,7 +4739,7 @@
 
 	.poc-scrolly-shell {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+		grid-template-columns: minmax(0, 1fr) minmax(290px, 360px);
 		gap: 22px;
 		align-items: start;
 	}
@@ -4815,8 +4827,8 @@
 	.poc-stepper-inline-hint,
 	.poc-stepper-inline-body-copy {
 		margin: 0;
-		font-size: 0.76rem;
-		line-height: 1.4;
+		font-size: 0.8rem;
+		line-height: 1.5;
 		color: var(--text-muted);
 	}
 
@@ -4850,7 +4862,7 @@
 		align-content: center;
 		gap: 12px;
 		width: 100%;
-		min-height: calc(84vh * 0.6);
+		min-height: calc(76vh * 0.6);
 		padding: 10px 0 0;
 		border-left: 2px solid color-mix(in srgb, var(--accent) 16%, var(--border));
 		padding-left: 18px;
@@ -4861,7 +4873,7 @@
 		background: color-mix(in srgb, var(--bg-card) 97%, white 3%);
 		text-align: left;
 		color: var(--text);
-		opacity: 0.48;
+		opacity: 0.4;
 		transform: translateY(14px);
 		transition:
 			opacity 220ms ease,
@@ -4918,8 +4930,8 @@
 	}
 
 	.poc-stepper-pill-title {
-		font-size: 0.82rem;
-		font-weight: 600;
+		font-size: 0.94rem;
+		font-weight: 700;
 		line-height: 1.25;
 		color: var(--text);
 	}
@@ -4934,14 +4946,31 @@
 
 	.poc-stepper-card-body {
 		margin: 0;
-		max-width: 22.4ch; /* ~30% narrower than 32ch — more room for the map column */
-		font-size: 0.9rem;
-		line-height: 1.6;
-		color: var(--text-muted);
+		max-width: 33ch;
+		font-size: 0.98rem;
+		line-height: 1.65;
+		color: var(--text);
+		text-wrap: pretty;
 	}
 
-	.poc-inline-line {
+	.poc-stepper-card-body :global(p) {
+		margin: 0;
+	}
+
+	.poc-stepper-card-body :global(p + p) {
+		margin-top: 0.7rem;
+	}
+
+	.poc-stepper-card-body :global(.poc-inline-line) {
 		font-weight: 700;
+	}
+
+	.poc-stepper-card-note {
+		margin: 0;
+		max-width: 34ch;
+		font-size: 0.84rem;
+		line-height: 1.55;
+		color: var(--text-muted);
 	}
 
 	.poc-inline-line--red {
@@ -4964,12 +4993,37 @@
 		color: #7c3f98;
 	}
 
-	.poc-stepper-card-note {
-		margin: 0;
-		max-width: 24ch;
-		font-size: 0.8rem;
-		line-height: 1.55;
+	.poc-stepper-more {
+		max-width: 34ch;
+		border-top: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+		padding-top: 0.55rem;
+	}
+
+	.poc-stepper-more summary {
+		list-style: none;
+		cursor: pointer;
+		font-size: 0.79rem;
+		font-weight: 700;
+		color: var(--accent-strong);
+	}
+
+	.poc-stepper-more summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.poc-stepper-more summary::after {
+		content: ' +';
 		color: var(--text-muted);
+	}
+
+	.poc-stepper-more[open] summary::after {
+		content: ' -';
+	}
+
+	.poc-stepper-more__body {
+		display: grid;
+		gap: 0.5rem;
+		padding-top: 0.55rem;
 	}
 
 	.poc-stepper-card-note strong {
@@ -5055,7 +5109,7 @@
 
 	.poc-stepper-examples-title {
 		margin: 0;
-		max-width: 24ch;
+		max-width: 30ch;
 		font-size: 0.82rem;
 		font-weight: 700;
 		line-height: 1.45;
@@ -5168,8 +5222,8 @@
 
 	.poc-stepper-example__note {
 		margin: 0;
-		max-width: 24ch;
-		font-size: 0.77rem;
+		max-width: 31ch;
+		font-size: 0.8rem;
 		line-height: 1.45;
 		color: var(--text-muted);
 	}
@@ -5178,8 +5232,8 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.35rem 0.7rem;
-		max-width: 25ch;
-		font-size: 0.72rem;
+		max-width: 32ch;
+		font-size: 0.75rem;
 		line-height: 1.45;
 		color: var(--text-muted);
 	}
