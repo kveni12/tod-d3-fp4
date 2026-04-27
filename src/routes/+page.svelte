@@ -639,35 +639,26 @@
 	<div class="poc-pre-explore">
 	<section class="hero-full card">
 		<div class="eyebrow">Guided Story</div>
-		<h1>Massachusetts is expanding TOD--how can equity be protected?</h1>
+		<h1>Massachusetts is building more near transit. Who benefits?</h1>
 		<p class="subtitle">
-			Transit-oriented development is widely viewed as a robust and highly beneficial planning strategy: it can support housing growth,
-			reduce car dependence, and create higher-density neighborhoods with closer access to jobs and services. 
-			However, debate remains about <strong>whether the benefits of TOD are being shared with lower-income residents</strong>, and <strong>whether this development contributes
-			to gentrification and displacement</strong>.<br><br>
+			Transit-oriented development can add housing, reduce car dependence, and connect more people to jobs and services.
+			But it also raises a harder question: <strong>are those gains reaching lower-income residents, or making transit-rich places harder to stay in?</strong>
 		</p>
 		<p class="subtitle">
-			To answer this question, we analyze the current geographic distribution of TOD across Massachusetts, and analyze
-			the correlations between increased TOD and demographic changes in TOD areas in the hope of identifying possible
-			trends (though not causal proof) that can inform equity considerations and policy decisions.
+			This story looks at where new housing is landing across Massachusetts, how closely it tracks transit access,
+			and what kinds of neighborhood change tend to show up in TOD-heavy places.
 		</p>
 		<p class="hero-plan-note">
-			A separate writeup page includes our design decisions, development overview, and final project plan:
+			For methods, design choices, and the project plan:
 			<a href={`${base}/writeup`}>open the full writeup</a>.
 		</p>
 	</section>
 
 	<section class="story card story--signal">
-		<h2>The central takeaway</h2>
-		<p class="signal-line">Many transit-rich places see limited housing growth, which indicates further opportunities
-			for transit-oriented development.</p>
-		<p class="signal-line">Some of these high-opportunity areas are lower-income, and therefore more at risk of
-			displacement due to rising costs.
-		</p>
-		<p class="signal-line">TOD is associated with rising income and education levels, which signals a possible
-			pressure pushing lower-income households out of these areas. Incorporating affordable housing requirements into TOD
-			development can help mitigate this pressure.
-		</p>
+		<h2>The main point</h2>
+		<p class="signal-line">Housing growth and transit access do not line up as neatly as policy goals suggest.</p>
+		<p class="signal-line">Some well-connected places are still adding little housing, while growth also shows up far from strong transit.</p>
+		<p class="signal-line">Where TOD is strongest, the pattern often comes with signs of rising market pressure, which makes affordability central to the equity question.</p>
 	</section>
 
 	{#if !muniLoaded}
@@ -677,11 +668,9 @@
 		</div>
 	{:else}
 	<section class="story card">
-		<h2>What is the status of TOD in Massachusetts?</h2>
+		<h2>How much new housing is actually transit-oriented?</h2>
 		<p>
-			Despite policy efforts, most new housing being built in Massachusetts consists of non-TOD units. However, total development has increased over time,
-			so the volume of TOD units has also been increasing. With the passage of the MBTA Communities Act, TOD is expected to become even more widespread,
-			so it is important to understand the effects TOD has already had on the state.
+			TOD has grown over time, but it is still not the dominant pattern. A large share of new housing is still being built outside the strongest transit context.
 		</p>
 
 		<section class="chart-card card">
@@ -695,24 +684,17 @@
 			<div class="story-chart-panel__text">
 				<h2>Who benefits from TOD?</h2>
 				<p>
-					For many residents, a primary concern with TOD is the gap between housing supply and genuine affordability.
-					Although TOD projects often increase the total number of housing units, if these units are
-					market-rate, they are usually significantly more expensive than existing units in the neighborhood.
-					This does mean that low-to-moderate income households often cannot afford to move into these homes,
-					and more importantly, it often raises rents for those already living in the area.
+					The usual promise of TOD is more housing near good transit. But new housing does not automatically mean affordable housing.
 				</p>
 
 				<p>
-					Encouraging TOD projects that include affordable housing units can help mitigate this issue, but recent
-					trends show that affordability is not currently keeping pace with total production.
+					In recent years, affordability has lagged behind total production. That matters because market-rate growth can still raise pressure in already desirable neighborhoods.
 				</p>
 			</div>
 			<div class="story-chart-panel__chart">
 				<h3>Most new housing is still market-rate</h3>
 				<p class="chart-note">
-					The affordable share of new development stays low for most of the timeline, with only a few short
-					spikes upward. Even in years when more housing is being added, most of those units are still
-					market-rate rather than affordable.
+					The affordable share rises occasionally, but for most of the timeline the bulk of new units are still market-rate.
 				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elAffordableTrend}></div>
 			</div>
@@ -724,14 +706,10 @@
 			<div class="story-chart-panel__text">
 				<h2>Where is development most concentrated?</h2>
 				<p>
-					Although lower-income residents are the most at risk of displacement,
-					municipalities with more lower income households (&lt; $125k/year) are also often the ones seeing the most new development.
-					This suggests that equitable implementation matters most in the places already under the most pressure.
+					New housing is not landing evenly across the state. A substantial share is concentrated in municipalities with larger lower-income populations.
 				</p>
 				<p>
-					Here, <strong>higher-vulnerability</strong> municipalities are the ones above the median share of households earning less than
-					$125k, while <strong>lower-vulnerability</strong> municipalities fall below that median. The comparison is meant to show
-					where new housing production is landing relative to that income pressure.
+					Here, <strong>higher-vulnerability</strong> means places above the statewide median share of households earning less than $125,000. The point is to show where growth pressure is landing, not to assign a fixed label forever.
 				</p>
 			</div>
 			<div class="story-chart-panel__chart">
@@ -742,21 +720,17 @@
 	</section>
 
 	<section class="story card">
-		<h2>What is the impact of TOD?</h2>
+		<h2>What kinds of change tend to accompany TOD?</h2>
 		<p>
-			Lower-income communities are at higher risk for displacement due to TOD, so it is all the more important
-			to understand what demographic changes are associated with TOD, and determine how they might be mitigated.
-			These proxy indicators are often associated with (though not always solely caused by) gentrification pressure:
+			We use a few familiar proxy measures to track neighborhood change around development. None of them proves displacement on its own, but together they can point to rising market pressure.
 		</p>
 		<ul class="story-list">
 			<li>Sharp increases in median income, often used as a <strong>risk indicator for rising housing costs</strong></li>
 			<li>Rapid increases in the percentage of residents with bachelor's degrees or higher</li>
-			<li>Shift from owner-occupied housing to high-turnover rental units [analysis of this metric will be added soon]</li>
+			<li>Shifts from owner-occupied housing toward higher-turnover rental housing [analysis coming soon]</li>
 		</ul>
 		<p>
-			Changes in these measures will not necessarily establish that TOD causes gentrification, but they can be interpreted as
-			warning signals that can help identify where neighborhood change may be happening
-			alongside new development and transit access.
+			Read these as warning signs, not a causal estimate.
 		</p>
 	</section>
 	<!-- <section class="story card">
@@ -814,16 +788,12 @@
 
 	
 	<section class="story card full-width">
-		<h2>How can we analyze the effects of TOD holisitically?</h2>
+		<h2>A tract-level view of TOD</h2>
 		<p>
-			Different regions in Massachusetts have different characteristics, and have undergone different levels of development.
-			In order to analyze the varying intensity of TOD and other development, we can consider decennial census tracts
-			as a regional unit of analysis.
+			Municipal summaries are useful, but they smooth over a lot of local variation. Census tracts let us compare transit access, housing growth, and neighborhood change at a finer scale.
 		</p>
 		<p>
-			Before we can analyze the demographic changes associated with TOD, we need a broad framework for understanding
-			and comparing different regions of the state based on their development intensity and type. To do this, we answer
-			several key questions:
+			The walkthrough below asks three simple questions:
 		</p>
 		<ul class="story-list">
 			<li>Where is transit accessible?</li>
@@ -842,20 +812,16 @@
 						<strong> non-TOD developments</strong>.
 					</p>
 					<p>
-						<strong>TOD-dominated tracts</strong> are tracts where at least <strong>50%</strong> of filtered new units come from TOD developments and
-						housing stock increases by at least <strong>2.0%</strong>. <strong>Non-TOD-dominated tracts</strong> meet the same growth threshold but fall
-						below that TOD stock share cutoff. <strong>Minimal-development tracts</strong> stay below the stock-growth threshold.
+						<strong>TOD-dominated tracts</strong> get at least half of their filtered new units from TOD projects and clear a 2 percent housing-growth threshold. <strong>Non-TOD-dominated tracts</strong> also grow, but less of that growth is transit-oriented. <strong>Minimal-development tracts</strong> stay below the growth threshold.
 					</p>
 				</div>
 				<div class="framing-block">
 					<h2>Key assumptions</h2>
 					<p>
-						This walkthrough uses a fixed <strong>0.5-mile MBTA access threshold</strong> and compares tract-level housing growth, TOD share, and
-						transit access descriptively rather than causally.
+						This walkthrough uses a fixed <strong>0.5-mile MBTA access threshold</strong> and compares tracts descriptively rather than causally.
 					</p>
 					<p>
-						Mismatch categories are based on how transit access and housing growth compare within the tract set, and the averages shown in the
-						walkthrough treat each tract equally rather than weighting by population or total units.
+						Mismatch categories depend on how each tract compares with the rest of the regional sample. In the walkthrough, tract averages are shown as tract-level comparisons rather than population-weighted totals.
 					</p>
 				</div>
 			</div>
@@ -892,14 +858,10 @@
 			<section class="chart-card card full-width">
 				<h3>Transit access and new housing growth do not consistently align across Greater Boston tracts</h3>
 				<p class="chart-note">
-					As you move through the walkthrough, the map progresses from transit access, to housing growth, to mismatch, and then
-					to lower-income context. Blue tract fill indicates stronger housing growth, red indicates weaker or negative growth,
-					and purple outlines identify the tracts where transit access and growth no longer move together in the expected way.
-					The full exploration interface comes afterward, once that argument has been established more clearly. You can also
-					hover over tracts and development dots throughout the map to see tooltips with more detail.
+					The map moves from transit access, to housing growth, to mismatch, and then to lower-income context. Blue means stronger housing growth, red means weaker or negative growth, and purple outlines mark places where access and growth pull apart.
 				</p>
 				<p class="chart-note">
-					For readability, tract tooltips and example cards use short labels like <strong>“Tract in Suffolk County”</strong> rather than full census tract identifiers. Those labels are there to help orient the viewer quickly, not to imply that the analysis itself is only happening at the county level.
+					For readability, example cards use short names like <strong>“Tract in Suffolk County”</strong> instead of full census identifiers.
 				</p>
 				<div class="chart-wrap chart-tall chart-wrap--poc-map chart-wrap--poc-map--main-tall">
 					<PocNhgisTractMap
@@ -917,57 +879,46 @@
 			<section class="story card">
 				<h2>Three places to notice</h2>
 				<p class="chart-note">
-					These are useful anchors while you scroll. They are not the only places that matter, but they make the regional
-					argument easier to interpret because they show different relationships between transit access and housing growth.
+					These places are useful anchors while you scroll. They are not the whole story, but they make the regional pattern easier to read.
 				</p>
 				<div class="annotation-grid">
 					<div class="annotation-card">
 						<h3>Boston and Cambridge</h3>
-						<p>These municipalities anchor the strongest rapid-transit system in the region.</p>
-						<p>They matter because they show the expected case most clearly: dense transit access and substantial housing growth in the same part of the map.</p>
-						<p>At the same time, not every tract here grows equally. That unevenness matters, because it reminds us that being near strong transit does not automatically produce the same development outcome everywhere.</p>
+						<p>The strongest rapid-transit geography in the region.</p>
+						<p>These tracts show the clearest version of the expected case: strong access and substantial growth in the same place.</p>
+						<p>But even here, growth is uneven.</p>
 					</div>
 					<div class="annotation-card">
 						<h3>Quincy and Revere</h3>
-						<p>These are useful comparison cases because they sit within the broader transit system but do not reproduce the same growth pattern everywhere.</p>
-						<p>They matter because the mismatch question is not only about the inner core. Nearby tracts can share transit context while still showing different housing outcomes.</p>
-						<p>That variation makes the planning problem more concrete: access alone does not tell us where growth will actually occur.</p>
+						<p>Transit is still present here, but the pattern is less consistent.</p>
+						<p>Nearby tracts can share similar access and still end up with different housing outcomes.</p>
 					</div>
 					<div class="annotation-card">
 						<h3>Outer-ring tracts west of Boston</h3>
-						<p>Some highlighted tracts farther from the strongest MBTA access still show meaningful growth.</p>
-						<p>They matter because they reveal the reverse side of the mismatch story: growth can occur without equivalent transit access.</p>
-						<p>That is important for the gentrification argument because it suggests new housing growth is not consistently being steered toward the most transit-rich places, even though those are often framed as the most equitable places to add housing.</p>
+						<p>Some tracts far from the strongest MBTA access still show meaningful growth.</p>
+						<p>They reveal the other side of the mismatch story: housing can grow even where transit remains limited.</p>
 					</div>
 				</div>
 			</section>
 
 
 			<section class="story card">
-				<h2>How can we identify demographic changes associated with TOD?</h2>
+				<h2>Comparing TOD-heavy and non-TOD-heavy tracts</h2>
 				<p>
-					Development, transit-oriented or otherwise, often results in demographic change. In order to
-					isolate the influence of TOD from the influence of development generally, we use three of the
-					census tract groups defined in the previous section.
+					To separate TOD from development more generally, we compare three tract groups from the map.
 				</p>
 				<ul class="story-list story-list--nested">
 					<li>
-						<strong>Minimal development tracts</strong> (less than 2% increase in housing stock): These are
-						likely to show different demographic changes than high-development tracts and are filtered out of
-						the demographic analysis.
+						<strong>Minimal development tracts</strong> grew too little to anchor the main comparison.
 					</li>
 					<li>
-						High-development tracts: Census tracts with at least 2% increase in housing
-						stock. These tracts are divided into two groups to differentiate between the effects of TOD and
-						non-TOD development:
+						High-development tracts are then split in two:
 						<ul>
 							<li>
-								<strong>TOD-dominated tracts</strong>: High-development tracts where TOD units make up at
-								least 50% of new development.
+								<strong>TOD-dominated tracts</strong>, where TOD makes up at least half of new development.
 							</li>
 							<li>
-								<strong>Non-TOD-dominated tracts</strong>: High-development tracts where TOD units make up
-								less than 50% of new development.
+								<strong>Non-TOD-dominated tracts</strong>, where it does not.
 							</li>
 						</ul>
 					</li>
@@ -979,17 +930,10 @@
 				<section class="story card story-chart-text">
 					<h2>Income analysis</h2>
 					<p>
-						We can get a sense of the socioeconomic distribution of people by looking at the median income
-						of a neighborhood. In census tracts dominated by TOD, the median income changes by
-						<strong>{incomeRow.fmtTod}</strong>, while in non-TOD dominated tracts it changes by
-						<strong>{incomeRow.fmtCtrl}</strong>, and in minimal development tracts by
-						<strong>{incomeRow.fmtMinimal}</strong>. This is one proxy for neighborhood change and possible
-						market pressure, though it should not be read as direct evidence that TOD itself caused these
-						shifts.
+						TOD-dominated tracts show larger income increases than the non-TOD comparison group. That does not prove causation, but it is consistent with stronger neighborhood change in the places where TOD is most concentrated.
 					</p>
 					<p>
-						If TOD-dominated tracts show larger income increases, that is consistent with stronger
-						socioeconomic sorting or housing-market pressure, though other urban factors may also contribute.
+						Average income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
 					{#if incomeMiniBar}
 						<figure class="cohort-mini-bar">
@@ -1095,9 +1039,7 @@
 				<section class="chart-card card story-chart-plot">
 					<h3>TOD intensity vs median income change</h3>
 					<p class="chart-note">
-						This plot shows that not only does TOD correspond to greater income jumps than non-TOD,
-						but also that higher TOD intensity is associated with larger income changes within the observed tract sample.
-						Hover for tract details and click points if you want to hold onto a few comparisons.
+						Higher TOD intensity generally lines up with larger income increases in the tract sample.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} />
@@ -1109,13 +1051,10 @@
 				<section class="story card story-chart-text">
 					<h2>Education analysis</h2>
 					<p>
-						Another indicator of socioeconomic change is the percentage of people who are college-educated.
-						In TOD-dominated tracts, the bachelor's degree share changes by
-						<strong>{eduRow.fmtTod}</strong>, compared to
-						<strong>{eduRow.fmtCtrl}</strong> in non-TOD dominated tracts and
-						<strong>{eduRow.fmtMinimal}</strong> in minimal development tracts. This is another proxy for
-						neighborhood change. Because most adults do not gain bachelor's degrees rapidly within a decade,
-						changes often reflect turnover, replacement, or selective in-migration.
+						TOD-dominated tracts also tend to post larger increases in the share of adults with bachelor’s degrees or higher.
+					</p>
+					<p>
+						That pattern is often read as another sign of neighborhood turnover or selective in-migration. The average change is <strong>{eduRow.fmtTod}</strong> in TOD-dominated tracts, compared with <strong>{eduRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
 					{#if eduMiniBar}
 						<figure class="cohort-mini-bar">
@@ -1218,8 +1157,7 @@
 				<section class="chart-card card story-chart-plot">
 					<h3>TOD intensity vs bachelor's degree share change</h3>
 					<p class="chart-note">
-						The same pattern holds for education: tracts with more TOD see larger increases in the share
-						of residents with bachelor's degrees or higher. Hover for tract details and click points to keep a few in view.
+						The same relationship appears in education: more TOD tends to align with larger increases in college-educated share.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} />
@@ -1238,20 +1176,11 @@
 			<section class="story card full-width afford-compare">
 				<h2>How affordability could help</h2>
 				<p>
-					Among <strong>TOD-dominated tracts</strong>, we split tracts by whether at least half of
-					<strong>new TOD units</strong> in MassBuilds are affordable (≥50% affordable TOD share) or not (&lt;50%).
-					Comparing these two groups shows how affordability lines up with the same income and education
-					indicators as above (scatter plots match the playground &ldquo;Affordable TOD share&rdquo; view; bars
-					are population-weighted tract means within each group).
+					Among TOD-dominated tracts, we split places by whether at least half of new TOD units are affordable. The goal is simple: do TOD-heavy places with more affordability also show weaker signs of market pressure?
 				</p>
 				{#if affIncomeSplit && affEduSplit}
 					<p>
-						In the high&ndash;affordable TOD group, median income changes by <strong>{affIncomeSplit.fmtHi}</strong>
-						on average (vs. <strong>{affIncomeSplit.fmtLo}</strong> where the affordable TOD share is below
-						50%). For education, the bachelor&rsquo;s share changes by <strong>{affEduSplit.fmtHi}</strong> vs.
-						<strong>{affEduSplit.fmtLo}</strong>. This pattern is consistent with smaller socioeconomic shifts
-						where more of the TOD pipeline is affordable, though the comparison remains descriptive, not
-						causal.
+						In the higher-affordability TOD group, median income changes by <strong>{affIncomeSplit.fmtHi}</strong> on average, versus <strong>{affIncomeSplit.fmtLo}</strong> in the lower-affordability group. For education, the comparison is <strong>{affEduSplit.fmtHi}</strong> versus <strong>{affEduSplit.fmtLo}</strong>.
 					</p>
 				{/if}
 
@@ -1542,11 +1471,7 @@
 			<section class="story card">
 				<h2>What does this tell us?</h2>
 				<p>
-					Transit-oriented development is a powerful tool for addressing the housing crisis, and there are many regions
-					particularly ripe for TOD. However, the current patterns of TOD are associated with demographic changes
-					that suggest increased displacement pressure, particularly for lower-income households. In order to mitigate
-					these issues, it is important to ensure that TOD projects include a substantial number of affordable housing units--
-					particularly in lower-income and more at-risk communities.
+					TOD can still be a powerful housing strategy. But in this prototype, the places with the most transit-oriented growth also tend to show stronger signs of neighborhood change. That makes affordability less of an add-on and more of the core equity safeguard.
 				</p>
 			</section>
 		{/if}
@@ -1557,9 +1482,9 @@
 	{#if muniLoaded && !tractLoading && !tractError}
 		<div class="explore-after-narrow">
 			<section class="explore-gate card full-width" aria-labelledby="explore-gate-heading">
-				<h2 id="explore-gate-heading">Explore the map for yourself</h2>
+				<h2 id="explore-gate-heading">Explore the full map</h2>
 				<p>
-					If you want to keep exploring after the guided story, the full interactive choropleth and toggleable map tools now live on their own page.
+					The guided version above fixes the argument in place. The full map keeps the same data, but opens up all of the toggles and filters.
 				</p>
 				<p class="explore-gate__cta">
 					<a class="explore-gate__button" href={`${base}/playground`}>Open the playground</a>
@@ -1569,11 +1494,7 @@
 			<section class="story card full-width sources-card">
 				<h2>Data sources and acknowledgments</h2>
 				<p>
-					This project brings together tract-level census data, tract geometry, MBTA stops and line data, and project-level
-					housing development records. In the current application, those processed assets are loaded as
-					<code>tract_data.json</code>, <code>tracts.geojson</code>, <code>developments.json</code>,
-					<code>mbta_stops.json</code>, <code>mbta_lines.geojson</code>, and <code>meta.json</code>. Together, they let us compare
-					housing growth, transit access, TOD-related development, and lower-income context in the same regional frame.
+					This project combines tract-level census data, MBTA network geometry, and project-level housing development records. Together, those sources make it possible to compare housing growth, transit access, affordability, and neighborhood change in the same regional frame.
 				</p>
 				<ul class="story-list sources-list">
 					<li>
@@ -1602,9 +1523,7 @@
 					</li>
 				</ul>
 				<p>
-					This proof of concept also reflects substantial course feedback and repeated revision. The current page was shaped by
-					iteration on the story, layout, and interaction design so that the final experience would guide readers toward the
-					main planning question before opening into a fuller interactive exploration tool.
+					The current prototype also reflects repeated classroom feedback and revision. It was designed to lead with the planning question, then open out into exploration only after the main pattern is visible.
 				</p>
 			</section>
 		</div>
@@ -1654,7 +1573,7 @@
 
 		--poc-max-width: 1680px;
 
-		font-family: var(--font-body);
+		font-family: Georgia, "Times New Roman", Times, serif;
 		color: var(--ink);
 		background: var(--bg);
 		max-width: var(--poc-max-width);
@@ -1676,9 +1595,10 @@
 	}
 
 	.explore-gate {
-		padding: 18px 20px;
+		padding: 20px 0 0;
 		display: grid;
 		gap: 10px;
+		border-top: 1px solid rgba(120, 114, 102, 0.2);
 	}
 
 	.explore-gate h2 {
@@ -1720,7 +1640,11 @@
 
 	* { box-sizing: border-box; }
 
-	h1, h2, h3 { margin-top: 0; }
+	h1, h2, h3 {
+		margin-top: 0;
+		font-family: Georgia, "Times New Roman", Times, serif;
+		font-weight: 600;
+	}
 
 	h1 {
 		margin-bottom: 14px;
@@ -1730,16 +1654,17 @@
 	}
 
 	.card {
-		background: var(--paper);
-		border: 1px solid rgba(120, 114, 102, 0.14);
-		border-radius: 12px;
+		background: transparent;
+		border: 0;
+		border-radius: 0;
 		box-shadow: none;
 	}
 
 	/* ── Hero ─────────────────────────────────────────── */
 	.hero-full {
-		padding: 20px 22px;
-		margin-bottom: 14px;
+		padding: 18px 0 28px;
+		margin-bottom: 18px;
+		border-bottom: 1px solid rgba(120, 114, 102, 0.2);
 	}
 
 	.eyebrow {
@@ -1755,7 +1680,13 @@
 		text-transform: uppercase;
 	}
 
-	.subtitle { color: var(--muted); line-height: 1.58; margin-bottom: 0; }
+	.subtitle {
+		color: var(--muted);
+		line-height: 1.72;
+		margin-bottom: 0;
+		font-size: 1.12rem;
+		max-width: 46rem;
+	}
 
 	/* ── Dashboard layout ─────────────────────────────── */
 	.dashboard {
@@ -1975,11 +1906,22 @@
 
 	/* ── Story / narrative cards ──────────────────────── */
 	.story {
-		padding: 18px;
+		padding: 24px 0;
+		border-top: 1px solid rgba(120, 114, 102, 0.14);
 	}
 
-	.story h2 { font-size: 1.2rem; margin-bottom: 10px; }
-	.story p { color: var(--muted); line-height: 1.58; margin-bottom: 12px; }
+	.story h2 {
+		font-size: 1.55rem;
+		margin-bottom: 12px;
+		letter-spacing: -0.01em;
+	}
+	.story p {
+		color: var(--muted);
+		line-height: 1.72;
+		margin-bottom: 14px;
+		font-size: 1.06rem;
+		max-width: 44rem;
+	}
 	.story p:last-child { margin-bottom: 0; }
 
 	.hero-plan-note {
@@ -2000,10 +1942,12 @@
 
 	.story-list {
 		color: var(--muted);
-		line-height: 1.58;
+		line-height: 1.68;
 		padding-left: 22px;
 		margin: 10px 0;
 		list-style-position: outside;
+		max-width: 42rem;
+		font-size: 1.03rem;
 	}
 
 	.story-list li { margin-bottom: 6px; }
@@ -2111,8 +2055,7 @@
 	}
 
 	/* ── Chart cards ──────────────────────────────────── */
-	.chart-card { padding: 20px; }
-	.chart-card { padding: 16px; }
+	.chart-card { padding: 16px 0 0; }
 
 	.chart-card h2 { font-size: 1.15rem; margin-bottom: 8px; }
 	.chart-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
@@ -2187,7 +2130,8 @@
 
 	/* Narrative + chart in one white card (municipal affordability & vulnerability) */
 	.story-chart-panel {
-		padding: 18px;
+		padding: 24px 0;
+		border-top: 1px solid rgba(120, 114, 102, 0.14);
 	}
 
 	.story-card--embedded {
@@ -2222,14 +2166,16 @@
 	}
 
 	.story-chart-panel__text h2 {
-		font-size: 1.2rem;
-		margin-bottom: 10px;
+		font-size: 1.55rem;
+		margin-bottom: 12px;
 	}
 
 	.story-chart-panel__text p {
 		color: var(--muted);
-		line-height: 1.58;
-		margin-bottom: 12px;
+		line-height: 1.72;
+		margin-bottom: 14px;
+		font-size: 1.05rem;
+		max-width: 44rem;
 	}
 
 	.story-chart-panel__text p:last-child {
@@ -2244,7 +2190,7 @@
 	}
 
 	.story-chart-panel__chart h3 {
-		font-size: 1rem;
+		font-size: 1.08rem;
 		margin-bottom: 8px;
 	}
 
@@ -2614,12 +2560,12 @@
 	}
 
 	.annotation-card {
-		padding: 14px;
-		border: 1px solid var(--line);
-		border-radius: 14px;
-		background: rgba(255, 253, 248, 0.78);
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: transparent;
 		display: grid;
-		gap: 8px;
+		gap: 6px;
 	}
 
 	.annotation-card h3 {
@@ -2811,10 +2757,11 @@
 	}
 
 	.framing-block {
-		padding: 16px 18px;
-		border: 1px solid var(--line);
-		border-radius: 18px;
-		background: rgba(248, 249, 245, 0.78);
+		padding: 16px 0 0;
+		border: 0;
+		border-top: 1px solid rgba(120, 114, 102, 0.14);
+		border-radius: 0;
+		background: transparent;
 	}
 
 	.framing-block h2 {
