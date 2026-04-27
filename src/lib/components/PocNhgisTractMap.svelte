@@ -102,6 +102,7 @@
 		primaryRows: [],
 		secondaryRows: []
 	});
+	let guidedTooltipSummaryOverride = $state('');
 	let revealStage = $state(0);
 	/**
 	 * Playground step 5 only: show TOD / non-TOD interior rims (independent of walkthrough auto-layers).
@@ -493,7 +494,7 @@
 			kicker: 'Step 1',
 			title: 'Where Transit Access Is Strongest',
 			bodyHtml:
-				'This map shows how transit access across Greater Boston is concentrated in a dense, radial network centered on the urban core. The Red, Orange, Blue, and Green lines cluster around Boston and Cambridge, while the commuter rail extends outward into surrounding suburbs, with services like the CapeFLYER reaching even farther.<br><br>Focus on where lines overlap most. Boston and Cambridge stand out, along with places like Quincy and Revere. These areas represent the strongest and most consistent transit access.<br><br>This sets up a simple question: does housing growth appear in these same places?',
+				'Transit access is strongest in the urban core. The Red, Orange, Blue, and Green lines cluster around Boston and Cambridge, while commuter rail stretches outward into the suburbs.<br><br>Focus on where lines overlap most: Boston, Cambridge, Quincy, and Revere. The question for the next step is simple: does new housing show up in these same places?',
 			legend:
 				'Tract fill is muted here to foreground the network: rapid transit and commuter rail are the main read. (Use MBTA line/stop toggles in the free Explore view.)'
 		},
@@ -501,7 +502,7 @@
 			kicker: 'Step 2',
 			title: 'Where Housing Growth Is Happening',
 			bodyHtml:
-				'This map adds housing growth. Darker blues show stronger growth, reds show weaker or negative growth. The Seaport stands out, but strong growth also appears farther out in parts of Plymouth, Essex, and Worcester counties.<br><br>Now compare this to the previous map. Some growth appears near strong transit, but much of it appears beyond those areas.<br><br>If transit-oriented development is working as intended, we might expect growth to be more concentrated near the strongest parts of the network. Instead, the pattern looks more spread out, raising questions about how growth and access are distributed.',
+				'This map adds housing growth. Darker blues show stronger growth; reds show weaker or negative growth. The Seaport stands out, but strong growth also appears farther out in parts of Plymouth, Essex, and Worcester counties.<br><br>Compared with the transit map, growth looks more spread out than expected. Some of it follows strong access, but a lot of it does not.',
 			legend:
 				'Use the color bar on the right edge of the map: blue = higher % housing unit growth, red = lower or negative growth, relative to the scale printed on the bar. Tan = limited or unreliable data.'
 		},
@@ -509,7 +510,7 @@
 			kicker: 'Step 3',
 			title: 'Looking at the Contrast Up Close',
 			bodyHtml:
-				'Here, we zoom into individual tracts to make the pattern easier to see.<br><br>Focus on a few examples. Some tracts show strong housing growth with only limited transit access nearby. Others sit closer to strong transit but show little or even negative growth.<br><br>Looking at these side by side makes the contrast clearer. Growth and transit access do not consistently appear together.',
+				'Here, we zoom into a few tracts to make the pattern easier to see.<br><br>Some places show strong housing growth with limited nearby transit. Others sit closer to strong transit but show little or even negative growth. Side by side, the mismatch becomes easier to recognize.',
 			legend:
 				'Same housing-growth color scale as the previous step. Dimmed tracts are outside the scroll-sync focus so nearby contrasts read more clearly.'
 		},
@@ -517,7 +518,7 @@
 			kicker: 'Step 4',
 			title: 'A measurable mismatch',
 			bodyHtml:
-				'This step makes the pattern explicit. Solid purple outlines mark tracts with strong transit access but low or negative housing growth. Dashed purple outlines mark the opposite, where growth is strong despite weaker or minimal transit access.<br><br>Both patterns appear across the region. Some high-access areas show limited growth, while some lower-access areas show substantial growth.<br><br>This does not mean growth outside transit is inherently negative, but it highlights a clear difference between where access is strongest and where housing is being added.',
+				'This step makes the pattern explicit. Solid purple outlines mark tracts with strong transit access but low or negative housing growth. Dashed purple outlines mark the reverse: strong growth despite weaker transit access.<br><br>Both patterns appear across the region. The point is not that one type of place is good or bad on its own, but that access and growth are clearly not moving together.',
 			legend:
 				'The map key lists purple rim styles. Growth fill and the color bar still describe housing change; purple outlines add the access–growth mismatch read.'
 		},
@@ -525,7 +526,7 @@
 			kicker: 'Step 5',
 			title: 'How Growth Is Distributed Relative to Transit',
 			bodyHtml:
-				'We now move from mismatch to classification. Tracts are grouped based on how development is distributed relative to transit. Green outlines mark more transit-oriented development, while orange outlines mark more non-TOD patterns.<br><br>The map still shows housing growth underneath, but now also shows whether that growth is concentrated near transit or not.<br><br>This makes it easier to compare not just where growth appears, but how it relates to transit access across the region.',
+				'Instead of just showing mismatch, this step classifies tracts by how development relates to transit. Green outlines mark more transit-oriented development, while orange outlines mark more non-TOD patterns.<br><br>The map still shows housing growth underneath, but now we can compare not just where growth happened, but how closely it tracks transit.',
 			legend:
 				'The key shows teal (TOD-dominated) vs orange (non-TOD-dominated) interior rims. Choropleth color is still % housing growth from the same diverging scale as before.'
 		},
@@ -533,7 +534,7 @@
 			kicker: 'Step 6',
 			title: 'Boston and Cambridge',
 			bodyHtml:
-				'This zoom focuses on Boston and Cambridge as a reference case. Most tracts here are TOD-dominated, which aligns with strong transit access.<br><br>At the same time, the pattern is not uniform. There are areas with minimal development, and some tracts show low or even negative growth.<br><br>This shows that even in the most connected areas, housing growth is not consistently high.',
+				'Boston and Cambridge are the clearest reference case. Most tracts here are TOD-dominated, which fits the strongest transit geography in the region.<br><br>But even here, growth is uneven. Strong transit access does not automatically mean large amounts of new housing.',
 			legend:
 				'Teal / orange TOD split plus growth fill, same as step 5; zoom is tighter on the core so you can read individual tracts.'
 		},
@@ -541,7 +542,7 @@
 			kicker: 'Step 7',
 			title: 'Quincy and Revere',
 			bodyHtml:
-				'Moving outward to Quincy and Revere, the pattern becomes more mixed. Transit access is still present, but nearby tracts do not all show the same relationship between growth and TOD.<br><br>There are slightly more non-TOD tracts, and there are also areas with minimal development or low growth.<br><br>This suggests that the relationship between transit and growth becomes less consistent outside the urban core.',
+				'Moving outward to Quincy and Revere, the pattern becomes more mixed. Transit is still present, but nearby tracts do not all show the same relationship between growth and TOD.<br><br>Compared with the core, development here looks less consistent and less tightly tied to transit.',
 			legend:
 				'Encodings match step 5: growth in color, TOD / non-TOD in the green vs orange ring treatment shown in the key.'
 		},
@@ -549,7 +550,7 @@
 			kicker: 'Step 8',
 			title: 'Outer-Ring Growth',
 			bodyHtml:
-				'In the outer ring, the pattern shifts more clearly. Many tracts are farther from strong transit, and much of the development appears in non-TOD categories.<br><br>Transit is still present in some places, but it is more limited and less frequent. Growth appears more dispersed and less closely associated with strong transit access.<br><br>This highlights a different pattern compared to the urban core.',
+				'In the outer ring, the pattern shifts more clearly. Many tracts sit farther from strong transit, and much of the development falls into non-TOD categories.<br><br>Growth is still happening, but it is more dispersed and less closely tied to the strongest access.',
 			legend:
 				'Same legend as steps 5–7: fill = growth, rims = TOD class. The outer zoom emphasizes non-core relationships.'
 		},
@@ -557,7 +558,7 @@
 			kicker: 'Step 9',
 			title: 'Projects Enter the Picture',
 			bodyHtml:
-				'This step adds individual developments. Each dot represents a project, with size reflecting units and color showing the share of multi-family housing from white to purple. Green outlines indicate transit-accessible projects, while yellow outlines indicate those that are not.<br><br>Most projects are overwhelmingly multi-family, with many near 100 percent. Larger projects appear more often near the core, but projects are distributed across the region.<br><br>Many projects, even in highly accessible areas, include little or no affordable housing, which limits who is able to access those units.',
+				'This step adds individual developments. Each dot is a project, with size showing units and color showing multifamily share. Green outlines indicate transit-accessible projects; yellow outlines indicate those that are not.<br><br>Most projects are heavily multifamily, but they are spread across a wider geography than the strongest transit network alone would suggest.',
 			legend:
 				'Key + map: dot area scales with project size (√ units); white→purple = multifamily share; green vs yellow project ring = transit-accessible or not. Tract color is still the growth layer.'
 		},
@@ -565,7 +566,7 @@
 			kicker: 'Step 10',
 			title: 'Projects as Examples',
 			bodyHtml:
-				'This step highlights a few projects to make the pattern more concrete. Some, like Assembly Row and 16 Boardman St, represent strong TOD cases with dense housing near transit. Others, like 16 Dyer, are near transit but less tightly integrated.<br><br>On the other end, projects like Mahoney Farm and The Pinehills show substantial growth farther from strong transit access.<br><br>These examples make it easier to compare how location, scale, and affordability vary across developments.',
+				'These examples make the pattern more concrete. Assembly Row and 16 Boardman St are strong TOD cases with dense housing near transit. 16 Dyer sits in more of a middle ground. Mahoney Farm and The Pinehills show sizable growth much farther from strong transit access.<br><br>Together, they show that location, scale, and affordability do not line up in one predictable way.',
 			legend:
 				'Read highlighted pins like other development dots: size = units, fill ramp = % multifamily, outline = transit access; compare with the named cards beside the map.'
 		},
@@ -573,7 +574,7 @@
 			kicker: 'Step 11',
 			title: 'Who This Affects',
 			bodyHtml:
-				'In this final step, higher-income tracts fade into the background, where high income is defined as greater than $125k per year and lower income as less than $125k.<br><br>Many lower-income tracts appear within mismatch categories. Some are in high-access areas with limited growth, while others are in areas with growth but weaker transit access.<br><br>Among lower-income tracts, there also appear to be more areas with minimal development, even in places with transit access.<br><br>This shifts the focus from where housing is built to how access is distributed. Transit-oriented development is often associated with improved access, but without affordability, that access may not be equally available to all households.',
+				'In this final step, higher-income tracts fade into the background so lower-income tracts are easier to see.<br><br>Many of those tracts fall inside the mismatch patterns: some are in high-access places with limited growth, while others are in growing places with weaker transit access.<br><br>The equity question is the point here. Even when transit-oriented development expands access, that access is not equally available if affordability does not come with it.',
 			legend:
 				'Lower-income tracts stay vivid; other tracts wash out. Use the toggles in the key if cohort vs mismatch rims are shown—meaning matches the same swatches and line styles as earlier steps.'
 		}
@@ -2412,7 +2413,7 @@
 			});
 		}
 
-		const summary =
+		const summary = guidedTooltipSummaryOverride || (
 			mismatchEyebrow === 'High access, low growth'
 				? 'Why it matters: transit access is strong here, but housing growth has stayed weak.'
 				: mismatchEyebrow === 'High growth, low access'
@@ -2423,7 +2424,8 @@
 							? 'Why it matters: most significant development in this tract has happened outside the stronger transit geography.'
 							: devClass === 'minimal'
 								? 'Why it matters: this tract has seen relatively little development in the selected period.'
-								: '';
+								: ''
+		);
 		tooltip = {
 			visible: true,
 			x,
@@ -2727,9 +2729,11 @@
 		});
 		secondaryRows.push({ label: 'Type', value: d.mixed_use ? 'Mixed-use' : 'Residential' });
 		if (d.rdv) secondaryRows.push({ label: 'Redevelopment', value: 'Yes' });
-		const summary = access
+		const summary = guidedTooltipSummaryOverride || (
+			access
 			? 'Why it matters: this project adds housing in a transit-accessible location.'
-			: 'Why it matters: this project adds housing in a location with weaker transit access.';
+			: 'Why it matters: this project adds housing in a location with weaker transit access.'
+		);
 		tooltip = {
 			visible: true,
 			x,
@@ -3490,6 +3494,11 @@
 
 	function inspectGuidedExample(id) {
 		if (!id) return;
+		const example =
+			guidedContrastExamples.find((item) => item.id === id) ??
+			guidedMismatchExamples.find((item) => item.id === id) ??
+			null;
+		guidedTooltipSummaryOverride = example?.note || '';
 		zoomToTract(id);
 		panelState.selectAll([id]);
 		panelState.setLastInteracted(id);
@@ -3506,6 +3515,12 @@
 
 	function inspectGuidedDevelopment(d) {
 		if (!d) return;
+		const key = developmentKey(d);
+		const example =
+			guidedStepTenExamples.find((item) => developmentKey(item.dev) === key) ??
+			guidedDevelopmentExamples.find((item) => developmentKey(item) === key) ??
+			null;
+		guidedTooltipSummaryOverride = example?.note || '';
 		activeGuidedDevelopmentKey = developmentKey(d);
 		zoomToDevelopment(d);
 		window.setTimeout(() => {
@@ -3544,6 +3559,7 @@
 		tooltip = { ...tooltip, visible: false, anchorX: null, anchorY: null };
 		pinnedTooltipStage = null;
 		activeGuidedDevelopmentKey = null;
+		guidedTooltipSummaryOverride = '';
 		hoveredMismatchCluster = null;
 		cancelHoverRest();
 	}
@@ -4318,21 +4334,21 @@
 									</div>
 								{/if}
 							{#if activeTooltip.secondaryRows.length > 0}
-								<div class="map-tooltip__details">
-									<p class="map-tooltip__details-label">Details</p>
+								<details class="map-tooltip__details">
+									<summary class="map-tooltip__details-label">More info</summary>
 									<div class="map-tooltip__rows">
 										{#each activeTooltip.secondaryRows as row, i (i)}
-												<div
-													class="map-tooltip__row"
-													class:map-tooltip__row--stack={String(row.value ?? '').length > 26}
-												>
-													<span class="map-tooltip__label">{row.label}</span>
-													<span class="map-tooltip__value">{row.value}</span>
-												</div>
-											{/each}
-										</div>
+											<div
+												class="map-tooltip__row"
+												class:map-tooltip__row--stack={String(row.value ?? '').length > 26}
+											>
+												<span class="map-tooltip__label">{row.label}</span>
+												<span class="map-tooltip__value">{row.value}</span>
+											</div>
+										{/each}
 									</div>
-								{/if}
+								</details>
+							{/if}
 							</div>
 						{/if}
 						</div>
@@ -4739,7 +4755,7 @@
 
 	.poc-scrolly-shell {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(290px, 360px);
+		grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
 		gap: 22px;
 		align-items: start;
 	}
@@ -4837,7 +4853,7 @@
 		gap: calc(33vh * 0.6);
 		padding-top: 8px;
 		/* Extra runway after step 3 so the page does not jump to the next section immediately */
-		padding-bottom: calc(57vh * 0.6 + 108px);
+		padding-bottom: calc(68vh * 0.6 + 164px);
 		isolation: isolate;
 	}
 
@@ -4946,9 +4962,9 @@
 
 	.poc-stepper-card-body {
 		margin: 0;
-		max-width: 33ch;
-		font-size: 0.98rem;
-		line-height: 1.65;
+		max-width: 37ch;
+		font-size: 1rem;
+		line-height: 1.62;
 		color: var(--text);
 		text-wrap: pretty;
 	}
@@ -6578,11 +6594,6 @@
 		text-align: left;
 	}
 
-	.map-tooltip__details {
-		display: grid;
-		gap: 6px;
-	}
-
 	.map-tooltip__details-label {
 		margin: 0;
 		font-size: 0.63rem;
@@ -6590,6 +6601,30 @@
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
 		color: var(--text-muted);
+		list-style: none;
+		cursor: pointer;
+	}
+
+	.map-tooltip__details {
+		display: grid;
+		gap: 8px;
+	}
+
+	.map-tooltip__details[open] .map-tooltip__details-label {
+		color: var(--accent-strong);
+	}
+
+	.map-tooltip__details-label::-webkit-details-marker {
+		display: none;
+	}
+
+	.map-tooltip__details-label::after {
+		content: ' +';
+		color: var(--text-muted);
+	}
+
+	.map-tooltip__details[open] .map-tooltip__details-label::after {
+		content: ' -';
 	}
 
 	.map-tooltip__rows {

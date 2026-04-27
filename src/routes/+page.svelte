@@ -640,13 +640,14 @@
 	<section class="hero-full card">
 		<div class="eyebrow">Guided Story</div>
 		<h1>Massachusetts is building more near transit. Who benefits?</h1>
+		<p class="byline">By Krishna Parvataneni, Allison Eto, Hanna Chen, and Supriya Lall</p>
 		<p class="subtitle">
 			Transit-oriented development can add housing, reduce car dependence, and connect more people to jobs and services.
 			But it also raises a harder question: <strong>are those gains reaching lower-income residents, or making transit-rich places harder to stay in?</strong>
 		</p>
 		<p class="subtitle">
-			This story looks at where new housing is landing across Massachusetts, how closely it tracks transit access,
-			and what kinds of neighborhood change tend to show up in TOD-heavy places.
+			This story follows where new housing is landing, how closely it tracks transit access,
+			and what kinds of neighborhood change show up in TOD-heavy places.
 		</p>
 		<p class="hero-plan-note">
 			For methods, design choices, and the project plan:
@@ -855,14 +856,14 @@
 				<p>{tractError}</p>
 			</div>
 		{:else}
-			<section class="chart-card card full-width">
+			<section class="chart-card card full-width chart-card--guided">
 				<p class="story-eyebrow story-eyebrow--center">Guided map story</p>
 				<h2 class="chart-card__headline">Transit access and new housing growth do not consistently align across Greater Boston tracts</h2>
 				<p class="chart-note">
-					The walkthrough starts broad and then gets more specific: first where transit is strongest, then where housing grew, then where those two patterns split apart, and finally where that mismatch matters most for lower-income tracts.
+					The walkthrough starts broad and then gets more specific: where transit is strongest, where housing grew, where those two patterns split apart, and where that mismatch matters most for lower-income tracts.
 				</p>
 				<p class="chart-note">
-					For readability, example cards use short names like <strong>“Tract in Suffolk County”</strong> instead of full census identifiers.
+					For readability, example cards use short names like <strong>“Tract in Suffolk County”</strong> instead of full census identifiers. Tooltip summaries mirror the story cards, and you can open <strong>More info</strong> for the details.
 				</p>
 				<div class="takeaway-strip" aria-label="Main takeaway from the guided map">
 					<strong>Main takeaway:</strong> the region is adding housing, but not consistently in the places with the strongest transit access or in ways that clearly expand access for lower-income residents.
@@ -1709,6 +1710,15 @@
 		text-transform: uppercase;
 	}
 
+	.byline {
+		margin: 0 auto 14px;
+		font-size: 0.95rem;
+		font-weight: 600;
+		line-height: 1.45;
+		color: var(--ink);
+		max-width: min(42rem, 92vw);
+	}
+
 	.subtitle {
 		color: var(--muted);
 		line-height: 1.72;
@@ -2109,6 +2119,10 @@
 		display: grid;
 		justify-items: center;
 		width: 100%;
+	}
+
+	.chart-card--guided {
+		padding-bottom: 12px;
 	}
 
 	.chart-card__headline {
