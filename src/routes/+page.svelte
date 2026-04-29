@@ -605,6 +605,14 @@
 			setHovered(gisjoin) {
 				this.hoveredTract = gisjoin;
 			},
+			clearSelection() {
+				this.selectedTracts = new Set();
+				this.hoveredTract = null;
+			},
+			setSelectedTracts(gisjoins) {
+				this.selectedTracts = new Set(gisjoins);
+				this.hoveredTract = null;
+			},
 			toggleTract(gisjoin) {
 				const next = new Set(this.selectedTracts);
 				if (next.has(gisjoin)) next.delete(gisjoin);
@@ -618,6 +626,49 @@
 	let eduPanelState = $state(makeTodScatterPanelState('bachelors_pct_change'));
 	let affIncomePanelState = $state(makeTodScatterPanelState('median_income_change_pct'));
 	let affEduPanelState = $state(makeTodScatterPanelState('bachelors_pct_change'));
+
+	const tractStoryExamples = $derived.by(() => {
+		const rows = nhgisLikeRows
+			.filter((row) => row.devClass === 'tod_dominated' && row.gisjoin)
+			.map((row) => ({
+				...row,
+				incomeValue: Number(row.median_income_change_pct),
+				eduValue: Number(row.bachelors_pct_change)
+			}));
+
+		const validIncome = rows.filter((row) => Number.isFinite(row.incomeValue));
+		const validEdu = rows.filter((row) => Number.isFinite(row.eduValue));
+		const lowerIncomeTod = validIncome.filter((row) => row.is_low_income);
+
+		return {
+			incomeLeaders: validIncome.slice().sort((a, b) => b.incomeValue - a.incomeValue).slice(0, 3),
+			eduLeaders: validEdu.slice().sort((a, b) => b.eduValue - a.eduValue).slice(0, 3),
+			lowerIncomeTod: lowerIncomeTod.slice().sort((a, b) => b.incomeValue - a.incomeValue).slice(0, 3)
+		};
+	});
+
+	function setSelectedAcrossStoryCharts(gisjoins) {
+		const ids = [...new Set(gisjoins.filter(Boolean))];
+		incomePanelState.setSelectedTracts(ids);
+		eduPanelState.setSelectedTracts(ids);
+		affIncomePanelState.setSelectedTracts(ids);
+		affEduPanelState.setSelectedTracts(ids);
+	}
+
+	function clearStoryChartSelections() {
+		incomePanelState.clearSelection();
+		eduPanelState.clearSelection();
+		affIncomePanelState.clearSelection();
+		affEduPanelState.clearSelection();
+	}
+
+	function describeExampleSet(rows, metricLabel) {
+		if (!rows?.length) return '';
+		const labels = rows.map((row) => row.county?.replace(/\s+County$/i, '')).filter(Boolean);
+		const unique = [...new Set(labels)];
+		const where = unique.length > 0 ? ` in ${unique.join(', ')}` : '';
+		return `Highlight ${metricLabel}${where}.`;
+	}
 
 	/**
 	 * Keep transit distance in sync with the municipal slider (``threshold``) without
@@ -923,6 +974,46 @@
 				</div>
 			</section>
 
+			<section class="story card story--brief tract-interaction-card">
+				<p class="story-eyebrow">Try the tract charts</p>
+				<h2>Start with a few highlighted examples</h2>
+				<p>
+					Hover any point for the quick read. If you want a closer look, use these buttons to keep the same tracts highlighted across the charts below.
+				</p>
+				<div class="tract-interaction-controls" role="group" aria-label="Highlight tract examples in the demographic charts">
+					<button
+						type="button"
+						class="chip-button"
+						onclick={() => setSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
+						disabled={!tractStoryExamples.incomeLeaders.length}
+						title={describeExampleSet(tractStoryExamples.incomeLeaders, 'higher-income-change TOD tracts')}
+					>
+						Show income examples
+					</button>
+					<button
+						type="button"
+						class="chip-button"
+						onclick={() => setSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
+						disabled={!tractStoryExamples.eduLeaders.length}
+						title={describeExampleSet(tractStoryExamples.eduLeaders, 'higher-education-change TOD tracts')}
+					>
+						Show education examples
+					</button>
+					<button
+						type="button"
+						class="chip-button"
+						onclick={() => setSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
+						disabled={!tractStoryExamples.lowerIncomeTod.length}
+						title={describeExampleSet(tractStoryExamples.lowerIncomeTod, 'lower-income TOD tracts')}
+					>
+						Show lower-income TOD examples
+					</button>
+					<button type="button" class="chip-button chip-button--subtle" onclick={clearStoryChartSelections}>
+						Clear highlights
+					</button>
+				</div>
+			</section>
+
 			<!-- Income / education tract analysis (reinstated from earlier POC story layout) -->
 			<div class="story-chart-row story-chart-row--tract full-width">
 				<section class="story card story-chart-text">
@@ -1037,7 +1128,7 @@
 				<section class="chart-card card story-chart-plot">
 					<h3>More TOD often lines up with faster income change</h3>
 					<p class="chart-note">
-						Each dot is a tract. The main pattern to look for is simple: tracts with more TOD tend to appear higher on the chart.
+						Hover for a tract summary, or keep a few tracts highlighted with the buttons above. The main thing to notice is that tracts with more TOD tend to appear higher on the chart.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} storyMode />
@@ -1156,7 +1247,7 @@
 				<section class="chart-card card story-chart-plot">
 					<h3>More TOD often lines up with bigger education gains</h3>
 					<p class="chart-note">
-						This chart tells a similar story. Tracts with more TOD are more likely to sit higher on the education-change axis.
+						This chart tells a similar story. The highlighted tracts carry over, so it is easier to see whether the same places also sit higher on the education-change axis.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} storyMode />
@@ -1200,7 +1291,7 @@
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} storyMode />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">More affordability generally lines up with smaller income increases.</figcaption>
+							<figcaption class="cohort-mini-bar__cap">The same selected tracts stay highlighted here, so you can compare whether more affordability also lines up with smaller income increases.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -1338,7 +1429,7 @@
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} storyMode />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">The education pattern points in the same direction.</figcaption>
+							<figcaption class="cohort-mini-bar__cap">The same comparison carries over here too: more affordability generally points toward smaller education change.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -2365,6 +2456,54 @@
 	.story-chart-row--tract .story-chart-text {
 		max-width: 40em;
 		justify-self: center;
+	}
+
+	.tract-interaction-card {
+		text-align: center;
+		max-width: 52rem;
+		margin-inline: auto;
+	}
+
+	.tract-interaction-controls {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 10px;
+		margin-top: 16px;
+	}
+
+	.chip-button {
+		border: 1px solid rgba(0, 132, 61, 0.22);
+		background: rgba(0, 132, 61, 0.07);
+		color: var(--ink);
+		padding: 9px 14px;
+		border-radius: 999px;
+		font: inherit;
+		font-size: 0.92rem;
+		font-weight: 600;
+		line-height: 1.2;
+		cursor: pointer;
+		transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+	}
+
+	.chip-button:hover:not(:disabled) {
+		background: rgba(0, 132, 61, 0.12);
+		border-color: rgba(0, 132, 61, 0.34);
+	}
+
+	.chip-button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.chip-button--subtle {
+		background: rgba(31, 36, 48, 0.04);
+		border-color: rgba(31, 36, 48, 0.12);
+	}
+
+	.chip-button--subtle:hover:not(:disabled) {
+		background: rgba(31, 36, 48, 0.08);
+		border-color: rgba(31, 36, 48, 0.18);
 	}
 
 	.story-chart-row--tract .story-chart-plot {
