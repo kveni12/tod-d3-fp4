@@ -693,7 +693,10 @@
 		<h1>Massachusetts is building more near transit. Who benefits?</h1>
 		<p class="byline">By Krishna Parvataneni, Allison Eto, Hanna Chen, and Supriya Lall</p>
 		<p class="subtitle">
-			If you rely on transit to reach work, school, or childcare, the question is not just whether more housing is being built. It is whether that housing is showing up in places people can actually reach and afford. <strong>This story follows where new housing is landing, how closely it tracks transit access, and what kinds of neighborhood change tend to appear in TOD-heavy places.</strong>
+			If you rely on transit to reach work, school, or childcare, the real question is not just whether more housing is being built. It is whether that housing shows up in places people can actually reach and afford.
+		</p>
+		<p class="subtitle subtitle--secondary">
+			<strong>This story tracks three things:</strong> where new housing is landing, whether it lines up with strong transit access, and what kinds of neighborhood change tend to appear in TOD-heavy places.
 		</p>
 		<p class="hero-plan-note">
 			For methods, design choices, and the project plan:
@@ -705,7 +708,7 @@
 		<h2>The main point</h2>
 		<p class="signal-line">Housing growth and transit access do not line up as neatly as policy goals suggest.</p>
 		<p class="signal-line">Some well-connected places are still adding little housing, while growth also shows up far from strong transit.</p>
-		<p class="signal-line">Where TOD is strongest, the pattern often comes with signs of rising market pressure, which makes affordability central to the equity question.</p>
+		<p class="signal-line">Where TOD is strongest, affordability becomes the main equity test.</p>
 	</section>
 
 	{#if !muniLoaded}
@@ -889,7 +892,7 @@
 				<p class="story-eyebrow story-eyebrow--center">Guided map story</p>
 				<h2 class="chart-card__headline">Transit access and new housing growth do not consistently align across Greater Boston tracts</h2>
 				<p class="chart-note">
-					The walkthrough starts broad and then gets more specific: where transit is strongest, where housing grew, where those patterns split apart, and where that mismatch matters most for lower-income tracts. Example cards use short names like <strong>“Tract in Suffolk County”</strong> for readability, and tooltips keep the same main takeaway with <strong>More info</strong> for extra detail.
+					The walkthrough moves from the full network to a closer Greater Boston view, then to tract examples, mismatch, projects, and lower-income context. Example cards use short names like <strong>“Tract in Suffolk County”</strong> for readability, and tooltips lead with the same takeaway before offering <strong>More info</strong>.
 				</p>
 				<div class="takeaway-strip" aria-label="Main takeaway from the guided map">
 					<strong>Main takeaway:</strong> the region is adding housing, but not consistently in the places with the strongest transit access or in ways that clearly expand access for lower-income residents.
@@ -910,7 +913,7 @@
 			<section class="story card">
 				<h2>Three places to notice</h2>
 				<p class="chart-note">
-					These places are useful anchors while you scroll. They are not the whole story, but they make the regional pattern easier to read.
+					These are quick anchors while you scroll. They are not the whole story, but they make the regional pattern easier to read.
 				</p>
 				<div class="annotation-grid">
 					<div class="annotation-card">
@@ -1843,6 +1846,11 @@
 		font-size: clamp(1.02rem, 1.8vw, 1.16rem);
 		max-width: min(46rem, 92vw);
 		margin-inline: auto;
+	}
+
+	.subtitle--secondary {
+		margin-top: 12px;
+		font-size: clamp(0.98rem, 1.6vw, 1.08rem);
 	}
 
 	/* ── Dashboard layout ─────────────────────────────── */

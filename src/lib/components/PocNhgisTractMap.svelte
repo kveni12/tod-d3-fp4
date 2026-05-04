@@ -145,7 +145,7 @@
 	let pendingHoverPos = $state(/** @type {{ x: number; y: number } | null} */ (null));
 	/** Tract ID waiting for debounce to complete. */
 	let pendingHoverId = $state(/** @type {string | null} */ (null));
-	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 10 : focusLowIncomeTracts);
+	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 11 : focusLowIncomeTracts);
 	/**
 	 * Main page guided walkthrough: tracts/insights are not toggled by map click (scrolly and
 	 * in-text controls drive focus). The playground carousel keeps full click-to-select behavior.
@@ -294,7 +294,7 @@
 
 	function showCohortOutlines() {
 		if (guidedMode) {
-			return (revealStage >= 4 && revealStage <= 7) || (revealStage === 10 && guidedLowerIncomeOverlay === 'cohort');
+			return (revealStage >= 5 && revealStage <= 8) || (revealStage === 11 && guidedLowerIncomeOverlay === 'cohort');
 		}
 		if (playgroundStoryCarousel) {
 			if (revealStage === 4) return playgroundSandboxCohortOutlines;
@@ -304,12 +304,12 @@
 	}
 
 	function showMismatchOutlines() {
-		if (guidedMode) return revealStage === 3 || (revealStage === 10 && guidedLowerIncomeOverlay === 'mismatch');
+		if (guidedMode) return revealStage === 4 || (revealStage === 11 && guidedLowerIncomeOverlay === 'mismatch');
 		return revealStage === 2;
 	}
 
 	function showDevelopmentDots() {
-		if (guidedMode) return revealStage >= 8 && revealStage <= 9;
+		if (guidedMode) return revealStage >= 9 && revealStage <= 10;
 		if (playgroundStoryCarousel) {
 			if (revealStage === 4) return playgroundSandboxDevs;
 			return revealStage === 3;
@@ -494,15 +494,23 @@
 			kicker: 'Step 1',
 			title: 'Where Transit Access Is Strongest',
 			bodyHtml:
-				'Transit access is strongest in the urban core. The Red, Orange, Blue, and Green lines cluster around Boston and Cambridge, while commuter rail stretches outward into the suburbs.<br><br>Focus on where lines overlap most: Boston, Cambridge, Quincy, and Revere. The question for the next step is simple: does new housing show up in these same places?',
+				'Transit access is strongest in the urban core. The Red, Orange, Blue, and Green lines cluster around Boston and Cambridge, while commuter rail stretches outward into the suburbs.<br><br>Start by reading this as a map of access: where does the MBTA make it easiest to reach jobs and services?',
 			legend:
 				'Tract fill is muted here to foreground the network: rapid transit and commuter rail are the main read. (Use MBTA line/stop toggles in the free Explore view.)'
+		},
+		{
+			kicker: 'Step 1.5',
+			title: 'Zoom Into Greater Boston',
+			bodyHtml:
+				'Before we add housing growth, move closer to the eastern half of the state. This tighter view makes it easier to see the dense transit geography around Boston, Cambridge, Quincy, and Revere.<br><br>That is the part of the region the next few steps keep testing.',
+			legend:
+				'Same transit-only view as step 1, but zoomed closer so the strongest MBTA geography is easier to read.'
 		},
 		{
 			kicker: 'Step 2',
 			title: 'Where Housing Growth Is Happening',
 			bodyHtml:
-				'This map adds housing growth. Darker blues show stronger growth; reds show weaker or negative growth. The Seaport stands out, but strong growth also appears farther out in parts of Plymouth, Essex, and Worcester counties.<br><br>Compared with the transit map, growth looks more spread out than expected. Some of it follows strong access, but a lot of it does not.',
+				'This map adds housing growth. Darker blues show stronger growth; reds show weaker or negative growth. The Seaport stands out, but strong growth also appears farther out in parts of Plymouth, Essex, and Worcester counties.<br><br>Compared with the transit map, growth looks more spread out than expected.',
 			legend:
 				'Use the color bar on the right edge of the map: blue = higher % housing unit growth, red = lower or negative growth, relative to the scale printed on the bar. Tan = limited or unreliable data.'
 		},
@@ -510,7 +518,7 @@
 			kicker: 'Step 3',
 			title: 'Looking at the Contrast Up Close',
 			bodyHtml:
-				'Here, we zoom into a few tracts to make the pattern easier to see.<br><br>Some places show strong housing growth with limited nearby transit. Others sit closer to strong transit but show little or even negative growth. Side by side, the mismatch becomes easier to recognize.',
+				'Here, we zoom into a few tracts to make the pattern easier to see.<br><br>Some places show strong housing growth with limited nearby transit. Others sit closer to strong transit but show little or even negative growth.',
 			legend:
 				'Same housing-growth color scale as the previous step. Dimmed tracts are outside the scroll-sync focus so nearby contrasts read more clearly.'
 		},
@@ -518,7 +526,7 @@
 			kicker: 'Step 4',
 			title: 'A measurable mismatch',
 			bodyHtml:
-				'This step makes the pattern explicit. Solid purple outlines mark tracts with strong transit access but low or negative housing growth. Dashed purple outlines mark the reverse: strong growth despite weaker transit access.<br><br>Both patterns appear across the region. The point is not that one type of place is good or bad on its own, but that access and growth are clearly not moving together.',
+				'This step makes the pattern explicit. Solid purple outlines mark tracts with strong transit access but low or negative housing growth. Dashed purple outlines mark the reverse: strong growth despite weaker transit access.<br><br>Both patterns appear across the region, which makes the mismatch hard to ignore.',
 			legend:
 				'The map key lists purple rim styles. Growth fill and the color bar still describe housing change; purple outlines add the access–growth mismatch read.'
 		},
@@ -526,7 +534,7 @@
 			kicker: 'Step 5',
 			title: 'How Growth Is Distributed Relative to Transit',
 			bodyHtml:
-				'Instead of just showing mismatch, this step classifies tracts by how development relates to transit. Green outlines mark more transit-oriented development, while orange outlines mark more non-TOD patterns.<br><br>The map still shows housing growth underneath, but now we can compare not just where growth happened, but how closely it tracks transit.',
+				'Instead of just showing mismatch, this step classifies tracts by how development relates to transit. Green outlines mark more transit-oriented development, while orange outlines mark more non-TOD patterns.<br><br>Now we can compare not just where growth happened, but how closely it tracks transit.',
 			legend:
 				'The key shows teal (TOD-dominated) vs orange (non-TOD-dominated) interior rims. Choropleth color is still % housing growth from the same diverging scale as before.'
 		},
@@ -574,7 +582,7 @@
 			kicker: 'Step 11',
 			title: 'Who This Affects',
 			bodyHtml:
-				'In this final step, higher-income tracts fade into the background so lower-income tracts are easier to see.<br><br>Many of those tracts fall inside the mismatch patterns: some are in high-access places with limited growth, while others are in growing places with weaker transit access.<br><br>The equity question is the point here. Even when transit-oriented development expands access, that access is not equally available if affordability does not come with it.',
+				'In this final step, higher-income tracts fade into the background so lower-income tracts are easier to see.<br><br>Many of those tracts fall inside the mismatch patterns: some are in high-access places with limited growth, while others are in growing places with weaker transit access.<br><br>The equity question is the point here: access is not equally shared if affordability does not come with it.',
 			legend:
 				'Lower-income tracts stay vivid; other tracts wash out. Use the toggles in the key if cohort vs mismatch rims are shown—meaning matches the same swatches and line styles as earlier steps.'
 		}
@@ -1073,14 +1081,14 @@
 
 	function guidedRegionFeaturesForStage(stage) {
 		if (!guidedMode) return [];
-		if (stage === 5) {
+		if (stage === 6) {
 			return tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
 				const lon = Number(t.centlon);
 				return Number.isFinite(lat) && Number.isFinite(lon) && lat >= 42.30 && lat <= 42.43 && lon >= -71.17 && lon <= -70.98;
 			});
 		}
-		if (stage === 6) {
+		if (stage === 7) {
 			return tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
 				const lon = Number(t.centlon);
@@ -1091,14 +1099,14 @@
 				return isQuincy || isRevere;
 			});
 		}
-		if (stage === 7 || stage === 9) {
+		if (stage === 8 || stage === 10) {
 			const rowsByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
 			return tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
 				const lon = Number(t.centlon);
 				const row = rowsByGj.get(t.gisjoin);
 				const growth = Number(row?.census_hu_pct_change);
-				return Number.isFinite(lat) && Number.isFinite(lon) && Number.isFinite(growth) && lon <= -71.15 && lon >= -72.2 && lat >= 42.1 && lat <= 42.55 && growth >= (stage === 9 ? 10 : 15);
+				return Number.isFinite(lat) && Number.isFinite(lon) && Number.isFinite(growth) && lon <= -71.15 && lon >= -72.2 && lat >= 42.1 && lat <= 42.55 && growth >= (stage === 10 ? 10 : 15);
 			});
 		}
 		return [];
@@ -1926,7 +1934,7 @@
 
 		const transitM = transitDistanceMiToMetres(panelState.transitDistanceMi ?? 0.5);
 		const featuredDevelopmentKeys =
-			guidedMode && revealStage === 9 && guidedStepTenExamples?.length
+			guidedMode && revealStage === 10 && guidedStepTenExamples?.length
 				? new Set((guidedStepTenExamples ?? []).map((item) => developmentKey(item?.dev)).filter(Boolean))
 				: null;
 		const huVals = filteredDevs.map((d) => Number(d.hu) || 0).filter((h) => h > 0);
@@ -2055,10 +2063,10 @@
 			.select('path.focus-region__outline')
 			.attr('d', path)
 			.attr('fill', 'none')
-			.attr('stroke', guidedMode && revealStage >= 7 ? MBTA_ORANGE : MBTA_GREEN)
+			.attr('stroke', guidedMode && revealStage >= 8 ? MBTA_ORANGE : MBTA_GREEN)
 			.attr('stroke-width', 2.2)
 			.attr('stroke-linejoin', 'round')
-			.attr('stroke-dasharray', revealStage >= 7 ? '7 5' : 'none')
+			.attr('stroke-dasharray', revealStage >= 8 ? '7 5' : 'none')
 			.attr('vector-effect', 'non-scaling-stroke');
 		groups.transition(t).attr('opacity', 1);
 	}
@@ -3670,11 +3678,25 @@
 			recenterMap();
 			return;
 		}
-		if (revealStage <= 4 || revealStage === 8 || revealStage === 10) {
-			recenterMap();
+		if (revealStage === 1) {
+			const focus = tractFeatureByGeoFilter((t) => {
+				const lat = Number(t.centlat);
+				const lon = Number(t.centlon);
+				return Number.isFinite(lat) && Number.isFinite(lon) && lat >= 41.95 && lat <= 42.75 && lon >= -72.65 && lon <= -70.75;
+			});
+			zoomToFeatureGroup(focus, 3.8);
 			return;
 		}
-		if (revealStage === 5) {
+		if (revealStage >= 2 && revealStage <= 5) {
+			const focus = tractFeatureByGeoFilter((t) => {
+				const lat = Number(t.centlat);
+				const lon = Number(t.centlon);
+				return Number.isFinite(lat) && Number.isFinite(lon) && lat >= 41.95 && lat <= 42.75 && lon >= -72.65 && lon <= -70.75;
+			});
+			zoomToFeatureGroup(focus, 3.8);
+			return;
+		}
+		if (revealStage === 6) {
 			const focus = tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
 				const lon = Number(t.centlon);
@@ -3683,7 +3705,7 @@
 			zoomToFeatureGroup(focus, 8.5);
 			return;
 		}
-		if (revealStage === 6) {
+		if (revealStage === 7) {
 			const focus = tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
 				const lon = Number(t.centlon);
@@ -3692,7 +3714,7 @@
 			zoomToFeatureGroup(focus, 8.2);
 			return;
 		}
-		if (revealStage === 7) {
+		if (revealStage === 8) {
 			const rowsByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
 			const focus = tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
@@ -3704,7 +3726,7 @@
 			zoomToFeatureGroup(focus, 7.2);
 			return;
 		}
-		if (revealStage === 9) {
+		if (revealStage === 10) {
 			const rowsByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
 			const focus = tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
@@ -3714,6 +3736,10 @@
 				return Number.isFinite(lat) && Number.isFinite(lon) && Number.isFinite(growth) && lon <= -71.15 && lon >= -72.1 && lat >= 42.1 && lat <= 42.55 && growth >= 10;
 			});
 			zoomToFeatureGroup(focus, 8.2);
+			return;
+		}
+		if (revealStage === 11) {
+			recenterMap();
 		}
 	});
 
@@ -3733,19 +3759,9 @@
 		if (lastAutoFocusedStage === focusKey) return;
 		// New scroll / waypoint: clear prior scrolly-driven or incidental selection before applying the next focus.
 		resetGuidedWalkthroughMapState();
-		if (revealStage === 2 && guidedFocusDetail === 'contrast_example' && guidedContrastFeatured?.id) {
+		if (revealStage === 3 && guidedFocusDetail === 'contrast_example' && guidedContrastFeatured?.id) {
 			lastAutoFocusedStage = focusKey;
 			inspectGuidedExample(guidedContrastFeatured.id);
-			return;
-		}
-		if (revealStage === 2 && guidedFocusDetail?.startsWith('2_example:')) {
-			lastAutoFocusedStage = focusKey;
-			inspectGuidedExample(guidedFocusDetail.slice('2_example:'.length));
-			return;
-		}
-		if (revealStage === 3 && guidedFocusDetail === 'mismatch_example' && guidedMismatchFeatured?.id) {
-			lastAutoFocusedStage = focusKey;
-			inspectGuidedExample(guidedMismatchFeatured.id);
 			return;
 		}
 		if (revealStage === 3 && guidedFocusDetail?.startsWith('3_example:')) {
@@ -3753,14 +3769,24 @@
 			inspectGuidedExample(guidedFocusDetail.slice('3_example:'.length));
 			return;
 		}
-		if (revealStage === 9 && guidedFocusDetail === 'project_example' && guidedStepTenFeatured?.dev) {
+		if (revealStage === 4 && guidedFocusDetail === 'mismatch_example' && guidedMismatchFeatured?.id) {
+			lastAutoFocusedStage = focusKey;
+			inspectGuidedExample(guidedMismatchFeatured.id);
+			return;
+		}
+		if (revealStage === 4 && guidedFocusDetail?.startsWith('4_example:')) {
+			lastAutoFocusedStage = focusKey;
+			inspectGuidedExample(guidedFocusDetail.slice('4_example:'.length));
+			return;
+		}
+		if (revealStage === 10 && guidedFocusDetail === 'project_example' && guidedStepTenFeatured?.dev) {
 			lastAutoFocusedStage = focusKey;
 			inspectGuidedDevelopment(guidedStepTenFeatured.dev);
 			return;
 		}
-		if (revealStage === 9 && guidedFocusDetail?.startsWith('9_project:')) {
+		if (revealStage === 10 && guidedFocusDetail?.startsWith('10_project:')) {
 			const example = guidedStepTenExamples.find(
-				(item) => item.id === guidedFocusDetail.slice('9_project:'.length)
+				(item) => item.id === guidedFocusDetail.slice('10_project:'.length)
 			);
 			lastAutoFocusedStage = focusKey;
 			if (example?.dev) inspectGuidedDevelopment(example.dev);
@@ -4537,7 +4563,7 @@
 								{/if}
 								{#if guidedMode && i === 2 && guidedContrastExamples.length}
 									<div
-										use:focusWaypointRef={{ stage: 2, key: 'contrast_example' }}
+										use:focusWaypointRef={{ stage: 3, key: 'contrast_example' }}
 										class="poc-stepper-waypoint"
 									>
 										<p class="poc-stepper-waypoint__label">Scroll to focus on tract examples that already show this contrast.</p>
@@ -4546,12 +4572,12 @@
 										<p class="poc-stepper-examples-title">Example tracts that make the contrast more concrete</p>
 										{#each guidedContrastExamples as example (example.id)}
 											<div
-												use:focusWaypointRef={{ stage: 2, key: guidedExampleFocusKey(2, example.id) }}
+												use:focusWaypointRef={{ stage: 3, key: guidedExampleFocusKey(3, example.id) }}
 												class="poc-stepper-example-wrap"
 											>
 												<div
 													class="poc-stepper-example poc-stepper-example--static"
-													class:poc-stepper-example--active={guidedFocusDetail === guidedExampleFocusKey(2, example.id)}
+													class:poc-stepper-example--active={guidedFocusDetail === guidedExampleFocusKey(3, example.id)}
 												>
 													<div class="poc-stepper-example__head">
 														<span class="poc-stepper-example__label">{example.label}</span>
@@ -4581,7 +4607,7 @@
 								{/if}
 								{#if guidedMode && i === 3 && guidedMismatchExamples.length}
 									<div
-										use:focusWaypointRef={{ stage: 3, key: 'mismatch_example' }}
+										use:focusWaypointRef={{ stage: 4, key: 'mismatch_example' }}
 										class="poc-stepper-waypoint"
 									>
 										<p class="poc-stepper-waypoint__label">Scroll to focus on mismatch tracts marked with red insight markers.</p>
@@ -4590,12 +4616,12 @@
 										<p class="poc-stepper-examples-title">Examples of tracts where access and growth pull apart</p>
 										{#each guidedMismatchExamples as example (example.id)}
 											<div
-												use:focusWaypointRef={{ stage: 3, key: guidedExampleFocusKey(3, example.id) }}
+												use:focusWaypointRef={{ stage: 4, key: guidedExampleFocusKey(4, example.id) }}
 												class="poc-stepper-example-wrap"
 											>
 												<div
 													class="poc-stepper-example poc-stepper-example--static"
-													class:poc-stepper-example--active={guidedFocusDetail === guidedExampleFocusKey(3, example.id)}
+													class:poc-stepper-example--active={guidedFocusDetail === guidedExampleFocusKey(4, example.id)}
 												>
 													<div class="poc-stepper-example__head">
 														<span class="poc-stepper-example__label">{example.label}</span>
@@ -4636,7 +4662,7 @@
 								{/if}
 								{#if guidedMode && i === 9 && guidedStepTenExamples.length}
 									<div
-										use:focusWaypointRef={{ stage: 9, key: 'project_example' }}
+										use:focusWaypointRef={{ stage: 10, key: 'project_example' }}
 										class="poc-stepper-waypoint"
 									>
 										<p class="poc-stepper-waypoint__label">Scroll to focus on featured development examples.</p>
@@ -4645,12 +4671,12 @@
 										<p class="poc-stepper-examples-title">Important developments that help explain the pattern</p>
 										{#each guidedStepTenExamples as example (example.id)}
 											<div
-												use:focusWaypointRef={{ stage: 9, key: guidedProjectFocusKey(9, example.id) }}
+												use:focusWaypointRef={{ stage: 10, key: guidedProjectFocusKey(10, example.id) }}
 												class="poc-stepper-example-wrap"
 											>
 												<div
 													class="poc-stepper-example poc-stepper-example--static"
-													class:poc-stepper-example--active={guidedFocusDetail === guidedProjectFocusKey(9, example.id)}
+													class:poc-stepper-example--active={guidedFocusDetail === guidedProjectFocusKey(10, example.id)}
 												>
 													<div class="poc-stepper-example__head">
 														<span class="poc-stepper-example__label">{example.label}</span>

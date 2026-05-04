@@ -120,6 +120,18 @@
 			.range(TOD_COLOR_STEPS)(Math.min(1, Math.max(0, tf)));
 	}
 
+	function readableYLabel(yBase, fallback) {
+		if (yBase === 'median_income_change_pct') return 'Median income change (%)';
+		if (yBase === 'bachelors_pct_change') return "Change in bachelor's degree share (pp)";
+		return fallback;
+	}
+
+	function readableTitle(yBase, fallback) {
+		if (yBase === 'median_income_change_pct') return 'Housing growth vs income change in each tract';
+		if (yBase === 'bachelors_pct_change') return "Housing growth vs bachelor's degree change in each tract";
+		return `${fallback} vs housing growth`;
+	}
+
 	$effect(() => {
 		void plotKey;
 		if (!containerEl) return;
@@ -212,9 +224,8 @@
 
 		const { startY } = periodCensusBounds(tp);
 		const yMeta = meta.yVariables?.find((v) => v.key === yBase);
-		const yLabel = yMeta?.label ?? yBase;
-		const huSrcLabel = panelState.huChangeSource === 'census' ? 'Census' : 'MassBuilds';
-		const xLabel = `% housing stock increase (${huSrcLabel})`;
+		const yLabel = readableYLabel(yBase, yMeta?.label ?? yBase);
+		const xLabel = 'Housing growth in tract (%)';
 
 		const wAll = allPoints.map((d) => d.w);
 		const wMin = d3.min(wAll) ?? 1;
@@ -260,7 +271,7 @@
 			.nice()
 			.range([innerHeight, 0]);
 
-		const titleFull = `${yLabel} vs % housing growth (TOD analysis)`;
+		const titleFull = readableTitle(yBase, yLabel);
 		const scatterTitleLines = splitChartTitle(titleFull, wideLayout ? 58 : 44);
 		const titleAnchorX = marginLeft + innerWidth / 2;
 		const firstTitleBaseline = 20;

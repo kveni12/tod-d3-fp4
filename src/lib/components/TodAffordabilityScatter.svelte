@@ -88,6 +88,12 @@
 	/** Main WLS fit for TOD-dominated tracts: darkened MBTA green (matches ``TodIntensityScatter`` LINE_TOD). */
 	const LINE_FIT = d3.interpolateRgb(MBTA_GREEN, '#071a14')(0.24);
 
+	function readableYLabel(yBase, fallback) {
+		if (yBase === 'median_income_change_pct') return 'Median income change (%)';
+		if (yBase === 'bachelors_pct_change') return "Change in bachelor's degree share (pp)";
+		return fallback;
+	}
+
 	$effect(() => {
 		void plotKey;
 		if (!containerEl) return;
@@ -160,8 +166,8 @@
 
 		const { startY } = periodCensusBounds(tp);
 		const yMeta = meta.yVariables?.find((v) => v.key === yBase);
-		const yLabel = yMeta?.label ?? yBase;
-		const xLabel = '% of TOD units that are affordable';
+		const yLabel = readableYLabel(yBase, yMeta?.label ?? yBase);
+		const xLabel = 'Affordable share of TOD units (%)';
 		const huSrcLabel = panelState.huChangeSource === 'census' ? 'Census' : 'MassBuilds';
 
 		const wAll = points.map((d) => d.w);
