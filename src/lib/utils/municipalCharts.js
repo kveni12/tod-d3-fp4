@@ -1006,28 +1006,28 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const grouped = [
 		{
 			id: 'highIncome',
-			label: `Higher-income municipalities (${q1Label} or less of households under $125k)`,
+			label: 'Fewer households under $125k',
 			fill: '#16803c',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midHigh',
-			label: `Upper-middle municipalities (${q1Label} to ${q2Label} of households under $125k)`,
+			label: 'Somewhat fewer households under $125k',
 			fill: '#7ccf95',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midLow',
-			label: `Lower-middle municipalities (${q2Label} to ${q3Label} of households under $125k)`,
+			label: 'Somewhat more households under $125k',
 			fill: '#f3b256',
 			outline: '#0b8a43',
 			count: 0
 		},
 		{
 			id: 'lowIncome',
-			label: `Lower-income municipalities (more than ${q3Label} of households under $125k)`,
+			label: 'More households under $125k',
 			fill: '#d65245',
 			outline: '#0b8a43',
 			count: 0
@@ -1057,6 +1057,14 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		.style('margin-bottom', '8px')
 		.text(
 			`${fmtPct(higherVulnerabilityShare)} of selected-period units landed in municipalities above the regional median share of households earning less than $125k.`
+		);
+
+	root
+		.append('div')
+		.attr('class', 'chart-note')
+		.style('margin-bottom', '12px')
+		.text(
+			`Fill colors group municipalities into four bands based on the share of households earning under $125k (${q1Label}, ${q2Label}, and ${q3Label} are the cut points).`
 		);
 
 	addHtmlLegend(
