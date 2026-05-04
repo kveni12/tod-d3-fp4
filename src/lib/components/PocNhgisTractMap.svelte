@@ -4525,8 +4525,8 @@
 								use:stepRef={i}
 								class="poc-stepper-card"
 								class:poc-stepper-card--active={revealStage === i}
-								class:poc-stepper-card--dense={guidedMode && (i === 2 || i === 3 || i === 8 || i === 9 || i === 10)}
-								class:poc-stepper-card--runway-after={guidedMode && i === 3}
+								class:poc-stepper-card--dense={guidedMode && (i === 3 || i === 4 || i === 9 || i === 10 || i === 11)}
+								class:poc-stepper-card--runway-after={guidedMode && i === 4}
 								data-step-index={i}
 							>
 								<div class="poc-stepper-card-top">
@@ -4553,13 +4553,13 @@
 											{#if step.why}
 												<p class="poc-stepper-card-note"><strong>Why it matters:</strong> {step.why}</p>
 											{/if}
-											{#if step.prompt && i !== 2 && i !== 3 && i !== 8 && i !== 9}
+											{#if step.prompt && i !== 3 && i !== 4 && i !== 9 && i !== 10}
 												<p class="poc-stepper-card-note"><strong>What to notice next:</strong> {step.prompt}</p>
 											{/if}
 										</div>
 									</details>
 								{/if}
-								{#if guidedMode && i === 2 && guidedContrastExamples.length}
+								{#if guidedMode && i === 3 && guidedContrastExamples.length}
 									<div
 										use:focusWaypointRef={{ stage: 3, key: 'contrast_example' }}
 										class="poc-stepper-waypoint"
@@ -4603,7 +4603,7 @@
 										{/each}
 									</div>
 								{/if}
-								{#if guidedMode && i === 3 && guidedMismatchExamples.length}
+								{#if guidedMode && i === 4 && guidedMismatchExamples.length}
 									<div
 										use:focusWaypointRef={{ stage: 4, key: 'mismatch_example' }}
 										class="poc-stepper-waypoint"
@@ -4653,12 +4653,12 @@
 										{/each}
 									</div>
 								{/if}
-								{#if guidedMode && i === 8 && guidedDevelopmentExamples.length}
+								{#if guidedMode && i === 9 && guidedDevelopmentExamples.length}
 									<div class="poc-stepper-examples" aria-label="Notable TOD and non-TOD developments">
 										<p class="poc-stepper-examples-title">Scroll to see examples of individual developments and how they fit this pattern</p>
 									</div>
 								{/if}
-								{#if guidedMode && i === 9 && guidedStepTenExamples.length}
+								{#if guidedMode && i === 10 && guidedStepTenExamples.length}
 									<div
 										use:focusWaypointRef={{ stage: 10, key: 'project_example' }}
 										class="poc-stepper-waypoint"
