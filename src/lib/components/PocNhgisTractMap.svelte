@@ -3578,6 +3578,12 @@
 		return `${stage}_project:${id}`;
 	}
 
+	function stepBadgeLabel(step, index) {
+		const kicker = String(step?.kicker ?? '').trim();
+		const match = kicker.match(/^Step\s+(.+)$/i);
+		return match ? match[1] : `${index + 1}`;
+	}
+
 	/**
 	 * Drop map selection, pins, and popups when the guided focus key (scroll step / sub-waypoint) changes
 	 * so scrolly-driven highlights do not stick after scrolling back past them.
@@ -4475,7 +4481,7 @@
 										: undefined}
 								>
 									<div class="poc-stepper-card-top">
-										<span class="poc-stepper-pill-num">{pgStepIdx + 1}</span>
+										<span class="poc-stepper-pill-num">{stepBadgeLabel(step, pgStepIdx)}</span>
 										<div class="poc-stepper-pill-text">
 											<span class="poc-stepper-pill-kicker">{step?.kicker ?? ''}</span>
 											<span class="poc-stepper-pill-title">{step?.title ?? ''}</span>
@@ -4524,7 +4530,7 @@
 								data-step-index={i}
 							>
 								<div class="poc-stepper-card-top">
-									<span class="poc-stepper-pill-num">{i + 1}</span>
+									<span class="poc-stepper-pill-num">{stepBadgeLabel(step, i)}</span>
 									<div class="poc-stepper-pill-text">
 										<span class="poc-stepper-pill-kicker">{step.kicker}</span>
 										<span class="poc-stepper-pill-title">{step.title}</span>
@@ -4538,12 +4544,7 @@
 									{/if}
 								</p>
 								{#if guidedMode && i === 0}
-									<div
-										use:focusWaypointRef={{ stage: 0, key: 'core_access' }}
-										class="poc-stepper-waypoint"
-									>
-										<p class="poc-stepper-waypoint__label">Scroll to focus on Boston, Cambridge, Quincy, and Revere.</p>
-									</div>
+									<div use:focusWaypointRef={{ stage: 0, key: 'core_access' }} class="poc-stepper-waypoint"></div>
 								{/if}
 								{#if guidedMode && (step.legend || step.why)}
 									<details class="poc-stepper-more">
