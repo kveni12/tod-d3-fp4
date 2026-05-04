@@ -13,7 +13,7 @@ import { createMapZoomLayer } from './mapZoom.js';
 
 const fmtInt = d3.format(',');
 const fmtPct = d3.format('.0%');
-const fmtPct1 = d3.format('.1%');
+const fmtPct1 = (v) => `${d3.format('.1f')(Number(v) || 0)}%`;
 const incomePalette = ['#edf4ff', '#bfd6f6', '#6fa8dc', '#2f6ea6', '#003da5'];
 const affordableColor = d3
 	.scaleThreshold()
@@ -1006,28 +1006,28 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const grouped = [
 		{
 			id: 'highIncome',
-			label: `Higher-income municipalities (<${q1Label} under $125k)`,
+			label: `Higher-income municipalities (${q1Label} or less of households under $125k)`,
 			fill: '#16803c',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midHigh',
-			label: `Upper-middle municipalities (${q1Label}-${q2Label})`,
+			label: `Upper-middle municipalities (${q1Label} to ${q2Label} of households under $125k)`,
 			fill: '#7ccf95',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
 			id: 'midLow',
-			label: `Lower-middle municipalities (${q2Label}-${q3Label})`,
+			label: `Lower-middle municipalities (${q2Label} to ${q3Label} of households under $125k)`,
 			fill: '#f3b256',
 			outline: '#0b8a43',
 			count: 0
 		},
 		{
 			id: 'lowIncome',
-			label: `Lower-income municipalities (>${q3Label} under $125k)`,
+			label: `Lower-income municipalities (more than ${q3Label} of households under $125k)`,
 			fill: '#d65245',
 			outline: '#0b8a43',
 			count: 0
@@ -1134,5 +1134,5 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		.attr('text-anchor', 'middle')
 		.attr('fill', 'var(--text-muted)')
 		.attr('font-size', 13)
-		.text('Blue outlines = below-median share under $125k · Green outlines = above-median share under $125k');
+		.text('Blue outlines mark municipalities below the regional midpoint. Green outlines mark municipalities above it.');
 }
