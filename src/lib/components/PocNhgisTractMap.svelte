@@ -4543,9 +4543,6 @@
 										{step.body}
 									{/if}
 								</p>
-								{#if guidedMode && i === 0}
-									<div use:focusWaypointRef={{ stage: 0, key: 'core_access' }} class="poc-stepper-waypoint"></div>
-								{/if}
 								{#if guidedMode && (step.legend || step.why)}
 									<details class="poc-stepper-more">
 										<summary>More info</summary>
