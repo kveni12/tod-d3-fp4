@@ -2812,6 +2812,10 @@
 			y: event.clientY,
 			eyebrow: 'Insight marker',
 			title: modeLabel,
+			summary:
+				d.type === HIGH_ACCESS_LOW_GROWTH
+					? 'Why it matters: this tract has strong transit access, but housing growth has stayed relatively weak.'
+					: 'Why it matters: this tract is growing faster even though transit access is relatively weak.',
 			badge: 'Mismatch tract',
 			badgeTone: 'nontod',
 			primaryRows: [

@@ -1049,9 +1049,9 @@
 			<!-- Income / education tract analysis (reinstated from earlier POC story layout) -->
 			<div class="story-chart-row story-chart-row--tract full-width">
 				<section class="story card story-chart-text">
-					<h2>Where income is rising fastest</h2>
+					<h2>Income change tends to be larger in TOD-heavy tracts</h2>
 					<p>
-						TOD-heavy tracts tend to show bigger income increases than the non-TOD comparison group.
+						This does not prove displacement. It does suggest that tracts absorbing more TOD are also more likely to show faster income change.
 					</p>
 					<p>
 						On average, income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
@@ -1159,8 +1159,11 @@
 
 				<section class="chart-card card story-chart-plot">
 					<h3>More TOD often lines up with faster income change</h3>
+					<div class="takeaway-strip takeaway-strip--compact">
+						<strong>Main takeaway:</strong> as TOD share rises, tracts are more likely to appear higher on the income-change axis.
+					</div>
 					<p class="chart-note">
-						Hover for a tract summary, or keep a few tracts highlighted with the buttons above. The main thing to notice is that tracts with more TOD tend to appear higher on the chart.
+						Hover for a quick interpretation, or keep a few tracts highlighted with the buttons above.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} storyMode />
@@ -1170,7 +1173,7 @@
 
 			<div class="story-chart-row story-chart-row--tract full-width">
 				<section class="story card story-chart-text">
-					<h2>Where education levels are rising fastest</h2>
+					<h2>Education change shows a similar pattern</h2>
 					<p>
 						TOD-dominated tracts also tend to show bigger increases in the share of adults with bachelor’s degrees or higher.
 					</p>
@@ -1278,8 +1281,11 @@
 
 				<section class="chart-card card story-chart-plot">
 					<h3>More TOD often lines up with bigger education gains</h3>
+					<div class="takeaway-strip takeaway-strip--compact">
+						<strong>Main takeaway:</strong> the same TOD-heavy tracts often also sit higher on the education-change axis.
+					</div>
 					<p class="chart-note">
-						This chart tells a similar story. The highlighted tracts carry over, so it is easier to see whether the same places also sit higher on the education-change axis.
+						The highlighted tracts carry over, so it is easier to see whether the same places also sit higher on the education-change axis.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} storyMode />
@@ -1319,6 +1325,9 @@
 					>
 					<div class="afford-four-cell">
 						<h3 class="afford-four-cell__title">Income Change vs Affordability</h3>
+						<div class="takeaway-strip takeaway-strip--compact">
+							<strong>Main takeaway:</strong> higher affordable share generally points toward smaller income increases.
+						</div>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} storyMode />
@@ -1457,6 +1466,9 @@
 					>
 					<div class="afford-four-cell">
 						<h3 class="afford-four-cell__title">Education Change vs Affordability</h3>
+						<div class="takeaway-strip takeaway-strip--compact">
+							<strong>Main takeaway:</strong> higher affordable share also tends to line up with smaller education change.
+						</div>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} storyMode />

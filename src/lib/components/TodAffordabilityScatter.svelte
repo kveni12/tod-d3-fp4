@@ -483,16 +483,21 @@
 					d.tract.county && String(d.tract.county) !== 'County Name'
 						? String(d.tract.county)
 						: d.tract.gisjoin;
+				const storyTakeaway =
+					d.x >= 50
+						? `What this suggests: this tract has a relatively high affordable share, which tends to line up with weaker pressure signals.`
+						: `What this suggests: this tract has a lower affordable share, which often lines up with stronger pressure signals.`;
 				tooltip = {
 					visible: true,
 					x: event.clientX,
 					y: event.clientY,
 					lines: [
 						{ bold: true, text: name },
-						{ bold: false, text: `${xLabel}: ${fmt(d.x)}%` },
 						{ bold: false, text: `${yLabel}: ${fmt(d.y)}` },
+						{ bold: false, text: storyTakeaway },
+						{ bold: false, text: `${xLabel}: ${fmt(d.x)}%` },
 						{ bold: false, text: `Stock increase (${huSrcLabel}): ${fmt(d.stockPct)}%` },
-						{ bold: false, text: `HU (${startY}): ${huFmt(d.w)}` }
+						...(storyMode ? [] : [{ bold: false, text: `HU (${startY}): ${huFmt(d.w)}` }])
 					]
 				};
 			})
