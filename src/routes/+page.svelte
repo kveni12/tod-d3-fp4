@@ -1706,12 +1706,35 @@
 		background: var(--bg);
 		max-width: var(--poc-max-width);
 		margin: 0 auto;
-		padding: 18px 24px 44px;
+		padding: 18px clamp(20px, 3vw, 34px) 44px;
+		position: relative;
+		isolation: isolate;
 	}
+
+	.poc-root::before,
+	.poc-root::after {
+		content: '';
+		position: absolute;
+		top: 24px;
+		bottom: 24px;
+		width: 1px;
+		background: linear-gradient(
+			to bottom,
+			transparent 0%,
+			rgba(120, 114, 102, 0.16) 12%,
+			rgba(120, 114, 102, 0.12) 82%,
+			transparent 100%
+		);
+		pointer-events: none;
+		z-index: -1;
+	}
+
+	.poc-root::before { left: 10px; }
+	.poc-root::after { right: 10px; }
 
 	/* 75% of the main column max width — keeps long-form narrative readable; explore map stays wide below. */
 	.poc-pre-explore {
-		max-width: calc(var(--poc-max-width) * 0.75);
+		max-width: min(1320px, calc(var(--poc-max-width) * 0.78));
 		margin-inline: auto;
 		width: 100%;
 	}
@@ -2073,10 +2096,11 @@
 	.story {
 		padding: 24px 0;
 		border-top: 1px solid rgba(120, 114, 102, 0.12);
+		width: 100%;
 	}
 
 	.story h2 {
-		font-size: 1.7rem;
+		font-size: clamp(1.72rem, 2vw, 2rem);
 		margin-bottom: 14px;
 		letter-spacing: -0.01em;
 		color: var(--ink);
@@ -2251,7 +2275,7 @@
 	}
 
 	.chart-card__headline {
-		font-size: 1.9rem;
+		font-size: clamp(2rem, 3vw, 2.45rem);
 		line-height: 1.15;
 		margin: 0 0 10px;
 		max-width: 44rem;
@@ -2290,8 +2314,8 @@
 
 	.takeaway-strip {
 		max-width: 48rem;
-		margin: 8px auto 16px;
-		padding: 12px 14px;
+		margin: 12px auto 20px;
+		padding: 13px 16px;
 		border-top: 1px solid rgba(15, 128, 64, 0.22);
 		border-bottom: 1px solid rgba(15, 128, 64, 0.14);
 		color: var(--ink);
@@ -2371,6 +2395,7 @@
 	.story-chart-panel {
 		padding: 28px 0;
 		border-top: 1px solid rgba(120, 114, 102, 0.14);
+		width: 100%;
 	}
 
 	.story-card--embedded {
@@ -2382,7 +2407,7 @@
 
 	.story-chart-panel__grid {
 		display: grid;
-		gap: 18px;
+		gap: 22px;
 		align-items: start;
 		grid-template-columns: minmax(0, 1fr) minmax(300px, 1.05fr);
 	}
@@ -2406,11 +2431,12 @@
 	}
 
 	.story-chart-panel__text h2 {
-		font-size: clamp(1.8rem, 2vw, 2.15rem);
+		font-size: clamp(1.82rem, 2.2vw, 2.2rem);
 		margin-bottom: 16px;
 		max-width: 36rem;
 		margin-inline: auto;
 		line-height: 1.12;
+		letter-spacing: -0.015em;
 	}
 
 	.story-chart-panel__text p {
@@ -2434,7 +2460,7 @@
 	}
 
 	.story-chart-panel__chart h3 {
-		font-size: 1.25rem;
+		font-size: clamp(1.24rem, 1.7vw, 1.42rem);
 		margin-bottom: 12px;
 		color: var(--ink);
 		text-align: center;
@@ -3217,6 +3243,18 @@
 	}
 
 	.recommendation-card h2,
+	.conclusion-card h2 {
+		margin-inline: auto;
+		max-width: 38rem;
+	}
+
+	.recommendation-card > p,
+	.conclusion-card > p {
+		margin-inline: auto;
+		max-width: 44rem;
+	}
+
+	.recommendation-card h2,
 	.recommendation-card > p {
 		max-width: 44rem;
 		margin-inline: auto;
@@ -3261,6 +3299,13 @@
 
 		.recommendation-grid {
 			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 920px) {
+		.poc-root::before,
+		.poc-root::after {
+			display: none;
 		}
 	}
 
