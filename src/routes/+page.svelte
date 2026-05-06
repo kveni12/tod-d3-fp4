@@ -1044,6 +1044,20 @@
 						Clear highlights
 					</button>
 				</div>
+				<div class="takeaway-grid takeaway-grid--three tract-interaction-takeaways">
+					<div class="takeaway-card">
+						<p class="takeaway-label">Income examples</p>
+						<p class="takeaway-meta">Use these to see the TOD-heavy tracts where income has changed fastest.</p>
+					</div>
+					<div class="takeaway-card">
+						<p class="takeaway-label">Education examples</p>
+						<p class="takeaway-meta">Use these to see the tracts where education change is most pronounced.</p>
+					</div>
+					<div class="takeaway-card">
+						<p class="takeaway-label">Lower-income TOD examples</p>
+						<p class="takeaway-meta">Use these to focus on TOD-heavy tracts where the equity stakes are easiest to see.</p>
+					</div>
+				</div>
 			</section>
 
 			<!-- Income / education tract analysis (reinstated from earlier POC story layout) -->
@@ -2588,6 +2602,10 @@
 		justify-content: center;
 		gap: 10px;
 		margin-top: 16px;
+	}
+
+	.tract-interaction-takeaways {
+		margin-top: 14px;
 	}
 
 	.chip-button {
