@@ -758,7 +758,7 @@
 				</p>
 				<p class="chart-source">Source: MassBuilds development records and ACS income summaries, aggregated to municipalities.</p>
 			</div>
-			<div class="story-chart-panel__chart">
+			<div class="story-chart-panel__chart story-chart-panel__chart--growth-capture">
 				<h3>For every 100 new units, where do they land?</h3>
 				<p class="chart-note">
 					Each housing icon is about one percent of all units added in the selected years. Fill color moves from higher-income municipalities to lower-income municipalities, using estimated municipal median household income. The outline shows whether that municipality sits above or below the regional midpoint in the share of households earning under $125k.
@@ -2465,6 +2465,25 @@
 		color: var(--ink);
 		text-align: center;
 		line-height: 1.2;
+	}
+
+	.story-chart-panel__chart--growth-capture {
+		max-width: 760px;
+		margin-inline: auto;
+	}
+
+	.story-chart-panel__chart--growth-capture h3,
+	.story-chart-panel__chart--growth-capture .chart-note,
+	.story-chart-panel__chart--growth-capture .chart-wrap {
+		margin-inline: auto;
+	}
+
+	.story-chart-panel__chart--growth-capture h3 {
+		max-width: 34rem;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-note {
+		max-width: 38rem;
 	}
 
 	.story-chart-panel__chart .chart-wrap.small-chart.compact-side-chart {
