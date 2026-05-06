@@ -3855,7 +3855,8 @@
 				const el = stepEls[i];
 				if (!el) continue;
 				const rect = el.getBoundingClientRect();
-				if (rect.top <= triggerY) next = i;
+				const activationY = rect.top + Math.min(Math.max(rect.height * 0.28, 80), 180);
+				if (activationY <= triggerY) next = i;
 			}
 			let nextFocus = null;
 			for (const item of focusWaypointEls) {
