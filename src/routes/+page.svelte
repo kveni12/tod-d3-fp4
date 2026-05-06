@@ -655,6 +655,21 @@
 		affEduPanelState.setSelectedTracts(ids);
 	}
 
+	function sameSelectedAcrossStoryCharts(gisjoins) {
+		const ids = [...new Set(gisjoins.filter(Boolean))];
+		const selected = incomePanelState.selectedTracts ?? new Set();
+		if (selected.size !== ids.length) return false;
+		return ids.every((id) => selected.has(id));
+	}
+
+	function toggleSelectedAcrossStoryCharts(gisjoins) {
+		if (sameSelectedAcrossStoryCharts(gisjoins)) {
+			clearStoryChartSelections();
+			return;
+		}
+		setSelectedAcrossStoryCharts(gisjoins);
+	}
+
 	function clearStoryChartSelections() {
 		incomePanelState.clearSelection();
 		eduPanelState.clearSelection();
@@ -1016,7 +1031,8 @@
 					<button
 						type="button"
 						class="chip-button"
-						onclick={() => setSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
+						class:chip-button--active={sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
+						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
 						disabled={!tractStoryExamples.incomeLeaders.length}
 						title={describeExampleSet(tractStoryExamples.incomeLeaders, 'higher-income-change TOD tracts')}
 					>
@@ -1025,7 +1041,8 @@
 					<button
 						type="button"
 						class="chip-button"
-						onclick={() => setSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
+						class:chip-button--active={sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
+						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
 						disabled={!tractStoryExamples.eduLeaders.length}
 						title={describeExampleSet(tractStoryExamples.eduLeaders, 'higher-education-change TOD tracts')}
 					>
@@ -1034,7 +1051,8 @@
 					<button
 						type="button"
 						class="chip-button"
-						onclick={() => setSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
+						class:chip-button--active={sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
+						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
 						disabled={!tractStoryExamples.lowerIncomeTod.length}
 						title={describeExampleSet(tractStoryExamples.lowerIncomeTod, 'lower-income TOD tracts')}
 					>
@@ -2625,6 +2643,18 @@
 	.chip-button:hover:not(:disabled) {
 		background: rgba(0, 132, 61, 0.12);
 		border-color: rgba(0, 132, 61, 0.34);
+	}
+
+	.chip-button--active {
+		background: rgba(0, 132, 61, 0.18);
+		border-color: rgba(0, 132, 61, 0.58);
+		color: #0b4f2c;
+		box-shadow: inset 0 0 0 1px rgba(0, 132, 61, 0.18);
+	}
+
+	.chip-button--active:hover:not(:disabled) {
+		background: rgba(0, 132, 61, 0.22);
+		border-color: rgba(0, 132, 61, 0.64);
 	}
 
 	.chip-button:disabled {
