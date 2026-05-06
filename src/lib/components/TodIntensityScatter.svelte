@@ -667,11 +667,11 @@
 			.join('circle')
 			.attr('cx', (d) => xScale(d.x))
 			.attr('cy', (d) => yScale(d.y))
-			.attr('r', (d) => d.dotR ?? 3)
+			.attr('r', (d) => (selectedSet.has(d.tract.gisjoin) ? (d.dotR ?? 3) + 1.2 : d.dotR ?? 3))
 			.attr('fill', GREY_MINIMAL)
-			.attr('opacity', 0.45)
+			.attr('opacity', (d) => (selectedSet.size && !selectedSet.has(d.tract.gisjoin) ? 0.14 : 0.45))
 			.attr('stroke', (d) => (selectedSet.has(d.tract.gisjoin) ? LINE_SELECTED : 'none'))
-			.attr('stroke-width', 1.5)
+			.attr('stroke-width', (d) => (selectedSet.has(d.tract.gisjoin) ? 2.4 : 0))
 			.call(bindDotInteractions);
 
 		chart
@@ -682,11 +682,11 @@
 			.join('circle')
 			.attr('cx', (d) => xScale(d.x))
 			.attr('cy', (d) => yScale(d.y))
-			.attr('r', (d) => d.dotR ?? 4)
+			.attr('r', (d) => (selectedSet.has(d.tract.gisjoin) ? (d.dotR ?? 4) + 1.4 : d.dotR ?? 4))
 			.attr('fill', (d) => colorDiscretizedTod(d.todFraction))
-			.attr('opacity', 0.88)
+			.attr('opacity', (d) => (selectedSet.size && !selectedSet.has(d.tract.gisjoin) ? 0.18 : 0.9))
 			.attr('stroke', (d) => (selectedSet.has(d.tract.gisjoin) ? LINE_SELECTED : '#475569'))
-			.attr('stroke-width', (d) => (selectedSet.has(d.tract.gisjoin) ? 2 : 0.5))
+			.attr('stroke-width', (d) => (selectedSet.has(d.tract.gisjoin) ? 2.4 : 0.45))
 			.call(bindDotInteractions);
 
 		if (wideLayout) {
@@ -933,11 +933,14 @@
 			const gj = d?.tract?.gisjoin;
 			const h = gj && gj === hoveredId;
 			const sel = gj && selectedSet.has(gj);
-			el.attr('opacity', h ? 1 : d?.classification === 'minimal' ? 0.45 : 0.88);
+			const fadedOpacity = d?.classification === 'minimal' ? 0.14 : 0.18;
+			const baseOpacity = d?.classification === 'minimal' ? 0.45 : 0.9;
+			el.attr('opacity', h ? 1 : selectedSet.size && !sel ? fadedOpacity : baseOpacity);
+			el.attr('r', sel ? (d?.dotR ?? (d?.classification === 'minimal' ? 3 : 4)) + (d?.classification === 'minimal' ? 1.2 : 1.4) : d?.dotR ?? (d?.classification === 'minimal' ? 3 : 4));
 			if (d?.classification === 'minimal') {
-				el.attr('stroke', sel ? LINE_SELECTED : 'none').attr('stroke-width', sel ? 2 : 0);
+				el.attr('stroke', sel ? LINE_SELECTED : 'none').attr('stroke-width', sel ? 2.4 : 0);
 			} else {
-				el.attr('stroke', sel ? LINE_SELECTED : '#475569').attr('stroke-width', sel ? 2 : 0.5);
+				el.attr('stroke', sel ? LINE_SELECTED : '#475569').attr('stroke-width', sel ? 2.4 : 0.45);
 			}
 		});
 	});

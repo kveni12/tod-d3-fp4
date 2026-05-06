@@ -471,11 +471,11 @@
 			.attr('class', 'tod-aff-dot')
 			.attr('cx', (d) => xScale(d.x))
 			.attr('cy', (d) => yScale(d.y))
-			.attr('r', (d) => d.dotR ?? 4)
+			.attr('r', (d) => (selectedSet.has(d.tract.gisjoin) ? (d.dotR ?? 4) + 1.4 : d.dotR ?? 4))
 			.attr('fill', (d) => colorForStock(d.stockPct))
-			.attr('opacity', 0.92)
+			.attr('opacity', (d) => (selectedSet.size && !selectedSet.has(d.tract.gisjoin) ? 0.18 : 0.92))
 			.attr('stroke', (d) => (selectedSet.has(d.tract.gisjoin) ? LINE_SELECTED : '#1e293b'))
-			.attr('stroke-width', (d) => (selectedSet.has(d.tract.gisjoin) ? 2 : 0.35))
+			.attr('stroke-width', (d) => (selectedSet.has(d.tract.gisjoin) ? 2.4 : 0.35))
 			.style('cursor', 'pointer')
 			.on('mouseenter', function (event, d) {
 				panelState.setHovered(d.tract.gisjoin);
@@ -628,8 +628,9 @@
 			const gj = d?.tract?.gisjoin;
 			const h = gj && gj === hoveredId;
 			const sel = gj && selectedSet.has(gj);
-			el.attr('opacity', h ? 1 : 0.92);
-			el.attr('stroke', sel ? LINE_SELECTED : '#1e293b').attr('stroke-width', sel ? 2 : 0.35);
+			el.attr('opacity', h ? 1 : selectedSet.size && !sel ? 0.18 : 0.92);
+			el.attr('r', sel ? (d?.dotR ?? 4) + 1.4 : d?.dotR ?? 4);
+			el.attr('stroke', sel ? LINE_SELECTED : '#1e293b').attr('stroke-width', sel ? 2.4 : 0.35);
 		});
 	});
 

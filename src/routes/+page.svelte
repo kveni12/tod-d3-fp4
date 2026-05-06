@@ -1027,54 +1027,48 @@
 				<p>
 					Hover any point for the quick read. If you want a closer look, use these buttons to keep the same tracts highlighted across the charts below.
 				</p>
-				<div class="tract-interaction-controls" role="group" aria-label="Highlight tract examples in the demographic charts">
+				<div class="example-toggle-grid" role="group" aria-label="Highlight tract examples in the demographic charts">
 					<button
 						type="button"
-						class="chip-button"
-						class:chip-button--active={sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
+						class="example-toggle-card"
+						class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
 						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
 						disabled={!tractStoryExamples.incomeLeaders.length}
 						title={describeExampleSet(tractStoryExamples.incomeLeaders, 'higher-income-change TOD tracts')}
 					>
-						Show income examples
+						<span class="example-toggle-card__eyebrow">Income examples</span>
+						<span class="example-toggle-card__body">See the TOD-heavy tracts where income has changed fastest.</span>
+						<span class="example-toggle-card__action">{sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin)) ? 'Hide examples' : 'Show examples'}</span>
 					</button>
 					<button
 						type="button"
-						class="chip-button"
-						class:chip-button--active={sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
+						class="example-toggle-card"
+						class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
 						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
 						disabled={!tractStoryExamples.eduLeaders.length}
 						title={describeExampleSet(tractStoryExamples.eduLeaders, 'higher-education-change TOD tracts')}
 					>
-						Show education examples
+						<span class="example-toggle-card__eyebrow">Education examples</span>
+						<span class="example-toggle-card__body">See the tracts where education change is most pronounced.</span>
+						<span class="example-toggle-card__action">{sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin)) ? 'Hide examples' : 'Show examples'}</span>
 					</button>
 					<button
 						type="button"
-						class="chip-button"
-						class:chip-button--active={sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
+						class="example-toggle-card"
+						class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
 						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
 						disabled={!tractStoryExamples.lowerIncomeTod.length}
 						title={describeExampleSet(tractStoryExamples.lowerIncomeTod, 'lower-income TOD tracts')}
 					>
-						Show lower-income TOD examples
+						<span class="example-toggle-card__eyebrow">Lower-income TOD examples</span>
+						<span class="example-toggle-card__body">Focus on TOD-heavy tracts where the equity stakes are easiest to see.</span>
+						<span class="example-toggle-card__action">{sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin)) ? 'Hide examples' : 'Show examples'}</span>
 					</button>
+				</div>
+				<div class="tract-interaction-controls" role="group" aria-label="Clear tract example highlights">
 					<button type="button" class="chip-button chip-button--subtle" onclick={clearStoryChartSelections}>
 						Clear highlights
 					</button>
-				</div>
-				<div class="takeaway-grid takeaway-grid--three tract-interaction-takeaways">
-					<div class="takeaway-card">
-						<p class="takeaway-label">Income examples</p>
-						<p class="takeaway-meta">Use these to see the TOD-heavy tracts where income has changed fastest.</p>
-					</div>
-					<div class="takeaway-card">
-						<p class="takeaway-label">Education examples</p>
-						<p class="takeaway-meta">Use these to see the tracts where education change is most pronounced.</p>
-					</div>
-					<div class="takeaway-card">
-						<p class="takeaway-label">Lower-income TOD examples</p>
-						<p class="takeaway-meta">Use these to focus on TOD-heavy tracts where the equity stakes are easiest to see.</p>
-					</div>
 				</div>
 			</section>
 
@@ -2614,6 +2608,76 @@
 		margin-inline: auto;
 	}
 
+	.example-toggle-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 14px;
+		margin-top: 18px;
+		text-align: left;
+	}
+
+	.example-toggle-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+		padding: 16px 18px;
+		border-radius: 18px;
+		border: 1px solid rgba(16, 24, 40, 0.1);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 244, 0.94));
+		box-shadow: 0 10px 24px rgba(16, 24, 40, 0.05);
+		color: var(--ink);
+		font: inherit;
+		cursor: pointer;
+		transition:
+			transform 0.16s ease,
+			box-shadow 0.16s ease,
+			border-color 0.16s ease,
+			background 0.16s ease;
+	}
+
+	.example-toggle-card:hover:not(:disabled) {
+		transform: translateY(-1px);
+		border-color: rgba(0, 132, 61, 0.26);
+		box-shadow: 0 14px 34px rgba(0, 132, 61, 0.09);
+	}
+
+	.example-toggle-card--active {
+		border-color: rgba(0, 132, 61, 0.48);
+		background: linear-gradient(180deg, rgba(233, 247, 237, 0.98), rgba(244, 251, 245, 0.98));
+		box-shadow:
+			0 18px 36px rgba(0, 132, 61, 0.12),
+			inset 0 0 0 1px rgba(0, 132, 61, 0.14);
+	}
+
+	.example-toggle-card:disabled {
+		opacity: 0.52;
+		cursor: not-allowed;
+		box-shadow: none;
+		transform: none;
+	}
+
+	.example-toggle-card__eyebrow {
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.11em;
+		text-transform: uppercase;
+		color: var(--green);
+	}
+
+	.example-toggle-card__body {
+		font-size: 1rem;
+		line-height: 1.5;
+		color: color-mix(in srgb, var(--ink) 86%, white 14%);
+	}
+
+	.example-toggle-card__action {
+		margin-top: auto;
+		font-size: 0.9rem;
+		font-weight: 700;
+		color: var(--green);
+	}
+
 	.tract-interaction-controls {
 		display: flex;
 		flex-wrap: wrap;
@@ -2670,6 +2734,12 @@
 	.chip-button--subtle:hover:not(:disabled) {
 		background: rgba(31, 36, 48, 0.08);
 		border-color: rgba(31, 36, 48, 0.18);
+	}
+
+	@media (max-width: 980px) {
+		.example-toggle-grid {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	.story-chart-row--tract .story-chart-plot {
