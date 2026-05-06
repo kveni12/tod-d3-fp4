@@ -500,11 +500,11 @@
 		},
 		{
 			kicker: 'Step 1.5',
-			title: 'Zoom Into Greater Boston',
+			title: 'Zoom Into Boston and Cambridge',
 			bodyHtml:
-				'Before we add housing growth, move closer to the eastern half of the state. This tighter view makes it easier to see the dense transit geography around Boston, Cambridge, Quincy, and Revere.<br><br>That is the part of the region the next few steps keep testing.',
+				'Before we add housing growth, zoom in on Boston and Cambridge. This closer view makes the core of the MBTA network easier to read, especially where the Red, Orange, Blue, and Green lines cluster most tightly.<br><br>The next step widens back out so we can compare that core geography with the broader regional pattern of housing growth.',
 			legend:
-				'Same transit-only view as step 1, but zoomed closer so the strongest MBTA geography is easier to read.'
+				'Same transit-only view as step 1, but focused just on the Boston/Cambridge core before the map zooms back out.'
 		},
 		{
 			kicker: 'Step 2',
