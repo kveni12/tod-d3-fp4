@@ -3691,13 +3691,13 @@
 				return (
 					Number.isFinite(lat) &&
 					Number.isFinite(lon) &&
-					lat >= 42.18 &&
-					lat <= 42.52 &&
-					lon >= -71.30 &&
-					lon <= -70.82
+					lat >= 42.29 &&
+					lat <= 42.43 &&
+					lon >= -71.18 &&
+					lon <= -70.98
 				);
 			});
-			zoomToFeatureGroup(focus, 5.6);
+			zoomToFeatureGroup(focus, 8.8);
 			return;
 		}
 		if (revealStage >= 2 && revealStage <= 5) {
