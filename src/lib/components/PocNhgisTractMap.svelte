@@ -3772,9 +3772,8 @@
 		if (lastAutoFocusedStage === focusKey) return;
 		// New scroll / waypoint: clear prior scrolly-driven or incidental selection before applying the next focus.
 		resetGuidedWalkthroughMapState();
-		if (revealStage === 3 && guidedFocusDetail === 'contrast_example' && guidedContrastFeatured?.id) {
+		if (revealStage === 3 && guidedFocusDetail === 'contrast_example') {
 			lastAutoFocusedStage = focusKey;
-			inspectGuidedExample(guidedContrastFeatured.id);
 			return;
 		}
 		if (revealStage === 3 && guidedFocusDetail?.startsWith('3_example:')) {
