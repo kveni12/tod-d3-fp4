@@ -4533,8 +4533,8 @@
 								use:stepRef={i}
 								class="poc-stepper-card"
 								class:poc-stepper-card--active={revealStage === i}
-								class:poc-stepper-card--dense={guidedMode && (i === 3 || i === 4 || i === 9 || i === 10 || i === 11)}
-								class:poc-stepper-card--runway-after={guidedMode && i === 4}
+								class:poc-stepper-card--dense={guidedMode && (i === 3 || i === 4 || i === 5 || i === 9 || i === 10 || i === 11)}
+								class:poc-stepper-card--runway-after={guidedMode && (i === 4 || i === 5)}
 								data-step-index={i}
 							>
 								<div class="poc-stepper-card-top">
