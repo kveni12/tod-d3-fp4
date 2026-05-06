@@ -696,7 +696,7 @@
 			If you rely on transit to reach work, school, or childcare, the real question is not just whether more housing is being built. It is whether that housing shows up in places people can actually reach and afford.
 		</p>
 		<p class="subtitle subtitle--secondary">
-			<strong>This story tracks three things:</strong> where new housing is landing, whether it lines up with strong transit access, and what kinds of neighborhood change tend to appear in TOD-heavy places.
+			<strong>This story tracks three things:</strong> where housing is landing, whether it lines up with strong transit access, and whether TOD-heavy places also show signs of rising pressure.
 		</p>
 		<p class="hero-plan-note">
 			For methods, design choices, and the project plan:
@@ -708,7 +708,7 @@
 		<h2>The main point</h2>
 		<p class="signal-line">Housing growth and transit access do not line up as neatly as policy goals suggest.</p>
 		<p class="signal-line">Some well-connected places are still adding little housing, while growth also shows up far from strong transit.</p>
-		<p class="signal-line">Where TOD is strongest, affordability becomes the main equity test.</p>
+		<p class="signal-line"><strong>For planners, the key question is not only how much housing gets built, but where it lands and who can afford it.</strong></p>
 	</section>
 
 	{#if !muniLoaded}
@@ -726,6 +726,9 @@
 
 		<section class="chart-card card">
 			<h3>TOD vs non-TOD mix by year</h3>
+			<div class="takeaway-strip takeaway-strip--compact">
+				<strong>Takeaway:</strong> TOD grows in some years, but most new units still fall outside the strongest transit geography.
+			</div>
 			<div class="chart-wrap small-chart" bind:this={elComposition}></div>
 		</section>
 	</section>
@@ -754,16 +757,22 @@
 			<div class="story-chart-panel__text">
 				<h2>Where is development most concentrated?</h2>
 				<p>
-					This chart asks a simple question: when the region adds new housing, does it land more often in higher-income municipalities or in municipalities where more households are already below roughly middle-income levels?
+					This chart asks a simpler policy question: when the region adds new housing, which kinds of municipalities are receiving it?
 				</p>
 				<p class="chart-source">Source: MassBuilds development records and ACS income summaries, aggregated to municipalities.</p>
 			</div>
 			<div class="story-chart-panel__chart story-chart-panel__chart--growth-capture">
 				<h3>For every 100 new units, where do they land?</h3>
 				<p class="chart-note">
-					Each housing icon is about one percent of all units added in the selected years. Fill color moves from higher-income municipalities to lower-income municipalities, using estimated municipal median household income. The outline shows whether that municipality sits above or below the regional midpoint in the share of households earning under $125k.
+					Each housing icon is about one percent of all units added in the selected years. Fill color shows estimated municipal median income. The outline shows whether that municipality has a higher or lower share of households earning under $125k than the regional midpoint.
 				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
+				<details class="supplemental supplemental--centered">
+					<summary>How these groups are defined</summary>
+					<p class="chart-note">
+						Fill colors group municipalities by estimated median household income. Blue outlines mark municipalities below the regional midpoint in the share of households under $125k, while green outlines mark municipalities above it.
+					</p>
+				</details>
 			</div>
 		</div>
 	</section>
@@ -826,38 +835,58 @@
 		<p class="story-eyebrow">Why we zoom in</p>
 		<h2>What to look for in the tract-level map</h2>
 		<p>
-			Municipal summaries help us see the regional pattern, but they smooth over a lot of local variation. Census tracts let us look more closely at where transit access is strongest, where housing growth is actually happening, and where signs of neighborhood change tend to appear.
+			Municipal summaries help us see the regional pattern, but they smooth over local variation. Census tracts let us compare where transit access is strongest, where housing growth is actually happening, and where signs of pressure tend to appear.
 		</p>
-		<ul class="story-list">
-			<li><strong>Median income change</strong>, a common warning sign for rising housing costs</li>
-			<li><strong>Bachelor’s degree share change</strong>, a common warning sign for turnover or selective in-migration</li>
-		</ul>
-		<p class="chart-note">Read these as warning signs, not proof. Source: NHGIS / U.S. Census tract measures, MBTA stop access, and MassBuilds development records.</p>
+		<div class="takeaway-grid takeaway-grid--three">
+			<div class="takeaway-card">
+				<p class="takeaway-label">Access</p>
+				<p class="takeaway-meta">Which tracts sit closest to strong MBTA service?</p>
+			</div>
+			<div class="takeaway-card">
+				<p class="takeaway-label">Growth</p>
+				<p class="takeaway-meta">Which tracts are actually adding housing?</p>
+			</div>
+			<div class="takeaway-card">
+				<p class="takeaway-label">Pressure</p>
+				<p class="takeaway-meta">Do TOD-heavy tracts also show faster income and education change?</p>
+			</div>
+		</div>
+		<details class="supplemental supplemental--centered">
+			<summary>Measures and caveats</summary>
+			<ul class="story-list">
+				<li><strong>Median income change</strong>, a common warning sign for rising housing costs</li>
+				<li><strong>Bachelor’s degree share change</strong>, a common warning sign for turnover or selective in-migration</li>
+			</ul>
+			<p class="chart-note">Read these as warning signs, not proof. Source: NHGIS / U.S. Census tract measures, MBTA stop access, and MassBuilds development records.</p>
+		</details>
 	</section>
 	
 	<section class="tract-section">
 		<section class="story card full-width story--framing">
-			<div class="framing-grid">
-				<div class="framing-block">
-					<h2>Key definitions</h2>
-					<p>
-						<strong>TOD developments</strong> are projects within <strong>0.5 miles</strong> of an MBTA stop; all others are treated as
-						<strong> non-TOD developments</strong>.
-					</p>
-					<p>
-						<strong>TOD-dominated tracts</strong> get at least half of their filtered new units from TOD projects and clear a 2 percent housing-growth threshold. <strong>Non-TOD-dominated tracts</strong> also grow, but less of that growth is transit-oriented. <strong>Minimal-development tracts</strong> stay below the growth threshold.
-					</p>
+			<details class="supplemental supplemental--centered" open>
+				<summary>Key definitions and assumptions</summary>
+				<div class="framing-grid">
+					<div class="framing-block">
+						<h2>Key definitions</h2>
+						<p>
+							<strong>TOD developments</strong> are projects within <strong>0.5 miles</strong> of an MBTA stop; all others are treated as
+							<strong> non-TOD developments</strong>.
+						</p>
+						<p>
+							<strong>TOD-dominated tracts</strong> get at least half of their filtered new units from TOD projects and clear a 2 percent housing-growth threshold. <strong>Non-TOD-dominated tracts</strong> also grow, but less of that growth is transit-oriented. <strong>Minimal-development tracts</strong> stay below the growth threshold.
+						</p>
+					</div>
+					<div class="framing-block">
+						<h2>Key assumptions</h2>
+						<p>
+							This walkthrough uses a fixed <strong>0.5-mile MBTA access threshold</strong> and compares tracts descriptively rather than causally.
+						</p>
+						<p>
+							Mismatch categories depend on how each tract compares with the rest of the regional sample. In the walkthrough, tract averages are shown as tract-level comparisons rather than population-weighted totals.
+						</p>
+					</div>
 				</div>
-				<div class="framing-block">
-					<h2>Key assumptions</h2>
-					<p>
-						This walkthrough uses a fixed <strong>0.5-mile MBTA access threshold</strong> and compares tracts descriptively rather than causally.
-					</p>
-					<p>
-						Mismatch categories depend on how each tract compares with the rest of the regional sample. In the walkthrough, tract averages are shown as tract-level comparisons rather than population-weighted totals.
-					</p>
-				</div>
-			</div>
+			</details>
 		</section>
 
 
@@ -1567,6 +1596,12 @@
 				<p>
 					TOD can still be a powerful housing strategy. But in this prototype, the places with the most transit-oriented growth also tend to show stronger signs of neighborhood change. That makes affordability less of an add-on and more of the core equity safeguard.
 				</p>
+				<details class="supplemental supplemental--centered">
+					<summary>Other possible explanations</summary>
+					<p class="chart-note">
+						These patterns may also reflect zoning rules, land availability, neighborhood desirability, or broader real-estate cycles. The point here is to flag where TOD, growth, and pressure appear together, not to claim that transit access alone caused those changes.
+					</p>
+				</details>
 			</section>
 
 			<section class="story card recommendation-card">
@@ -2234,6 +2269,11 @@
 		border-top: 1px solid var(--line);
 	}
 
+	.supplemental--centered {
+		max-width: 44rem;
+		margin-inline: auto;
+	}
+
 	.supplemental summary {
 		cursor: pointer;
 		font-weight: 700;
@@ -2260,6 +2300,11 @@
 	.supplemental-grid,
 	.supplemental-card {
 		margin-top: 14px;
+	}
+
+	.supplemental--centered .story-list {
+		margin-inline: auto;
+		text-align: left;
 	}
 
 	/* ── Chart cards ──────────────────────────────────── */
@@ -2322,6 +2367,14 @@
 		background: rgba(236, 247, 239, 0.44);
 		line-height: 1.55;
 		text-align: center;
+	}
+
+	.takeaway-strip--compact {
+		max-width: 34rem;
+		margin-top: 4px;
+		margin-bottom: 14px;
+		padding-block: 10px;
+		font-size: 0.95rem;
 	}
 
 	.takeaway-grid--three {
