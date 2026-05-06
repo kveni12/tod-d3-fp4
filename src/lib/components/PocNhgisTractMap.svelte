@@ -3855,7 +3855,7 @@
 				const el = stepEls[i];
 				if (!el) continue;
 				const rect = el.getBoundingClientRect();
-				const activationY = rect.top + Math.min(Math.max(rect.height * 0.28, 80), 180);
+				const activationY = rect.top + Math.min(Math.max(rect.height * (i === 5 ? 0.14 : 0.28), i === 5 ? 44 : 80), i === 5 ? 120 : 180);
 				if (activationY <= triggerY) next = i;
 			}
 			let nextFocus = null;
@@ -4970,25 +4970,26 @@
 	.poc-stepper-card {
 		display: grid;
 		align-content: center;
-		gap: 12px;
+		gap: 14px;
 		width: 100%;
 		min-height: calc(76vh * 0.6);
-		padding: 10px 0 0;
+		padding: 14px 0 0;
 		border-left: 2px solid color-mix(in srgb, var(--accent) 16%, var(--border));
-		padding-left: 18px;
+		padding-left: 20px;
 		border-radius: var(--radius-sm);
 		border-top: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
 		border-right: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
 		border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
-		background: color-mix(in srgb, var(--bg-card) 97%, white 3%);
+		background: color-mix(in srgb, var(--bg-card) 98%, white 2%);
 		text-align: left;
 		color: var(--text);
-		opacity: 0.4;
+		opacity: 0.52;
 		transform: translateY(14px);
 		transition:
 			opacity 220ms ease,
 			transform 220ms ease,
-			border-color 220ms ease;
+			border-color 220ms ease,
+			background 220ms ease;
 	}
 
 	.poc-stepper-card--active {
@@ -4996,6 +4997,7 @@
 		border-top-color: color-mix(in srgb, var(--accent) 24%, var(--border));
 		border-right-color: color-mix(in srgb, var(--accent) 24%, var(--border));
 		border-bottom-color: color-mix(in srgb, var(--accent) 24%, var(--border));
+		background: color-mix(in srgb, var(--bg-card) 88%, white 12%);
 		opacity: 1;
 		transform: translateY(0);
 	}
@@ -5040,26 +5042,27 @@
 	}
 
 	.poc-stepper-pill-title {
-		font-size: 0.94rem;
+		font-size: 1.04rem;
 		font-weight: 700;
 		line-height: 1.25;
 		color: var(--text);
 	}
 
 	.poc-stepper-pill-kicker {
-		font-size: 0.65rem;
+		font-size: 0.7rem;
 		line-height: 1.25;
 		color: var(--text-muted);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		letter-spacing: 0.07em;
 	}
 
 	.poc-stepper-card-body {
 		margin: 0;
-		max-width: 37ch;
-		font-size: 1rem;
-		line-height: 1.62;
+		max-width: 39ch;
+		font-size: 1.08rem;
+		line-height: 1.72;
 		color: var(--text);
+		font-weight: 450;
 		text-wrap: pretty;
 	}
 
@@ -5077,9 +5080,9 @@
 
 	.poc-stepper-card-note {
 		margin: 0;
-		max-width: 34ch;
-		font-size: 0.84rem;
-		line-height: 1.55;
+		max-width: 36ch;
+		font-size: 0.92rem;
+		line-height: 1.62;
 		color: var(--text-muted);
 	}
 
@@ -5112,7 +5115,7 @@
 	.poc-stepper-more summary {
 		list-style: none;
 		cursor: pointer;
-		font-size: 0.79rem;
+		font-size: 0.88rem;
 		font-weight: 700;
 		color: var(--accent-strong);
 	}
