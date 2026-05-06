@@ -1028,7 +1028,7 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	for (const row of projectRows) {
 		const units = Number(row.units) || 0;
 		const metaRow = muniMeta.get(row.municipality);
-		const bucket = groupedById.get(metaRow?.band ?? 'midHigh');
+		const bucket = groupedById.get(metaRow?.band ?? 'upperMiddle');
 		if (bucket) bucket.count += units;
 	}
 	const groupedWithShares = grouped.map((d) => ({
@@ -1058,7 +1058,7 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 			`Fill colors group municipalities by estimated median household income. Outlines still show whether a municipality sits above or below the regional midpoint in households earning under $125k.`
 		);
 
-	addHtmlLegend(
+	const incomeLegend = addHtmlLegend(
 		root,
 		grouped.map((d) => ({
 			type: 'outline',
@@ -1067,6 +1067,23 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 			label: d.label
 		}))
 	);
+	incomeLegend
+		.style('display', 'grid')
+		.style('grid-template-columns', 'repeat(2, minmax(280px, max-content))')
+		.style('justify-content', 'center')
+		.style('column-gap', '22px')
+		.style('row-gap', '10px')
+		.style('width', 'fit-content')
+		.style('max-width', '100%')
+		.style('margin-left', 'auto')
+		.style('margin-right', 'auto')
+		.style('text-align', 'left');
+	incomeLegend
+		.selectAll('.legend-item')
+		.style('display', 'flex')
+		.style('align-items', 'center')
+		.style('gap', '10px')
+		.style('min-width', '0');
 
 	const width = Math.max(320, root.node().clientWidth || 520);
 	const height = 372;
