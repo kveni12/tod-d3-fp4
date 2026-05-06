@@ -13,6 +13,42 @@ export function num(v) {
 	return Number.isFinite(n) ? n : 0;
 }
 
+function estimateMedianIncomeFromBins(row) {
+	const bins = [
+		{ key: 'incu10', low: 0, high: 10000 },
+		{ key: 'inc1015', low: 10000, high: 15000 },
+		{ key: 'inc1520', low: 15000, high: 20000 },
+		{ key: 'inc2025', low: 20000, high: 25000 },
+		{ key: 'inc2530', low: 25000, high: 30000 },
+		{ key: 'inc3035', low: 30000, high: 35000 },
+		{ key: 'inc3540', low: 35000, high: 40000 },
+		{ key: 'inc4045', low: 40000, high: 45000 },
+		{ key: 'inc4550', low: 45000, high: 50000 },
+		{ key: 'inc5060', low: 50000, high: 60000 },
+		{ key: 'inc6075', low: 60000, high: 75000 },
+		{ key: 'i7599', low: 75000, high: 100000 },
+		{ key: 'i100125', low: 100000, high: 125000 },
+		{ key: 'i125150', low: 125000, high: 150000 },
+		{ key: 'i150200', low: 150000, high: 200000 },
+		{ key: 'in200o', low: 200000, high: 250000 }
+	];
+	const total = num(row.hh);
+	if (!total) return NaN;
+	const halfway = total / 2;
+	let cumulative = 0;
+	for (const bin of bins) {
+		const count = num(row[bin.key]);
+		if (!count) continue;
+		const next = cumulative + count;
+		if (halfway <= next) {
+			const withinBin = (halfway - cumulative) / count;
+			return bin.low + withinBin * (bin.high - bin.low);
+		}
+		cumulative = next;
+	}
+	return bins[bins.length - 1].high;
+}
+
 export function normalize(name) {
 	return (name || '')
 		.toLowerCase()
@@ -93,7 +129,12 @@ export async function loadMunicipalData(basePath) {
 	const householdByNorm = new Map(
 		housingRaw.map((d) => [
 			normalize(d.muni),
-			{ households: num(d.hh), over200k: num(d.in200o), incomeBinsKnown: true }
+			{
+				households: num(d.hh),
+				over200k: num(d.in200o),
+				incomeBinsKnown: true,
+				estimatedMedianIncome: estimateMedianIncomeFromBins(d)
+			}
 		])
 	);
 
@@ -253,7 +294,8 @@ export function buildMunicipalityRows(
 					high125: income ? income.high125 : NaN,
 					zoningBin: story?.zoningBin || 'Unknown',
 					baselineAffordableShare: story?.baselineAffordableShare || 0,
-					households: housing?.households || 0
+					households: housing?.households || 0,
+					estimatedMedianIncome: housing?.estimatedMedianIncome || NaN
 				};
 			},
 			(d) => d.municipalNorm
@@ -289,7 +331,8 @@ export function buildMunicipalityRows(
 				high125: income ? income.high125 : NaN,
 				zoningBin: story?.zoningBin || meta.zoningBin || 'Unknown',
 				baselineAffordableShare: story?.baselineAffordableShare || 0,
-				households: housing?.households || 0
+				households: housing?.households || 0,
+				estimatedMedianIncome: housing?.estimatedMedianIncome || NaN
 			};
 		})
 		.filter((d) => Number.isFinite(d.under125));

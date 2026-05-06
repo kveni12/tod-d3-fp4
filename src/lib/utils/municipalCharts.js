@@ -972,20 +972,13 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	}
 
 	const vulnerabilityMedian = d3.median(domainRows, (d) => d.under125) || 0;
-	const sortedIncomeShares = domainRows
-		.map((d) => Number(d.under125))
-		.filter((d) => Number.isFinite(d))
-		.sort(d3.ascending);
-	const q1 = d3.quantileSorted(sortedIncomeShares, 0.25) ?? 0;
-	const q2 = d3.quantileSorted(sortedIncomeShares, 0.5) ?? vulnerabilityMedian;
-	const q3 = d3.quantileSorted(sortedIncomeShares, 0.75) ?? 0;
 
-	function incomeBand(under125) {
-		if (!Number.isFinite(under125)) return 'midHigh';
-		if (under125 <= q1) return 'highIncome';
-		if (under125 <= q2) return 'midHigh';
-		if (under125 <= q3) return 'midLow';
-		return 'lowIncome';
+	function incomeBand(medianIncome) {
+		if (!Number.isFinite(medianIncome)) return 'upperMiddle';
+		if (medianIncome < 75000) return 'lowIncome';
+		if (medianIncome < 100000) return 'lowerMiddle';
+		if (medianIncome < 125000) return 'upperMiddle';
+		return 'highIncome';
 	}
 
 	const muniMeta = new Map(
@@ -993,41 +986,39 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 			d.municipality,
 			{
 				under125: Number(d.under125),
-				band: incomeBand(Number(d.under125)),
+				estimatedMedianIncome: Number(d.estimatedMedianIncome),
+				band: incomeBand(Number(d.estimatedMedianIncome)),
 				isHigherVulnerability: Number(d.under125) >= vulnerabilityMedian
 			}
 		])
 	);
 
 	const totalUnits = d3.sum(projectRows, (d) => d.units) || 0;
-	const q1Label = fmtPct1(q1);
-	const q2Label = fmtPct1(q2);
-	const q3Label = fmtPct1(q3);
 	const grouped = [
 		{
 			id: 'highIncome',
-			label: `Lowest share under $125k (≤ ${q1Label})`,
+			label: 'Higher-income municipalities ($125k+ median)',
 			fill: '#16803c',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
-			id: 'midHigh',
-			label: `Lower-middle share (${q1Label}–${q2Label})`,
+			id: 'upperMiddle',
+			label: 'Upper-middle municipalities ($100k-$125k median)',
 			fill: '#7ccf95',
 			outline: '#1849b5',
 			count: 0
 		},
 		{
-			id: 'midLow',
-			label: `Upper-middle share (${q2Label}–${q3Label})`,
+			id: 'lowerMiddle',
+			label: 'Lower-middle municipalities ($75k-$100k median)',
 			fill: '#f3b256',
 			outline: '#0b8a43',
 			count: 0
 		},
 		{
 			id: 'lowIncome',
-			label: `Highest share under $125k (> ${q3Label})`,
+			label: 'Lower-income municipalities (below $75k median)',
 			fill: '#d65245',
 			outline: '#0b8a43',
 			count: 0
@@ -1064,7 +1055,7 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		.attr('class', 'chart-note')
 		.style('margin-bottom', '12px')
 		.text(
-			`Fill colors group municipalities into four bands based on the share of households earning under $125k. The legend shows the actual cut points used in this view.`
+			`Fill colors group municipalities by estimated median household income. Outlines still show whether a municipality sits above or below the regional midpoint in households earning under $125k.`
 		);
 
 	addHtmlLegend(
