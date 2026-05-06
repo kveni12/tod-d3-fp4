@@ -3849,6 +3849,7 @@
 		const updateStageFromScroll = () => {
 			frame = 0;
 			const triggerY = window.innerHeight * 0.42;
+			const focusTriggerY = window.innerHeight * 0.52;
 			let next = 0;
 			for (let i = 0; i < stepEls.length; i += 1) {
 				const el = stepEls[i];
@@ -3860,7 +3861,7 @@
 			for (const item of focusWaypointEls) {
 				if (!item || item.stage !== next) continue;
 				const rect = item.node.getBoundingClientRect();
-				if (rect.top <= triggerY) nextFocus = item.key;
+				if (rect.top <= focusTriggerY) nextFocus = item.key;
 			}
 			if (next !== revealStage) revealStage = next;
 			if (nextFocus != guidedFocusDetail) guidedFocusDetail = nextFocus;
