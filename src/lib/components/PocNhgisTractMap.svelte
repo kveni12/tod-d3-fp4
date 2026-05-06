@@ -3688,9 +3688,16 @@
 			const focus = tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
 				const lon = Number(t.centlon);
-				return Number.isFinite(lat) && Number.isFinite(lon) && lat >= 41.95 && lat <= 42.75 && lon >= -72.65 && lon <= -70.75;
+				return (
+					Number.isFinite(lat) &&
+					Number.isFinite(lon) &&
+					lat >= 42.18 &&
+					lat <= 42.52 &&
+					lon >= -71.30 &&
+					lon <= -70.82
+				);
 			});
-			zoomToFeatureGroup(focus, 3.8);
+			zoomToFeatureGroup(focus, 5.6);
 			return;
 		}
 		if (revealStage >= 2 && revealStage <= 5) {
