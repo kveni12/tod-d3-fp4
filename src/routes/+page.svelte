@@ -713,10 +713,6 @@
 		<p class="subtitle subtitle--secondary">
 			<strong>This story tracks three things:</strong> where housing is landing, whether it lines up with strong transit access, and whether TOD-heavy places also show signs of rising pressure.
 		</p>
-		<p class="hero-plan-note">
-			For methods, design choices, and the project plan:
-			<a href={`${base}/writeup`}>open the full writeup</a>.
-		</p>
 	</section>
 
 	<section class="story card story--signal">
