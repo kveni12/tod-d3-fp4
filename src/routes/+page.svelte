@@ -1414,6 +1414,11 @@
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} storyMode />
 							</div>
+							<div class="tract-interaction-controls tract-interaction-controls--story-chart" role="group" aria-label="Clear income affordability scatter selection">
+								<button type="button" class="chip-button chip-button--subtle" onclick={() => affIncomePanelState.clearSelection()}>
+									Clear selection
+								</button>
+							</div>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -1552,6 +1557,11 @@
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} storyMode />
+							</div>
+							<div class="tract-interaction-controls tract-interaction-controls--story-chart" role="group" aria-label="Clear education affordability scatter selection">
+								<button type="button" class="chip-button chip-button--subtle" onclick={() => affEduPanelState.clearSelection()}>
+									Clear selection
+								</button>
 							</div>
 						</figure>
 					</div>
@@ -2995,6 +3005,11 @@
 		padding: 8px 12px;
 		font-size: 0.82rem;
 		letter-spacing: 0.01em;
+	}
+
+	.tract-interaction-controls--story-chart {
+		margin-top: 10px;
+		justify-content: center;
 	}
 
 	.tract-interaction-takeaways {
