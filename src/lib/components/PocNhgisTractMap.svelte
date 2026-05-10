@@ -5100,8 +5100,8 @@
 
 	.poc-scrolly-shell {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
-		gap: 22px;
+		grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
+		gap: 26px;
 		align-items: start;
 	}
 
@@ -5118,11 +5118,10 @@
 
 	.poc-stepper-side {
 		display: grid;
-		gap: 12px;
+		gap: 14px;
 		align-content: start;
 		padding-top: 2px;
-		/* Breathable right edge vs. column gutter / viewport (cards also pad inline-end). */
-		padding-inline-end: clamp(10px, 2vw, 16px);
+		padding-inline-end: clamp(4px, 1vw, 10px);
 		min-width: 0;
 		position: relative;
 		z-index: 1;
@@ -5133,11 +5132,12 @@
 		top: auto;
 		z-index: auto;
 		display: grid;
-		gap: 4px;
-		padding: 10px 12px;
-		border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+		gap: 6px;
+		padding: 14px 16px;
+		border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
 		border-radius: var(--radius-sm);
-		background: color-mix(in srgb, var(--bg-card) 96%, white);
+		background: color-mix(in srgb, var(--bg-card) 94%, white 6%);
+		box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
 	}
 
 	.poc-guided-nav {
@@ -5223,25 +5223,26 @@
 	.poc-stepper-card {
 		display: grid;
 		align-content: center;
-		gap: 14px;
+		gap: 15px;
 		width: 100%;
 		min-height: calc(76vh * 0.6);
-		padding: 14px 12px 1.35rem 20px;
-		border-left: 2px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+		padding: 18px 18px 1.45rem 18px;
+		border-left: 3px solid color-mix(in srgb, var(--accent) 16%, var(--border));
 		border-radius: var(--radius-sm);
 		border-top: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
 		border-right: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
 		border-bottom: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
-		background: color-mix(in srgb, var(--bg-card) 98%, white 2%);
+		background: color-mix(in srgb, var(--bg-card) 96%, white 4%);
 		text-align: left;
 		color: var(--text);
-		opacity: 0.52;
+		opacity: 0.68;
 		transform: translateY(14px);
 		transition:
 			opacity 220ms ease,
 			transform 220ms ease,
 			border-color 220ms ease,
-			background 220ms ease;
+			background 220ms ease,
+			box-shadow 220ms ease;
 	}
 
 	.poc-stepper-card--active {
@@ -5249,9 +5250,10 @@
 		border-top-color: color-mix(in srgb, var(--accent) 24%, var(--border));
 		border-right-color: color-mix(in srgb, var(--accent) 24%, var(--border));
 		border-bottom-color: color-mix(in srgb, var(--accent) 24%, var(--border));
-		background: color-mix(in srgb, var(--bg-card) 88%, white 12%);
+		background: color-mix(in srgb, var(--bg-card) 86%, white 14%);
 		opacity: 1;
 		transform: translateY(0);
+		box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
 	}
 
 	.poc-stepper-card--dense {
@@ -5294,27 +5296,27 @@
 	}
 
 	.poc-stepper-pill-title {
-		font-size: 1.04rem;
+		font-size: 1.14rem;
 		font-weight: 700;
-		line-height: 1.25;
+		line-height: 1.2;
 		color: var(--text);
 	}
 
 	.poc-stepper-pill-kicker {
-		font-size: 0.7rem;
+		font-size: 0.74rem;
 		line-height: 1.25;
 		color: var(--text-muted);
 		text-transform: uppercase;
-		letter-spacing: 0.07em;
+		letter-spacing: 0.08em;
 	}
 
 	.poc-stepper-card-body {
 		margin: 0;
-		max-width: 39ch;
-		font-size: 1.08rem;
-		line-height: 1.72;
+		max-width: 43ch;
+		font-size: 1.12rem;
+		line-height: 1.74;
 		color: var(--text);
-		font-weight: 450;
+		font-weight: 460;
 		text-wrap: pretty;
 	}
 
@@ -5332,9 +5334,9 @@
 
 	.poc-stepper-card-note {
 		margin: 0;
-		max-width: 36ch;
-		font-size: 0.92rem;
-		line-height: 1.62;
+		max-width: 40ch;
+		font-size: 0.98rem;
+		line-height: 1.64;
 		color: var(--text-muted);
 	}
 
