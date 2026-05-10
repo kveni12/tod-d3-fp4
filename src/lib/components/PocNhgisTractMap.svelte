@@ -3944,6 +3944,15 @@
 			zoomToFeatureGroup(focus, 7.2);
 			return;
 		}
+		if (revealStage === 9) {
+			const focus = tractFeatureByGeoFilter((t) => {
+				const lat = Number(t.centlat);
+				const lon = Number(t.centlon);
+				return Number.isFinite(lat) && Number.isFinite(lon) && lat >= 41.95 && lat <= 42.75 && lon >= -72.65 && lon <= -70.75;
+			});
+			zoomToFeatureGroup(focus, 3.8);
+			return;
+		}
 		if (revealStage === 10) {
 			const rowsByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
 			const focus = tractFeatureByGeoFilter((t) => {
