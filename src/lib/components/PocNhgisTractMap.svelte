@@ -3744,6 +3744,22 @@
 			return;
 		}
 		if (revealStage === 10) {
+			if (guidedFocusDetail === '11_compare') {
+				const focus = tractFeatureByGeoFilter((t) => {
+					const lat = Number(t.centlat);
+					const lon = Number(t.centlon);
+					return (
+						Number.isFinite(lat) &&
+						Number.isFinite(lon) &&
+						lat >= 41.95 &&
+						lat <= 42.75 &&
+						lon >= -72.55 &&
+						lon <= -70.75
+					);
+				});
+				zoomToFeatureGroup(focus, 4.2);
+				return;
+			}
 			const rowsByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
 			const focus = tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
@@ -4713,6 +4729,12 @@
 									</div>
 								{/if}
 								{#if guidedMode && i === 10}
+									<div
+										use:focusWaypointRef={{ stage: 10, key: '11_compare' }}
+										class="poc-stepper-waypoint poc-stepper-waypoint--compact"
+									>
+										<p class="poc-stepper-waypoint__label">Next: compare the lower-income view against the broader tract patterns.</p>
+									</div>
 									<div class="poc-stepper-overlay-toggle" aria-label="Choose which outline layer to compare in the lower-income step">
 										<p class="poc-stepper-examples-title">Compare the lower-income view with either tract grouping or mismatch outlines</p>
 										<div class="poc-stepper-overlay-toggle__buttons" role="group" aria-label="Lower-income outline view">
