@@ -4925,7 +4925,7 @@
 								{/if}
 								{#if guidedMode && i === 9 && guidedDevelopmentExamples.length}
 									<div class="poc-stepper-examples" aria-label="Notable TOD and non-TOD developments">
-										<p class="poc-stepper-examples-title">Scroll to see examples of individual developments and how they fit this pattern</p>
+										<p class="poc-stepper-examples-title">Scroll to see a few individual developments and how they fit this larger pattern.</p>
 									</div>
 								{/if}
 								{#if guidedMode && i === 10 && guidedStepTenExamples.length}
@@ -5504,10 +5504,11 @@
 
 	.poc-stepper-waypoint__label {
 		margin: 0;
-		font-size: 0.78rem;
+		font-size: 0.88rem;
 		font-weight: 700;
-		line-height: 1.45;
+		line-height: 1.5;
 		color: var(--text);
+		text-wrap: pretty;
 	}
 
 	.poc-stepper-contrast-anchors {
@@ -5692,11 +5693,12 @@
 
 	.poc-stepper-examples-title {
 		margin: 0;
-		max-width: 30ch;
-		font-size: 0.82rem;
+		max-width: 40ch;
+		font-size: 0.96rem;
 		font-weight: 700;
-		line-height: 1.45;
+		line-height: 1.55;
 		color: var(--text);
+		text-wrap: pretty;
 	}
 
 	.poc-stepper-example {
