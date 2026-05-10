@@ -172,9 +172,22 @@
 		const fallbackHeight = 260;
 		const width = tooltipEl?.offsetWidth ?? fallbackWidth;
 		const height = tooltipEl?.offsetHeight ?? fallbackHeight;
+		if (typeof window === 'undefined') return { left: activeTooltip.x + offset, top: activeTooltip.y + offset };
+		if (activeTooltip.anchorX != null && activeTooltip.anchorY != null) {
+			const ax = activeTooltip.anchorX;
+			const ay = activeTooltip.anchorY;
+			const preferRight = ax <= window.innerWidth * 0.58;
+			const rawLeft = preferRight ? ax + 20 : ax - width - 20;
+			const rawTop = ay - Math.min(height * 0.38, 132);
+			const maxLeft = Math.max(margin, window.innerWidth - width - margin);
+			const maxTop = Math.max(margin, window.innerHeight - height - margin);
+			return {
+				left: Math.min(maxLeft, Math.max(margin, rawLeft)),
+				top: Math.min(maxTop, Math.max(margin, rawTop))
+			};
+		}
 		const rawLeft = activeTooltip.x + offset;
 		const rawTop = activeTooltip.y + offset;
-		if (typeof window === 'undefined') return { left: rawLeft, top: rawTop };
 		const maxLeft = Math.max(margin, window.innerWidth - width - margin);
 		const maxTop = Math.max(margin, window.innerHeight - height - margin);
 		return {
@@ -4653,7 +4666,7 @@
 								{/if}
 							{#if activeTooltip.secondaryRows.length > 0}
 								<details class="map-tooltip__details">
-									<summary class="map-tooltip__details-label">More info</summary>
+									<summary class="map-tooltip__details-label">+ View more</summary>
 									<div class="map-tooltip__rows">
 										{#each activeTooltip.secondaryRows as row, i (i)}
 											<div
