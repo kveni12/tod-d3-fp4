@@ -5100,8 +5100,8 @@
 
 	.poc-scrolly-shell {
 		display: grid;
-		grid-template-columns: minmax(0, 1.04fr) minmax(360px, 0.96fr);
-		gap: 26px;
+		grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
+		gap: 22px;
 		align-items: start;
 	}
 
