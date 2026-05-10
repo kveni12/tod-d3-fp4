@@ -1717,9 +1717,6 @@
 					</li>
 				</ul>
 				<p>
-					No Warren Group residential sales dataset is published on this website. That data use agreement does not allow us to post the residential sales files themselves, so the public site only includes the processed tract, transit, and housing-development materials used in this prototype.
-				</p>
-				<p>
 					The current prototype also reflects repeated classroom feedback and revision. It was designed to lead with the planning question, then open out into exploration only after the main pattern is visible.
 				</p>
 			</section>
