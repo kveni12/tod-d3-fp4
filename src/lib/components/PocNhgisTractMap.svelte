@@ -145,7 +145,7 @@
 	let pendingHoverPos = $state(/** @type {{ x: number; y: number } | null} */ (null));
 	/** Tract ID waiting for debounce to complete. */
 	let pendingHoverId = $state(/** @type {string | null} */ (null));
-	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 11 : focusLowIncomeTracts);
+	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 10 : focusLowIncomeTracts);
 	/**
 	 * Main page guided walkthrough: tracts/insights are not toggled by map click (scrolly and
 	 * in-text controls drive focus). The playground carousel keeps full click-to-select behavior.
@@ -294,7 +294,7 @@
 
 	function showCohortOutlines() {
 		if (guidedMode) {
-			return (revealStage >= 5 && revealStage <= 8) || (revealStage === 11 && guidedLowerIncomeOverlay === 'cohort');
+			return (revealStage >= 5 && revealStage <= 8) || (revealStage === 10 && guidedLowerIncomeOverlay === 'cohort');
 		}
 		if (playgroundStoryCarousel) {
 			if (revealStage === 4) return playgroundSandboxCohortOutlines;
@@ -304,7 +304,7 @@
 	}
 
 	function showMismatchOutlines() {
-		if (guidedMode) return revealStage === 4 || (revealStage === 11 && guidedLowerIncomeOverlay === 'mismatch');
+		if (guidedMode) return revealStage === 4 || (revealStage === 10 && guidedLowerIncomeOverlay === 'mismatch');
 		return revealStage === 2;
 	}
 
@@ -3771,7 +3771,7 @@
 			zoomToFeatureGroup(focus, 8.2);
 			return;
 		}
-		if (revealStage === 11) {
+		if (revealStage === 10) {
 			recenterMap();
 		}
 	});
@@ -4735,71 +4735,73 @@
 									>
 										<p class="poc-stepper-waypoint__label">Next: compare the lower-income view against the broader tract patterns.</p>
 									</div>
-									<div class="poc-stepper-overlay-toggle" aria-label="Choose which outline layer to compare in the lower-income step">
-										<p class="poc-stepper-examples-title">Compare the lower-income view with either tract grouping or mismatch outlines</p>
-										<div class="poc-stepper-overlay-toggle__buttons" role="group" aria-label="Lower-income outline view">
-											<button
-												type="button"
-												class="poc-stepper-overlay-toggle__btn"
-												class:poc-stepper-overlay-toggle__btn--active={guidedLowerIncomeOverlay === 'cohort'}
-												onclick={() => (guidedLowerIncomeOverlay = 'cohort')}
-											>
-												TOD / non-TOD outlines
-											</button>
-											<button
-												type="button"
-												class="poc-stepper-overlay-toggle__btn"
-												class:poc-stepper-overlay-toggle__btn--active={guidedLowerIncomeOverlay === 'mismatch'}
-												onclick={() => (guidedLowerIncomeOverlay = 'mismatch')}
-											>
-												Mismatch outlines
-											</button>
-										</div>
-										<p class="poc-stepper-card-note">
-											{#if guidedLowerIncomeOverlay === 'cohort'}
-												<strong>What this shows:</strong> the orange and green outlines compare whether significant development in lower-income tracts has been more TOD-dominated or more non-TOD-dominated.
-											{:else}
-												<strong>What this shows:</strong> the purple mismatch outlines show where lower-income tracts sit inside the access-versus-growth disconnect, either as high-access/low-growth places or higher-growth/weaker-access places.
-											{/if}
-										</p>
-										{#if guidedLowerIncomeSummary}
-											<div class="poc-stepper-lower-income-summary" aria-label="Lower-income tract summary">
-												{#if guidedLowerIncomeOverlay === 'cohort'}
-													<div class="poc-stepper-lower-income-summary__card">
-														<span class="poc-stepper-lower-income-summary__label">TOD-dominated</span>
-														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortTod / guidedLowerIncomeSummary.total)}</strong>
-														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
-													</div>
-													<div class="poc-stepper-lower-income-summary__card">
-														<span class="poc-stepper-lower-income-summary__label">Non-TOD-dominated</span>
-														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortNonTod / guidedLowerIncomeSummary.total)}</strong>
-														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
-													</div>
-													<div class="poc-stepper-lower-income-summary__card">
-														<span class="poc-stepper-lower-income-summary__label">Minimal development</span>
-														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortMinimal / guidedLowerIncomeSummary.total)}</strong>
-														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
-													</div>
-												{:else}
-													<div class="poc-stepper-lower-income-summary__card">
-														<span class="poc-stepper-lower-income-summary__label">Any mismatch</span>
-														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchAny / guidedLowerIncomeSummary.total)}</strong>
-														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
-													</div>
-													<div class="poc-stepper-lower-income-summary__card">
-														<span class="poc-stepper-lower-income-summary__label">High access, low growth</span>
-														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchHa / guidedLowerIncomeSummary.total)}</strong>
-														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
-													</div>
-													<div class="poc-stepper-lower-income-summary__card">
-														<span class="poc-stepper-lower-income-summary__label">High growth, low access</span>
-														<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchHg / guidedLowerIncomeSummary.total)}</strong>
-														<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
-													</div>
-												{/if}
+									{#if guidedFocusDetail === '11_compare'}
+										<div class="poc-stepper-overlay-toggle" aria-label="Choose which outline layer to compare in the lower-income step">
+											<p class="poc-stepper-examples-title">Compare the lower-income view with either tract grouping or mismatch outlines</p>
+											<div class="poc-stepper-overlay-toggle__buttons" role="group" aria-label="Lower-income outline view">
+												<button
+													type="button"
+													class="poc-stepper-overlay-toggle__btn"
+													class:poc-stepper-overlay-toggle__btn--active={guidedLowerIncomeOverlay === 'cohort'}
+													onclick={() => (guidedLowerIncomeOverlay = 'cohort')}
+												>
+													TOD / non-TOD outlines
+												</button>
+												<button
+													type="button"
+													class="poc-stepper-overlay-toggle__btn"
+													class:poc-stepper-overlay-toggle__btn--active={guidedLowerIncomeOverlay === 'mismatch'}
+													onclick={() => (guidedLowerIncomeOverlay = 'mismatch')}
+												>
+													Mismatch outlines
+												</button>
 											</div>
-										{/if}
-									</div>
+											<p class="poc-stepper-card-note">
+												{#if guidedLowerIncomeOverlay === 'cohort'}
+													<strong>What this shows:</strong> the orange and green outlines compare whether significant development in lower-income tracts has been more TOD-dominated or more non-TOD-dominated.
+												{:else}
+													<strong>What this shows:</strong> the purple mismatch outlines show where lower-income tracts sit inside the access-versus-growth disconnect, either as high-access/low-growth places or higher-growth/weaker-access places.
+												{/if}
+											</p>
+											{#if guidedLowerIncomeSummary}
+												<div class="poc-stepper-lower-income-summary" aria-label="Lower-income tract summary">
+													{#if guidedLowerIncomeOverlay === 'cohort'}
+														<div class="poc-stepper-lower-income-summary__card">
+															<span class="poc-stepper-lower-income-summary__label">TOD-dominated</span>
+															<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortTod / guidedLowerIncomeSummary.total)}</strong>
+															<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+														</div>
+														<div class="poc-stepper-lower-income-summary__card">
+															<span class="poc-stepper-lower-income-summary__label">Non-TOD-dominated</span>
+															<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortNonTod / guidedLowerIncomeSummary.total)}</strong>
+															<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+														</div>
+														<div class="poc-stepper-lower-income-summary__card">
+															<span class="poc-stepper-lower-income-summary__label">Minimal development</span>
+															<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.cohortMinimal / guidedLowerIncomeSummary.total)}</strong>
+															<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+														</div>
+													{:else}
+														<div class="poc-stepper-lower-income-summary__card">
+															<span class="poc-stepper-lower-income-summary__label">Any mismatch</span>
+															<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchAny / guidedLowerIncomeSummary.total)}</strong>
+															<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+														</div>
+														<div class="poc-stepper-lower-income-summary__card">
+															<span class="poc-stepper-lower-income-summary__label">High access, low growth</span>
+															<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchHa / guidedLowerIncomeSummary.total)}</strong>
+															<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+														</div>
+														<div class="poc-stepper-lower-income-summary__card">
+															<span class="poc-stepper-lower-income-summary__label">High growth, low access</span>
+															<strong class="poc-stepper-lower-income-summary__value">{d3.format('.0%')(guidedLowerIncomeSummary.mismatchHg / guidedLowerIncomeSummary.total)}</strong>
+															<span class="poc-stepper-lower-income-summary__meta">of lower-income tracts</span>
+														</div>
+													{/if}
+												</div>
+											{/if}
+										</div>
+									{/if}
 								{/if}
 							</section>
 						{/each}
