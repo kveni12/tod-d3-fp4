@@ -603,7 +603,7 @@
 			bodyHtml:
 				'Individual developments offer a more granular view on project size, transit access, and multifamily share.<br><br>Most projects are heavily multifamily, but they are spread across a wider geography than the strongest transit network alone would suggest.',
 			legend:
-				'Key + map: dot area scales with project size (√ units); white→purple = multifamily share; green vs yellow project ring = transit-accessible or not. Tract color is still the growth layer.'
+				'Dot area scales with project size using the same square-root sizing as the map. White to purple shows multifamily share, while green and yellow rings show whether a project is transit-accessible. Tract color still shows housing growth.'
 		},
 		{
 			kicker: 'Step 10',
@@ -5338,6 +5338,7 @@
 		font-size: 0.98rem;
 		line-height: 1.64;
 		color: var(--text-muted);
+		text-wrap: pretty;
 	}
 
 	.poc-inline-line--red {
