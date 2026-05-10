@@ -68,6 +68,9 @@
 	 * showKeyFindings : boolean
 	 *     When true: render the “Key findings” callout under the map chrome (root story page only;
 	 *     omit on playground and other embeds).
+	 * guidedNarrativeLayout : 'split' | 'vertical'
+	 *     Guided story presentation only: default side-by-side ``split`` rail or experimental
+	 *     ``vertical`` stack with plain text steps.
 	 */
 	let {
 		panelState,
@@ -78,6 +81,7 @@
 		playgroundStoryCarousel = false,
 		choroplethMapHeight = 430,
 		showKeyFindings = false,
+		guidedNarrativeLayout = 'split',
 		mapFocusedTractDetail = $bindable(null),
 		mapViewActions = $bindable(null)
 	} = $props();
@@ -4275,8 +4279,14 @@
 			</div>
 			{/if}
 
-			<div class="poc-scrolly-shell">
-				<div class="poc-scrolly-left">
+			<div
+				class="poc-scrolly-shell"
+				class:poc-scrolly-shell--guided-vertical={guidedMode && guidedNarrativeLayout === 'vertical'}
+			>
+				<div
+					class="poc-scrolly-left"
+					class:poc-scrolly-left--guided-vertical={guidedMode && guidedNarrativeLayout === 'vertical'}
+				>
 					{#if !guidedMode}
 					<div class="poc-control-stack">
 				<div class="poc-spotlight-mismatch-row">
@@ -4696,8 +4706,15 @@
 					</div>
 				</div>
 
-				<aside class="poc-stepper-side" aria-label="Map explanation steps">
-					<div class="poc-stepper-head">
+				<aside
+					class="poc-stepper-side"
+					class:poc-stepper-side--guided-vertical={guidedMode && guidedNarrativeLayout === 'vertical'}
+					aria-label="Map explanation steps"
+				>
+					<div
+						class="poc-stepper-head"
+						class:poc-stepper-head--guided-vertical={guidedMode && guidedNarrativeLayout === 'vertical'}
+					>
 						<p class="poc-stepper-inline-kicker">Map walkthrough</p>
 						{#if playgroundStoryCarousel}
 							<div class="poc-guided-nav" aria-label="Walkthrough step controls">
@@ -4742,6 +4759,7 @@
 
 					<div
 						class="poc-stepper-inline-rail"
+						class:poc-stepper-inline-rail--guided-vertical={guidedMode && guidedNarrativeLayout === 'vertical'}
 						class:poc-stepper-inline-rail--single={playgroundStoryCarousel}
 						aria-label="Map steps"
 					>
@@ -4804,6 +4822,7 @@
 							<section
 								use:stepRef={i}
 								class="poc-stepper-card"
+								class:poc-stepper-card--guided-vertical={guidedMode && guidedNarrativeLayout === 'vertical'}
 								class:poc-stepper-card--active={revealStage === i}
 								class:poc-stepper-card--dense={guidedMode && (i === 3 || i === 4 || i === 5 || i === 9 || i === 10 || i === 11)}
 								class:poc-stepper-card--runway-after={guidedMode && (i === 4 || i === 5)}
@@ -5105,6 +5124,11 @@
 		align-items: start;
 	}
 
+	.poc-scrolly-shell--guided-vertical {
+		grid-template-columns: 1fr;
+		gap: 18px;
+	}
+
 	.poc-scrolly-left {
 		display: grid;
 		gap: 6px;
@@ -5114,6 +5138,13 @@
 		top: 10px;
 		align-self: start;
 		z-index: 1;
+	}
+
+	.poc-scrolly-left--guided-vertical {
+		position: relative;
+		top: auto;
+		width: min(100%, 1120px);
+		margin-inline: auto;
 	}
 
 	.poc-stepper-side {
@@ -5127,6 +5158,12 @@
 		z-index: 1;
 	}
 
+	.poc-stepper-side--guided-vertical {
+		width: min(100%, 760px);
+		margin-inline: auto;
+		padding-inline-end: 0;
+	}
+
 	.poc-stepper-head {
 		position: relative;
 		top: auto;
@@ -5138,6 +5175,15 @@
 		border-radius: var(--radius-sm);
 		background: color-mix(in srgb, var(--bg-card) 94%, white 6%);
 		box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+	}
+
+	.poc-stepper-head--guided-vertical {
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: transparent;
+		box-shadow: none;
+		text-align: center;
 	}
 
 	.poc-guided-nav {
@@ -5204,6 +5250,12 @@
 		isolation: isolate;
 	}
 
+	.poc-stepper-inline-rail--guided-vertical {
+		gap: 24px;
+		padding-top: 0;
+		padding-bottom: 48px;
+	}
+
 	.poc-stepper-inline-rail--single {
 		gap: 10px;
 		padding-top: 4px;
@@ -5245,6 +5297,18 @@
 			box-shadow 220ms ease;
 	}
 
+	.poc-stepper-card--guided-vertical {
+		min-height: 0;
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: transparent;
+		box-shadow: none;
+		opacity: 0.56;
+		transform: none;
+		gap: 10px;
+	}
+
 	.poc-stepper-card--active {
 		border-left-color: color-mix(in srgb, var(--accent) 52%, var(--border));
 		border-top-color: color-mix(in srgb, var(--accent) 24%, var(--border));
@@ -5254,6 +5318,12 @@
 		opacity: 1;
 		transform: translateY(0);
 		box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+	}
+
+	.poc-stepper-card--guided-vertical.poc-stepper-card--active {
+		background: transparent;
+		box-shadow: none;
+		opacity: 1;
 	}
 
 	.poc-stepper-card--dense {

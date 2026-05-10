@@ -1024,6 +1024,26 @@
 				</p>
 			</section>
 
+			<section class="chart-card card full-width chart-card--guided">
+				<p class="story-eyebrow story-eyebrow--center">Vertical scrollytelling test</p>
+				<h2 class="chart-card__headline">Same walkthrough, but in a vertical text flow</h2>
+				<p class="chart-note">
+					This is the same guided map content repeated below in a simpler vertical narrative treatment so we can compare whether it uses page height more naturally.
+				</p>
+				<div class="chart-wrap chart-tall chart-wrap--poc-map chart-wrap--poc-map--main-tall">
+					<PocNhgisTractMap
+						panelState={pocMapPanel}
+						tractList={tractListFiltered}
+						nhgisRows={nhgisLikeRows}
+						metricsDevelopments={tractWindowDevs}
+						guidedMode={true}
+						guidedNarrativeLayout="vertical"
+						choroplethMapHeight={645}
+						showKeyFindings={false}
+					/>
+				</div>
+			</section>
+
 
 			<section class="story card story--centered story--cohort-intro">
 				<h2>Comparing TOD-heavy and non-TOD-heavy tracts</h2>
