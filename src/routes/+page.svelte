@@ -2832,15 +2832,22 @@
 		height: auto;
 	}
 
-	/* Tract TOD scatters: wider copy column, plot slightly narrower than before */
+	/* Tract TOD sections read better as an editorial stack than a split dashboard row. */
 	.story-chart-row--tract {
-		grid-template-columns: minmax(0, 0.36fr) minmax(0, 0.64fr);
+		grid-template-columns: 1fr;
 		align-items: start;
 		justify-items: center;
+		gap: 18px;
 	}
 
 	.story-chart-row--tract .story-chart-text {
-		max-width: 40em;
+		max-width: 48rem;
+		justify-self: center;
+		text-align: center;
+	}
+
+	.story-chart-row--tract .story-chart-plot {
+		width: min(100%, 980px);
 		justify-self: center;
 	}
 
@@ -3799,8 +3806,8 @@
 
 	.afford-metric-row {
 		display: grid;
-		grid-template-columns: 3fr 2fr;
-		gap: 10px 12px;
+		grid-template-columns: 1fr;
+		gap: 16px;
 		align-items: start;
 		width: 100%;
 	}
@@ -3811,6 +3818,7 @@
 
 	.afford-four-cell--bar {
 		justify-self: center;
+		width: min(100%, 320px);
 	}
 
 	.afford-four-cell__title {
