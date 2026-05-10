@@ -1091,6 +1091,10 @@
 						class:tract-example-sticky-bar--dock={tractStickyBarPinned}
 						style={tractStickyBarPinned ? tractStickyBarDockGeom : ''}
 					>
+					<div class="tract-example-sticky-intro">
+						<p class="tract-example-sticky-kicker">Choose a lens</p>
+						<p class="tract-example-sticky-copy">Highlight a few tracts so the patterns in the charts are easier to spot.</p>
+					</div>
 					<div class="example-toggle-grid" role="group" aria-label="Highlight tract examples in the demographic charts">
 						<button
 							type="button"
@@ -1101,7 +1105,8 @@
 							disabled={!tractStoryExamples.incomeLeaders.length}
 							title={describeExampleSet(tractStoryExamples.incomeLeaders, 'higher-income-change TOD tracts')}
 						>
-							Greatest income change
+							<span class="example-toggle-card__eyebrow">Income</span>
+							<span class="example-toggle-card__label">Fastest change</span>
 						</button>
 						<button
 							type="button"
@@ -1112,7 +1117,8 @@
 							disabled={!tractStoryExamples.eduLeaders.length}
 							title={describeExampleSet(tractStoryExamples.eduLeaders, 'higher-education-change TOD tracts')}
 						>
-							Greatest Education Change
+							<span class="example-toggle-card__eyebrow">Education</span>
+							<span class="example-toggle-card__label">Largest increase</span>
 						</button>
 						<button
 							type="button"
@@ -1123,12 +1129,13 @@
 							disabled={!tractStoryExamples.lowerIncomeTod.length}
 							title={describeExampleSet(tractStoryExamples.lowerIncomeTod, 'lower-income TOD tracts')}
 						>
-							Lower-Income
+							<span class="example-toggle-card__eyebrow">Equity</span>
+							<span class="example-toggle-card__label">Lower-income TOD</span>
 						</button>
 					</div>
 					<div class="tract-interaction-controls tract-interaction-controls--sticky-bar" role="group" aria-label="Clear tract example highlights">
 						<button type="button" class="chip-button chip-button--subtle" onclick={clearStoryChartSelections}>
-							Clear highlights
+							Reset
 						</button>
 					</div>
 				</div>
@@ -2852,19 +2859,22 @@
 	.tract-example-sticky-bar {
 		position: relative;
 		z-index: 40;
-		display: flex;
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
 		align-items: center;
-		justify-content: center;
-		gap: 8px 10px;
+		gap: 10px 14px;
 		margin-top: 10px;
 		margin-bottom: 4px;
-		padding: 8px 10px;
-		border-radius: 12px;
+		padding: 12px 14px;
+		border-radius: 18px;
 		border: 1px solid rgba(16, 24, 40, 0.08);
-		background: color-mix(in srgb, var(--bg-card, #fffdf8) 92%, transparent);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 249, 244, 0.96)),
+			color-mix(in srgb, var(--bg-card, #fffdf8) 92%, transparent);
 		backdrop-filter: blur(10px);
-		box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06);
+		box-shadow:
+			0 10px 28px rgba(16, 24, 40, 0.08),
+			inset 0 1px 0 rgba(255, 255, 255, 0.55);
 	}
 
 	.tract-example-sticky-bar--dock {
@@ -2874,28 +2884,53 @@
 		box-sizing: border-box;
 	}
 
+	.tract-example-sticky-intro {
+		display: grid;
+		gap: 2px;
+		text-align: left;
+		min-width: 0;
+	}
+
+	.tract-example-sticky-kicker {
+		margin: 0;
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--accent) 72%, var(--ink));
+	}
+
+	.tract-example-sticky-copy {
+		margin: 0;
+		max-width: 22ch;
+		font-size: 0.9rem;
+		line-height: 1.35;
+		color: var(--muted);
+	}
+
 	.example-toggle-grid {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: center;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		align-items: stretch;
 		gap: 8px;
-		text-align: center;
+		text-align: left;
+		min-width: 0;
 	}
 
 	.example-toggle-card {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
+		display: grid;
+		align-content: start;
+		justify-items: start;
+		gap: 2px;
 		min-height: 0;
-		padding: 8px 12px;
-		border-radius: 999px;
+		padding: 10px 14px;
+		border-radius: 16px;
 		border: 1px solid rgba(16, 24, 40, 0.1);
 		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 244, 0.94));
 		box-shadow: 0 6px 16px rgba(16, 24, 40, 0.05);
 		color: var(--ink);
 		font: inherit;
-		font-size: 0.88rem;
+		font-size: 0.9rem;
 		font-weight: 600;
 		line-height: 1.2;
 		cursor: pointer;
@@ -2920,6 +2955,21 @@
 			inset 0 0 0 1px rgba(0, 132, 61, 0.14);
 	}
 
+	.example-toggle-card__eyebrow {
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: color-mix(in srgb, var(--accent) 64%, var(--muted));
+	}
+
+	.example-toggle-card__label {
+		font-size: 1rem;
+		font-weight: 650;
+		line-height: 1.25;
+		color: var(--ink);
+	}
+
 	.example-toggle-card:disabled {
 		opacity: 0.52;
 		cursor: not-allowed;
@@ -2938,11 +2988,13 @@
 	.tract-interaction-controls--sticky-bar {
 		margin-top: 0;
 		gap: 8px;
+		align-self: center;
 	}
 
 	.tract-interaction-controls--sticky-bar .chip-button {
-		padding: 7px 12px;
-		font-size: 0.88rem;
+		padding: 8px 12px;
+		font-size: 0.82rem;
+		letter-spacing: 0.01em;
 	}
 
 	.tract-interaction-takeaways {
@@ -2986,13 +3038,38 @@
 	}
 
 	.chip-button--subtle {
-		background: rgba(31, 36, 48, 0.04);
-		border-color: rgba(31, 36, 48, 0.12);
+		background: rgba(31, 36, 48, 0.035);
+		border-color: rgba(31, 36, 48, 0.1);
 	}
 
 	.chip-button--subtle:hover:not(:disabled) {
 		background: rgba(31, 36, 48, 0.08);
 		border-color: rgba(31, 36, 48, 0.18);
+	}
+
+	@media (max-width: 860px) {
+		.tract-example-sticky-bar {
+			grid-template-columns: 1fr;
+			justify-items: center;
+		}
+
+		.tract-example-sticky-intro {
+			text-align: center;
+		}
+
+		.tract-example-sticky-copy {
+			max-width: 34ch;
+		}
+
+		.example-toggle-grid {
+			grid-template-columns: 1fr;
+			width: 100%;
+		}
+
+		.example-toggle-card {
+			justify-items: center;
+			text-align: center;
+		}
 	}
 
 	.story-chart-row--tract .story-chart-plot {
