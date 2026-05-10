@@ -7132,7 +7132,7 @@
 
 	.map-tooltip__eyebrow {
 		margin: 0;
-		font-size: 0.63rem;
+		font-size: 0.72rem;
 		font-weight: 700;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
@@ -7141,16 +7141,16 @@
 
 	.map-tooltip__title {
 		margin: 0;
-		font-size: 0.92rem;
+		font-size: 1rem;
 		font-weight: 700;
-		line-height: 1.2;
+		line-height: 1.28;
 		color: var(--text);
 	}
 
 	.map-tooltip__summary {
 		margin: 0 0 8px;
-		font-size: 0.74rem;
-		line-height: 1.45;
+		font-size: 0.86rem;
+		line-height: 1.55;
 		color: var(--text);
 		padding-bottom: 8px;
 		border-bottom: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
@@ -7162,7 +7162,7 @@
 		flex-wrap: wrap;
 		padding: 3px 8px;
 		border-radius: 999px;
-		font-size: 0.68rem;
+		font-size: 0.74rem;
 		font-weight: 700;
 		letter-spacing: 0.03em;
 		border: 1px solid var(--border);
@@ -7259,9 +7259,9 @@
 	}
 
 	.map-tooltip__primary-label {
-		font-size: 0.68rem;
+		font-size: 0.76rem;
 		font-weight: 700;
-		line-height: 1.3;
+		line-height: 1.4;
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
 		color: var(--text-muted);
@@ -7270,9 +7270,9 @@
 	}
 
 	.map-tooltip__primary-value {
-		font-size: 0.86rem;
+		font-size: 0.94rem;
 		font-weight: 700;
-		line-height: 1.25;
+		line-height: 1.35;
 		text-align: right;
 		color: var(--text);
 		min-width: 0;
@@ -7290,7 +7290,7 @@
 
 	.map-tooltip__details-label {
 		margin: 0;
-		font-size: 0.63rem;
+		font-size: 0.72rem;
 		font-weight: 700;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
@@ -7335,17 +7335,17 @@
 
 	.map-tooltip__label {
 		color: var(--text-muted);
-		font-size: 0.73rem;
-		line-height: 1.35;
+		font-size: 0.8rem;
+		line-height: 1.45;
 		min-width: 0;
 		overflow-wrap: anywhere;
 	}
 
 	.map-tooltip__value {
 		color: var(--text);
-		font-size: 0.76rem;
+		font-size: 0.84rem;
 		font-weight: 600;
-		line-height: 1.35;
+		line-height: 1.45;
 		text-align: right;
 		min-width: 0;
 		overflow-wrap: anywhere;
