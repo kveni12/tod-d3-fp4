@@ -2856,7 +2856,7 @@
 
 	.tract-example-sticky-slot {
 		width: 100%;
-		max-width: 52rem;
+		max-width: 66rem;
 		margin-inline: auto;
 	}
 
@@ -2869,12 +2869,15 @@
 		position: relative;
 		z-index: 40;
 		display: grid;
-		grid-template-columns: auto minmax(0, 1fr) auto;
-		align-items: center;
-		gap: 10px 14px;
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-areas:
+			'intro intro'
+			'toggles controls';
+		align-items: start;
+		gap: 14px 18px;
 		margin-top: 10px;
 		margin-bottom: 4px;
-		padding: 12px 14px;
+		padding: 18px 20px;
 		border-radius: 18px;
 		border: 1px solid rgba(16, 24, 40, 0.08);
 		background:
@@ -2894,8 +2897,9 @@
 	}
 
 	.tract-example-sticky-intro {
+		grid-area: intro;
 		display: grid;
-		gap: 2px;
+		gap: 6px;
 		text-align: left;
 		min-width: 0;
 	}
@@ -2911,17 +2915,18 @@
 
 	.tract-example-sticky-copy {
 		margin: 0;
-		max-width: 22ch;
-		font-size: 0.9rem;
-		line-height: 1.35;
+		max-width: 52ch;
+		font-size: 1rem;
+		line-height: 1.5;
 		color: var(--muted);
 	}
 
 	.example-toggle-grid {
+		grid-area: toggles;
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		align-items: stretch;
-		gap: 8px;
+		gap: 12px;
 		text-align: left;
 		min-width: 0;
 	}
@@ -2930,9 +2935,9 @@
 		display: grid;
 		align-content: start;
 		justify-items: start;
-		gap: 2px;
-		min-height: 0;
-		padding: 10px 14px;
+		gap: 4px;
+		min-height: 5.75rem;
+		padding: 14px 16px;
 		border-radius: 16px;
 		border: 1px solid rgba(16, 24, 40, 0.1);
 		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 244, 0.94));
@@ -2973,10 +2978,11 @@
 	}
 
 	.example-toggle-card__label {
-		font-size: 1rem;
+		font-size: 1.08rem;
 		font-weight: 650;
-		line-height: 1.25;
+		line-height: 1.3;
 		color: var(--ink);
+		text-wrap: pretty;
 	}
 
 	.example-toggle-card:disabled {
@@ -2995,14 +3001,16 @@
 	}
 
 	.tract-interaction-controls--sticky-bar {
+		grid-area: controls;
 		margin-top: 0;
 		gap: 8px;
-		align-self: center;
+		align-self: stretch;
+		justify-content: flex-end;
 	}
 
 	.tract-interaction-controls--sticky-bar .chip-button {
-		padding: 8px 12px;
-		font-size: 0.82rem;
+		padding: 10px 14px;
+		font-size: 0.88rem;
 		letter-spacing: 0.01em;
 	}
 
@@ -3064,6 +3072,10 @@
 	@media (max-width: 860px) {
 		.tract-example-sticky-bar {
 			grid-template-columns: 1fr;
+			grid-template-areas:
+				'intro'
+				'toggles'
+				'controls';
 			justify-items: center;
 		}
 
@@ -3078,6 +3090,10 @@
 		.example-toggle-grid {
 			grid-template-columns: 1fr;
 			width: 100%;
+		}
+
+		.tract-interaction-controls--sticky-bar {
+			justify-content: center;
 		}
 
 		.example-toggle-card {
