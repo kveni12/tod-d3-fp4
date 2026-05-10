@@ -4275,10 +4275,7 @@
 			</div>
 			{/if}
 
-			<div
-				class="poc-scrolly-shell"
-				class:poc-scrolly-shell--guided-vertical={guidedMode && !playgroundStoryCarousel}
-			>
+			<div class="poc-scrolly-shell">
 				<div class="poc-scrolly-left">
 					{#if !guidedMode}
 					<div class="poc-control-stack">
@@ -5108,11 +5105,6 @@
 		align-items: start;
 	}
 
-	.poc-scrolly-shell--guided-vertical {
-		grid-template-columns: 1fr;
-		gap: 18px;
-	}
-
 	.poc-scrolly-left {
 		display: grid;
 		gap: 6px;
@@ -5124,12 +5116,6 @@
 		z-index: 1;
 	}
 
-	.poc-scrolly-shell--guided-vertical .poc-scrolly-left {
-		width: min(100%, 1120px);
-		margin-inline: auto;
-		top: 8px;
-	}
-
 	.poc-stepper-side {
 		display: grid;
 		gap: 14px;
@@ -5139,17 +5125,6 @@
 		min-width: 0;
 		position: relative;
 		z-index: 1;
-	}
-
-	.poc-scrolly-shell--guided-vertical .poc-stepper-side {
-		width: min(100%, 760px);
-		margin-inline: auto;
-		padding-inline-end: 0;
-	}
-
-	.poc-scrolly-shell--guided-vertical .poc-stepper-head,
-	.poc-scrolly-shell--guided-vertical .poc-stepper-inline-rail {
-		width: 100%;
 	}
 
 	.poc-stepper-head {
