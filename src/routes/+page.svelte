@@ -704,22 +704,35 @@
 	<!-- Narrative + tract story up to "Explore" use a narrower column; Explore stays full poc-root width. -->
 	<div class="poc-pre-explore">
 	<section class="hero-full card">
-		<div class="eyebrow">Guided Story</div>
+		<!-- <div class="eyebrow">Guided Story</div> -->
 		<h1>Massachusetts is building more near transit. Who benefits?</h1>
 		<p class="byline">By Krishna Parvataneni, Allison Eto, Hanna Chen, and Supriya Lall</p>
 		<p class="subtitle">
-			If you rely on transit to reach work, school, or childcare, the real question is not just whether more housing is being built. It is whether that housing shows up in places people can actually reach and afford.
+			Boston is in a housing crisis, but if you rely on transit to reach work, school, or childcare, the real question is not just whether more housing is being built. It is whether that housing shows up in places you can actually reach and afford.
+			This story explores three questions:
 		</p>
-		<p class="subtitle subtitle--secondary">
-			<strong>This story tracks three things:</strong> where housing is landing, whether it lines up with strong transit access, and whether TOD-heavy places also show signs of rising pressure.
+		<div class="hero-questions" aria-label="Story questions">
+			<div class="hero-question-box">
+				<p class="hero-question-kicker">Question 1</p>
+				<p class="hero-question-text">Where is new housing landing across the region?</p>
+			</div>
+			<div class="hero-question-box">
+				<p class="hero-question-kicker">Question 2</p>
+				<p class="hero-question-text">Does housing growth line up with strong transit access?</p>
+			</div>
+			<div class="hero-question-box">
+				<p class="hero-question-kicker">Question 3</p>
+				<p class="hero-question-text">Is housing growth associated with displacement pressure?</p>
+			</div>
+		</div>
+		<br>
+		<p class="signal-lead">
+			The data tells a complex story.
+			Housing growth and transit access do not line up as neatly as policy goals suggest—some well-connected places are still adding little housing, while growth also shows up far from strong transit.
+			<strong class="signal-lead-policy">
+				For planners, the key policy focus should be not only how much housing gets built, but where it lands and who can afford it.
+			</strong>
 		</p>
-	</section>
-
-	<section class="story card story--signal">
-		<h2>The main point</h2>
-		<p class="signal-line">Housing growth and transit access do not line up as neatly as policy goals suggest.</p>
-		<p class="signal-line">Some well-connected places are still adding little housing, while growth also shows up far from strong transit.</p>
-		<p class="signal-line"><strong>For planners, the key question is not only how much housing gets built, but where it lands and who can afford it.</strong></p>
 	</section>
 
 	{#if !muniLoaded}
@@ -731,16 +744,14 @@
 	<section class="story card story--centered">
 		<h2>How much new housing is actually transit-oriented?</h2>
 		<p>
+			Aligning with recent legislation, we define <strong>transit-oriented development</strong> (TOD) as multifamily housing within half a mile of an MBTA stop.
 			TOD has grown over time, but it is still not the dominant pattern. A large share of new housing is still being built outside the strongest transit context.
 		</p>
-		<p class="chart-source">Source: MassBuilds development records, summarized by year and transit access.</p>
 
 		<section class="chart-card card">
 			<h3>TOD vs non-TOD mix by year</h3>
-			<div class="takeaway-strip takeaway-strip--compact">
-				<strong>Takeaway:</strong> TOD grows in some years, but most new units still fall outside the strongest transit geography.
-			</div>
 			<div class="chart-wrap small-chart" bind:this={elComposition}></div>
+			<p class="chart-footnote">Source: MassBuilds development records, summarized by year and transit access.</p>
 		</section>
 	</section>
 
@@ -749,16 +760,14 @@
 			<div class="story-chart-panel__text">
 				<h2>Who benefits from TOD?</h2>
 				<p>
-					The usual promise of TOD is more housing near good transit. But new housing does not automatically mean affordable housing. In recent years, affordability has lagged behind total production, which means transit-rich growth can still come with rising pressure.
+					The usual promise of TOD is more housing near good transit. But new housing does not automatically mean affordable housing. In recent years, affordability has lagged behind
+					total production, and the bulk of new housing units are market-rate. This means transit-rich growth can still come with rising displacement pressure.
 				</p>
-				<p class="chart-source">Source: MassBuilds unit counts and listed affordable-unit fields.</p>
 			</div>
 			<div class="story-chart-panel__chart">
 				<h3>Most new housing is still market-rate</h3>
-				<p class="chart-note">
-					The affordable share rises occasionally, but for most years the bulk of new units are still market-rate.
-				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elAffordableTrend}></div>
+				<p class="chart-footnote">Source: MassBuilds unit counts and listed affordable-unit fields.</p>
 			</div>
 		</div>
 	</section>
@@ -767,23 +776,16 @@
 		<div class="story-chart-panel__grid">
 			<div class="story-chart-panel__text">
 				<h2>Where is development most concentrated?</h2>
-				<p>
-					This chart asks a simpler policy question: when the region adds new housing, which kinds of municipalities are receiving it?
+				<p class="growth-capture-intro">
+					when housing is added, does it land in higher- or lower-income areas?
 				</p>
-				<p class="chart-source">Source: MassBuilds development records and ACS income summaries, aggregated to municipalities.</p>
 			</div>
 			<div class="story-chart-panel__chart story-chart-panel__chart--growth-capture">
 				<h3>For every 100 new units, where do they land?</h3>
-				<p class="chart-note">
-					Each housing icon is about one percent of all units added in the selected years. Fill color shows estimated municipal median income. The outline shows whether that municipality has a higher or lower share of households earning under $125k than the regional midpoint.
-				</p>
 				<div class="chart-wrap small-chart compact-side-chart" bind:this={elGrowthCapture}></div>
-				<details class="supplemental supplemental--centered">
-					<summary>How these groups are defined</summary>
-					<p class="chart-note">
-						Fill colors group municipalities by estimated median household income. Blue outlines mark municipalities below the regional midpoint in the share of households under $125k, while green outlines mark municipalities above it.
-					</p>
-				</details>
+				<p class="chart-footnote">
+					Source: MassBuilds development records and ACS income summaries, aggregated to municipalities.
+				</p>
 			</div>
 		</div>
 	</section>
@@ -843,62 +845,31 @@
 
 	
 	<section class="story card full-width">
-		<p class="story-eyebrow">Why we zoom in</p>
-		<h2>What to look for in the tract-level map</h2>
+		<h2>Guided Map Story</h2>
 		<p>
-			Municipal summaries help us see the regional pattern, but they smooth over local variation. Census tracts let us compare where transit access is strongest, where housing growth is actually happening, and where signs of pressure tend to appear.
+			State-wide summaries help us see the overall patterns, but they smooth over local variation. Census tracts let us compare where transit access is strongest,
+			where housing growth is actually happening, and where signs of displacement pressure tend to appear.
 		</p>
-		<div class="takeaway-grid takeaway-grid--three">
-			<div class="takeaway-card">
+		<p class="tract-caveats">
+			<strong>Interpret lightly:</strong> Treat pressure cues as hypotheses or warning signs, not proof of causality.
+		</p>
+		<div class="takeaway-grid takeaway-grid--three takeaway-grid--tract-lens">
+			<div class="takeaway-card takeaway-card--tier takeaway-card--access">
 				<p class="takeaway-label">Access</p>
-				<p class="takeaway-meta">Which tracts sit closest to strong MBTA service?</p>
+				<p class="takeaway-meta">Which areas sit closest to strong MBTA service?</p>
 			</div>
-			<div class="takeaway-card">
+			<div class="takeaway-card takeaway-card--tier takeaway-card--growth">
 				<p class="takeaway-label">Growth</p>
-				<p class="takeaway-meta">Which tracts are actually adding housing?</p>
+				<p class="takeaway-meta">Which areas are actually adding housing?</p>
 			</div>
-			<div class="takeaway-card">
+			<div class="takeaway-card takeaway-card--tier takeaway-card--pressure">
 				<p class="takeaway-label">Pressure</p>
-				<p class="takeaway-meta">Do TOD-heavy tracts also show faster income and education change?</p>
+				<p class="takeaway-meta">Do TOD-heavy areas show demographic signs of displacement?</p>
 			</div>
 		</div>
-		<details class="supplemental supplemental--centered">
-			<summary>Measures and caveats</summary>
-			<ul class="story-list">
-				<li><strong>Median income change</strong>, a common warning sign for rising housing costs</li>
-				<li><strong>Bachelor’s degree share change</strong>, a common warning sign for turnover or selective in-migration</li>
-			</ul>
-			<p class="chart-note">Read these as warning signs, not proof. Source: NHGIS / U.S. Census tract measures, MBTA stop access, and MassBuilds development records.</p>
-		</details>
 	</section>
 	
 	<section class="tract-section">
-		<section class="story card full-width story--framing">
-			<details class="supplemental supplemental--centered" open>
-				<summary>Key definitions and assumptions</summary>
-				<div class="framing-grid">
-					<div class="framing-block">
-						<h2>Key definitions</h2>
-						<p>
-							<strong>TOD developments</strong> are projects within <strong>0.5 miles</strong> of an MBTA stop; all others are treated as
-							<strong> non-TOD developments</strong>.
-						</p>
-						<p>
-							<strong>TOD-dominated tracts</strong> get at least half of their filtered new units from TOD projects and clear a 2 percent housing-growth threshold. <strong>Non-TOD-dominated tracts</strong> also grow, but less of that growth is transit-oriented. <strong>Minimal-development tracts</strong> stay below the growth threshold.
-						</p>
-					</div>
-					<div class="framing-block">
-						<h2>Key assumptions</h2>
-						<p>
-							This walkthrough uses a fixed <strong>0.5-mile MBTA access threshold</strong> and compares tracts descriptively rather than causally.
-						</p>
-						<p>
-							Mismatch categories depend on how each tract compares with the rest of the regional sample. In the walkthrough, tract averages are shown as tract-level comparisons rather than population-weighted totals.
-						</p>
-					</div>
-				</div>
-			</details>
-		</section>
 
 
 		<!-- <section class="story card full-width">
@@ -930,7 +901,7 @@
 		{:else}
 			<section class="chart-card card full-width chart-card--guided">
 				<p class="story-eyebrow story-eyebrow--center">Guided map story</p>
-				<h2 class="chart-card__headline">Transit access and new housing growth do not consistently align across Greater Boston tracts</h2>
+				<h2 class="chart-card__headline">Transit access and new housing growth do not consistently align</h2>
 				<p class="chart-note">
 					The walkthrough moves from the full network to a closer Greater Boston view, then to tract examples, mismatch, projects, and lower-income context. Example cards use short names like <strong>“Tract in Suffolk County”</strong> for readability, and tooltips lead with the same takeaway before offering <strong>More info</strong>.
 				</p>
@@ -948,6 +919,9 @@
 						showKeyFindings={true}
 					/>
 				</div>
+				<p class="chart-footnote chart-footnote--guided-map">
+					Sources: NHGIS tract timelines, ACS municipal income snapshots, MBTA-linked access scores, MassBuilds project footprints.
+				</p>
 			</section>
 
 			<section class="story card">
@@ -1078,7 +1052,6 @@
 					<p>
 						On average, income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
-					<p class="chart-source">Source: NHGIS tract income measures and MassBuilds-derived TOD tract groupings.</p>
 					{#if incomeMiniBar}
 						<figure class="cohort-mini-bar">
 							<svg
@@ -1191,6 +1164,9 @@
 						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} storyMode />
 					</div>
 				</section>
+				<p class="chart-footnote chart-footnote--story-row">
+					Source: NHGIS tract income measures and MassBuilds-derived TOD tract groupings.
+				</p>
 			</div>
 
 			<div class="story-chart-row story-chart-row--tract full-width">
@@ -1202,7 +1178,6 @@
 					<p>
 						The average change is <strong>{eduRow.fmtTod}</strong> in TOD-dominated tracts, compared with <strong>{eduRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
-					<p class="chart-source">Source: NHGIS tract education measures and MassBuilds-derived TOD tract groupings.</p>
 					{#if eduMiniBar}
 						<figure class="cohort-mini-bar">
 							<svg
@@ -1313,6 +1288,9 @@
 						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} storyMode />
 					</div>
 				</section>
+				<p class="chart-footnote chart-footnote--story-row">
+					Source: NHGIS tract education measures and MassBuilds-derived TOD tract groupings.
+				</p>
 			</div>
 
 			<!-- <section class="chart-card card full-width">
@@ -1333,7 +1311,6 @@
 						The broad pattern is encouraging: TOD-heavy places with more affordability tend to show smaller increases in both income and college-degree share.
 					</p>
 				{/if}
-				<p class="chart-source">Source: MassBuilds affordable-unit fields paired with NHGIS tract income and education change measures.</p>
 
 				<div
 					class="afford-comparison-stack"
@@ -1623,6 +1600,9 @@
 					</div>
 					</div>
 				</div>
+				<p class="chart-footnote chart-footnote--afford-stack">
+					Source: MassBuilds affordable-unit fields paired with NHGIS tract income and education change measures.
+				</p>
 			</section>
 
 			<section class="story card conclusion-card">
@@ -1884,11 +1864,9 @@
 
 	h1 {
 		margin-bottom: 14px;
-		font-size: clamp(2.6rem, 6vw, 4.7rem);
-		line-height: 0.96;
+		font-size: clamp(1.82rem, 5.2vw, 3.29rem);
+		line-height: 1.06;
 		letter-spacing: -0.03em;
-		max-width: 9.6ch;
-		margin-inline: auto;
 	}
 
 	.card {
@@ -1903,6 +1881,13 @@
 		padding: clamp(12px, 2vw, 22px) 0 28px;
 		margin-bottom: 18px;
 		border-bottom: 1px solid rgba(120, 114, 102, 0.2);
+		text-align: center;
+	}
+
+	.hero-full h1 {
+		width: 70%;
+		max-width: none;
+		margin-inline: auto;
 		text-align: center;
 	}
 
@@ -1937,9 +1922,44 @@
 		margin-inline: auto;
 	}
 
-	.subtitle--secondary {
-		margin-top: 12px;
-		font-size: clamp(0.98rem, 1.6vw, 1.08rem);
+	.hero-questions {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 12px;
+		margin-top: 20px;
+		max-width: min(52rem, 94vw);
+		margin-inline: auto;
+		text-align: left;
+	}
+
+	.hero-question-box {
+		padding: 14px 16px;
+		border-radius: 14px;
+		border: 1px solid rgba(120, 114, 102, 0.22);
+		background: rgba(253, 250, 244, 0.78);
+		box-shadow: 0 14px 32px rgba(31, 36, 48, 0.04);
+	}
+
+	.hero-question-kicker {
+		margin: 0 0 8px;
+		font-size: 0.74rem;
+		font-weight: 800;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--accent);
+	}
+
+	.hero-question-text {
+		margin: 0;
+		font-size: clamp(0.94rem, 1.65vw, 1.06rem);
+		line-height: 1.52;
+		color: var(--ink);
+	}
+
+	@media (max-width: 820px) {
+		.hero-questions {
+			grid-template-columns: 1fr;
+		}
 	}
 
 	/* ── Dashboard layout ─────────────────────────────── */
@@ -2379,13 +2399,52 @@
 		margin-inline: auto;
 	}
 
-	.chart-source {
-		margin: 8px auto 0;
-		max-width: 42rem;
-		font-size: 0.82rem;
+	/* `p.chart-footnote` ties `.story p` specificity so footnote typography wins in story sections */
+	p.chart-footnote {
+		margin-top: 8px;
+		padding-top: 8px;
+		border-top: 1px solid rgba(120, 114, 102, 0.09);
+		max-width: 36rem;
+		font-size: 0.65rem;
 		line-height: 1.45;
-		color: color-mix(in srgb, var(--muted) 90%, white);
+		color: color-mix(in srgb, var(--muted) 62%, transparent);
+		text-align: left;
+	}
+
+	.story--centered .chart-card p.chart-footnote {
+		margin-inline: auto;
 		text-align: center;
+	}
+
+	.story.story--centered dfn {
+		font-style: normal;
+		font-weight: 700;
+		cursor: help;
+		text-decoration: underline;
+		text-decoration-style: dotted;
+		text-underline-offset: 0.12em;
+	}
+	.chart-footnote--guided-map {
+		margin-inline: auto;
+		text-align: center;
+		max-width: 38rem;
+	}
+
+	.chart-footnote--story-row {
+		grid-column: 1 / -1;
+		justify-self: center;
+		text-align: center;
+		max-width: 52rem;
+		margin-bottom: 0;
+		border-top-width: 0;
+		padding-top: 12px;
+	}
+
+	.chart-footnote--afford-stack {
+		margin-inline: auto;
+		text-align: center;
+		max-width: 48rem;
+		margin-top: 18px;
 	}
 
 	.takeaway-strip {
@@ -2552,12 +2611,11 @@
 	}
 
 	.story-chart-panel__chart--growth-capture {
-		max-width: 760px;
+		max-width: min(100%, 46rem);
 		margin-inline: auto;
 	}
 
 	.story-chart-panel__chart--growth-capture h3,
-	.story-chart-panel__chart--growth-capture .chart-note,
 	.story-chart-panel__chart--growth-capture .chart-wrap {
 		margin-inline: auto;
 	}
@@ -2566,8 +2624,125 @@
 		max-width: 34rem;
 	}
 
-	.story-chart-panel__chart--growth-capture .chart-note {
-		max-width: 38rem;
+	.story-chart-panel__text .growth-capture-intro,
+	.story-chart-panel__text .growth-capture-dek {
+		max-width: 40rem;
+		margin-inline: auto;
+		line-height: 1.62;
+	}
+
+	.story-chart-panel__text .growth-capture-intro {
+		font-size: 1.02rem;
+		color: var(--ink);
+		margin-bottom: 10px;
+	}
+
+	.story-chart-panel__text .growth-capture-dek {
+		font-size: 0.95rem;
+		color: var(--muted);
+		margin-bottom: 0;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend) {
+		width: 100%;
+		max-width: none;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		column-gap: clamp(1rem, 4vw, 1.75rem);
+		row-gap: 10px;
+		align-items: start;
+		box-sizing: border-box;
+		margin: 0 auto 14px;
+		padding: 12px 16px;
+		border-radius: 12px;
+		border: 1px dashed rgba(15, 128, 64, 0.28);
+		background: rgba(236, 247, 239, 0.28);
+		text-align: left;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__note) {
+		grid-column: 1 / -1;
+		margin: 0 0 14px;
+		font-size: 0.84rem;
+		line-height: 1.45;
+		color: var(--muted);
+	}
+
+	.story-chart-panel__chart--growth-capture
+		.chart-wrap
+		:global(.growth-capture-legend__section + .growth-capture-legend__section) {
+		margin-top: 0;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__section-title) {
+		margin: 0 0 8px;
+		font-size: 0.69rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #14532d;
+		opacity: 0.92;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__keys) {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		gap: 8px 14px;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__keys--fill) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__keys--outline) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@media (max-width: 560px) {
+		.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend) {
+			grid-template-columns: 1fr;
+		}
+
+		.story-chart-panel__chart--growth-capture
+			.chart-wrap
+			:global(.growth-capture-legend__section + .growth-capture-legend__section) {
+			margin-top: 12px;
+		}
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__key) {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__house) {
+		width: 1.65rem;
+		height: 1.82rem;
+		flex-shrink: 0;
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__house--outline) {
+		filter: drop-shadow(0 0.5px 0 rgba(15, 23, 42, 0.06));
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.growth-capture-legend__key-label) {
+		font-size: 0.82rem;
+		line-height: 1.38;
+		color: var(--ink);
+	}
+
+	.story-chart-panel__chart--growth-capture .chart-wrap :global(.chart-note) {
+		color: var(--muted);
+		line-height: 1.6;
+		font-size: 0.93rem;
+		margin-bottom: 10px;
+		text-align: center;
+		max-width: 42rem;
+		margin-inline: auto;
 	}
 
 	.story-chart-panel__chart .chart-wrap.small-chart.compact-side-chart {
@@ -2813,10 +2988,6 @@
 	.story--centered h2,
 	.story--centered p {
 		margin-inline: auto;
-	}
-
-	.signal-line {
-		max-width: 48rem;
 	}
 
 	.story.card.full-width > h2,
@@ -3080,15 +3251,31 @@
 
 	.story--signal {
 		display: grid;
-		gap: 10px;
+		gap: 12px;
 	}
 
-	.signal-line {
-		margin: 0;
+	.signal-lead {
+		margin: 0 auto;
+		max-width: 44rem;
+		font-size: 1.15rem;
+		line-height: 1.72;
+		color: color-mix(in srgb, var(--ink) 92%, transparent);
+		text-wrap: balance;
+	}
+
+	.signal-lead strong {
+		display: block;
 		font-size: 1.12rem;
 		line-height: 1.62;
 		color: var(--ink);
-		max-width: 48rem;
+		margin-top: 10px;
+	}
+
+	.signal-lead-policy {
+		display: block !important;
+		margin-top: 14px;
+		font-weight: 800;
+		letter-spacing: -0.01em;
 	}
 
 	.guide-figures {
@@ -3162,6 +3349,76 @@
 		background: transparent;
 		border: 0;
 		border-top: 1px solid rgba(120, 114, 102, 0.14);
+	}
+
+	.takeaway-grid--tract-lens {
+		max-width: 44rem;
+		margin-inline: auto;
+		margin-top: 18px;
+		gap: 12px;
+	}
+
+	.takeaway-card.takeaway-card--tier {
+		padding: 18px;
+		border-radius: 14px;
+		border-top: none;
+		border-left: 4px solid var(--tier-edge, rgba(125, 120, 110, 0.45));
+		background: linear-gradient(
+			to bottom right,
+			color-mix(in srgb, var(--tier-soft, transparent) 90%, transparent),
+			transparent
+		);
+		box-shadow: 0 14px 32px rgba(31, 36, 48, 0.05);
+	}
+
+	.takeaway-card.takeaway-card--access {
+		--tier-edge: rgba(22, 128, 90, 0.85);
+		--tier-soft: rgba(22, 128, 90, 0.18);
+	}
+
+	.takeaway-card.takeaway-card--growth {
+		--tier-edge: rgba(220, 120, 30, 0.85);
+		--tier-soft: rgba(220, 120, 30, 0.22);
+	}
+
+	.takeaway-card.takeaway-card--pressure {
+		--tier-edge: rgba(99, 80, 200, 0.85);
+		--tier-soft: rgba(99, 80, 200, 0.2);
+	}
+
+	.takeaway-card.takeaway-card--tier .takeaway-label {
+		color: var(--ink);
+		letter-spacing: 0.05em;
+	}
+
+	.takeaway-card.takeaway-card--tier .takeaway-meta {
+		border-top: 0;
+		margin-top: 6px;
+		padding-top: 0;
+		font-size: 0.9rem;
+		color: color-mix(in srgb, var(--muted) 88%, transparent);
+	}
+
+	.takeaway-card.takeaway-card--tier .takeaway-meta strong {
+		color: var(--ink);
+	}
+
+	.tract-caveats {
+		max-width: 44rem;
+		margin-inline: auto;
+		margin-top: 12px;
+		padding: 12px 16px;
+		border-radius: 12px;
+		background: rgba(255, 244, 237, 0.55);
+		border: 1px solid rgba(234, 88, 12, 0.22);
+		color: color-mix(in srgb, var(--ink) 92%, transparent);
+		font-size: 0.93rem;
+		line-height: 1.55;
+		text-align: left;
+	}
+
+	.story.card.full-width > p.tract-caveats {
+		text-align: left;
 	}
 
 	.takeaway-label {
@@ -3312,47 +3569,6 @@
 		font-size: 1.1rem;
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
-	}
-
-	.story--framing {
-		padding-top: 18px;
-		padding-bottom: 18px;
-	}
-
-	.framing-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 24px;
-		align-items: start;
-		max-width: 70rem;
-		margin-inline: auto;
-	}
-
-	.framing-block {
-		padding: 14px 0 0;
-		border: 0;
-		border-top: 1px solid rgba(120, 114, 102, 0.14);
-		border-radius: 0;
-		background: transparent;
-	}
-
-	.framing-block h2 {
-		margin: 0 0 10px;
-		font-size: 1.14rem;
-		text-align: center;
-	}
-
-	.framing-block p {
-		margin: 0;
-		color: var(--muted);
-		line-height: 1.6;
-		max-width: 31rem;
-		margin-inline: auto;
-		text-align: center;
-	}
-
-	.framing-block p + p {
-		margin-top: 10px;
 	}
 
 	/* Affordability: stacked rows (income, then education), each row = scatter + skinny compare bar */
@@ -3535,7 +3751,7 @@
 
 	/* ── Responsive ───────────────────────────────────── */
 	@media (max-width: 1060px) {
-		.dashboard, .small-grid, .summary-grid, .framing-grid {
+		.dashboard, .small-grid, .summary-grid {
 			grid-template-columns: 1fr;
 		}
 	}

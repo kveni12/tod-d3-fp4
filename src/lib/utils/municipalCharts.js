@@ -963,6 +963,124 @@ export function renderMuniAffordableTrend(el, projectRows, state) {
 
 /* ── Growth capture ──────────────────────────────────── */
 
+const GROWTH_CAPTURE_BAND_SPECS = [
+	{
+		id: 'highIncome',
+		label: 'Higher-income municipalities ($125k+ median)',
+		legendLine: '$125k+ median',
+		fill: '#16803c',
+		outline: '#1849b5'
+	},
+	{
+		id: 'upperMiddle',
+		label: 'Upper-middle municipalities ($100k-$125k median)',
+		legendLine: '$100k–$125k median',
+		fill: '#7ccf95',
+		outline: '#1849b5'
+	},
+	{
+		id: 'lowerMiddle',
+		label: 'Lower-middle municipalities ($75k-$100k median)',
+		legendLine: '$75k–$100k median',
+		fill: '#f3b256',
+		outline: '#0b8a43'
+	},
+	{
+		id: 'lowIncome',
+		label: 'Lower-income municipalities (below $75k median)',
+		legendLine: 'Below $75k median',
+		fill: '#d65245',
+		outline: '#0b8a43'
+	}
+];
+
+/** Ascending median-income order for the in-chart encoding legend. */
+const GROWTH_CAPTURE_FILL_LEGEND = [...GROWTH_CAPTURE_BAND_SPECS]
+	.slice()
+	.reverse()
+	.map((d) => ({ fill: d.fill, label: d.legendLine }));
+
+/** Outline colors and copy aligned with the midpoint framing in copy. */
+const GROWTH_CAPTURE_OUTLINE_LEGEND = [
+	{
+		stroke: '#1849b5',
+		label: 'Below the regional midpoint for share of households under $125k'
+	},
+	{
+		stroke: '#0b8a43',
+		label: 'Above the regional midpoint'
+	}
+];
+
+const GROWTH_CAPTURE_LEGEND_HOUSE_PATH =
+	'M 10 1.5 L 18.5 8.5 L 18.5 20.5 L 1.5 20.5 L 1.5 8.5 Z';
+
+function appendGrowthCaptureEncodingLegend(root) {
+	const wrap = root
+		.append('div')
+		.attr('class', 'growth-capture-legend')
+		.attr('aria-label', 'How to read the growth icons');
+
+	wrap
+		.append('p')
+		.attr('class', 'growth-capture-legend__note')
+		.text(
+			'Each house icon stands for one percent of new units in the selected period.'
+		);
+
+	const fillSection = wrap.append('div').attr('class', 'growth-capture-legend__section');
+	fillSection
+		.append('p')
+		.attr('class', 'growth-capture-legend__section-title')
+		.text('Fill — municipality median income');
+	const fillList = fillSection
+		.append('ul')
+		.attr('class', 'growth-capture-legend__keys growth-capture-legend__keys--fill');
+	for (const band of GROWTH_CAPTURE_FILL_LEGEND) {
+		const li = fillList.append('li').attr('class', 'growth-capture-legend__key');
+		const svg = li
+			.append('svg')
+			.attr('class', 'growth-capture-legend__house')
+			.attr('viewBox', '0 0 20 22')
+			.attr('aria-hidden', 'true')
+			.attr('focusable', 'false');
+		svg
+			.append('path')
+			.attr('d', GROWTH_CAPTURE_LEGEND_HOUSE_PATH)
+			.attr('fill', band.fill)
+			.attr('stroke', 'rgba(15,23,42,0.14)')
+			.attr('stroke-width', 0.6)
+			.attr('stroke-linejoin', 'round');
+		li.append('span').attr('class', 'growth-capture-legend__key-label').text(band.label);
+	}
+
+	const outSection = wrap.append('div').attr('class', 'growth-capture-legend__section');
+	outSection
+		.append('p')
+		.attr('class', 'growth-capture-legend__section-title')
+		.text('Outline — households under $125k vs. region');
+	const outList = outSection
+		.append('ul')
+		.attr('class', 'growth-capture-legend__keys growth-capture-legend__keys--outline');
+	for (const row of GROWTH_CAPTURE_OUTLINE_LEGEND) {
+		const li = outList.append('li').attr('class', 'growth-capture-legend__key');
+		const svg = li
+			.append('svg')
+			.attr('class', 'growth-capture-legend__house growth-capture-legend__house--outline')
+			.attr('viewBox', '0 0 20 22')
+			.attr('aria-hidden', 'true')
+			.attr('focusable', 'false');
+		svg
+			.append('path')
+			.attr('d', GROWTH_CAPTURE_LEGEND_HOUSE_PATH)
+			.attr('fill', 'rgba(255,255,255,0.92)')
+			.attr('stroke', row.stroke)
+			.attr('stroke-width', 1.85)
+			.attr('stroke-linejoin', 'round');
+		li.append('span').attr('class', 'growth-capture-legend__key-label').text(row.label);
+	}
+}
+
 export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	const root = d3.select(el);
 	root.selectAll('*').remove();
@@ -994,36 +1112,13 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 	);
 
 	const totalUnits = d3.sum(projectRows, (d) => d.units) || 0;
-	const grouped = [
-		{
-			id: 'highIncome',
-			label: 'Higher-income municipalities ($125k+ median)',
-			fill: '#16803c',
-			outline: '#1849b5',
-			count: 0
-		},
-		{
-			id: 'upperMiddle',
-			label: 'Upper-middle municipalities ($100k-$125k median)',
-			fill: '#7ccf95',
-			outline: '#1849b5',
-			count: 0
-		},
-		{
-			id: 'lowerMiddle',
-			label: 'Lower-middle municipalities ($75k-$100k median)',
-			fill: '#f3b256',
-			outline: '#0b8a43',
-			count: 0
-		},
-		{
-			id: 'lowIncome',
-			label: 'Lower-income municipalities (below $75k median)',
-			fill: '#d65245',
-			outline: '#0b8a43',
-			count: 0
-		}
-	];
+	const grouped = GROWTH_CAPTURE_BAND_SPECS.map(({ id, label, fill, outline }) => ({
+		id,
+		label,
+		fill,
+		outline,
+		count: 0
+	}));
 	const groupedById = new Map(grouped.map((d) => [d.id, d]));
 	for (const row of projectRows) {
 		const units = Number(row.units) || 0;
@@ -1050,44 +1145,11 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 			`${fmtPct(higherVulnerabilityShare)} of selected-period units landed in municipalities above the regional median share of households earning less than $125k.`
 		);
 
-	root
-		.append('div')
-		.attr('class', 'chart-note')
-		.style('margin-bottom', '12px')
-		.text(
-			`Fill colors group municipalities by estimated median household income. Outlines still show whether a municipality sits above or below the regional midpoint in households earning under $125k.`
-		);
-
-	const incomeLegend = addHtmlLegend(
-		root,
-		grouped.map((d) => ({
-			type: 'outline',
-			color: d.outline,
-			fill: d.fill,
-			label: d.label
-		}))
-	);
-	incomeLegend
-		.style('display', 'grid')
-		.style('grid-template-columns', 'repeat(2, minmax(280px, max-content))')
-		.style('justify-content', 'center')
-		.style('column-gap', '22px')
-		.style('row-gap', '10px')
-		.style('width', 'fit-content')
-		.style('max-width', '100%')
-		.style('margin-left', 'auto')
-		.style('margin-right', 'auto')
-		.style('text-align', 'left');
-	incomeLegend
-		.selectAll('.legend-item')
-		.style('display', 'flex')
-		.style('align-items', 'center')
-		.style('gap', '10px')
-		.style('min-width', '0');
+	appendGrowthCaptureEncodingLegend(root);
 
 	const width = Math.max(320, root.node().clientWidth || 520);
-	const height = 372;
-	const margin = { top: 18, right: 20, bottom: 62, left: 20 };
+	const height = 348;
+	const margin = { top: 18, right: 20, bottom: 28, left: 20 };
 	const innerW = width - margin.left - margin.right;
 	const innerH = height - margin.top - margin.bottom;
 	const svg = root.append('svg').attr('viewBox', `0 0 ${width} ${height}`);
@@ -1143,12 +1205,4 @@ export function renderMuniGrowthCapture(el, projectRows, domainRows, state) {
 		.attr('opacity', 1)
 		.append('title')
 		.text((d) => `Unit share: ${d.group.label}`);
-
-	g.append('text')
-		.attr('x', innerW / 2)
-		.attr('y', offsetY + gridH + 36)
-		.attr('text-anchor', 'middle')
-		.attr('fill', 'var(--text-muted)')
-		.attr('font-size', 13)
-		.text('Blue outlines mark municipalities below the regional midpoint. Green outlines mark municipalities above it.');
 }

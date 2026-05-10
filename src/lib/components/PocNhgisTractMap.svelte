@@ -528,7 +528,13 @@
 			bodyHtml:
 				'This step makes the pattern explicit. Solid purple outlines mark tracts with strong transit access but low or negative housing growth. Dashed purple outlines mark the reverse: strong growth despite weaker transit access.<br><br>Both patterns appear across the region, which makes the mismatch hard to ignore.',
 			legend:
-				'The map key lists purple rim styles. Growth fill and the color bar still describe housing change; purple outlines add the access–growth mismatch read.'
+				'The map key lists purple rim styles. Growth fill and the color bar still describe housing change; purple outlines add the access–growth mismatch read.',
+			methodsDetails: {
+				summary: 'How mismatch buckets are summarized',
+				bodyHtml:
+					'<p>Mismatch outlines compare each tract to the Greater Boston tract sample shown on this map—not statewide totals—and use those peer comparisons rather than arbitrary national cutoffs.</p>' +
+					'<p>In the walkthrough cards, highlighted numbers summarize tract averages (not population-weighted regional totals).</p>'
+			}
 		},
 		{
 			kicker: 'Step 5',
@@ -536,7 +542,14 @@
 			bodyHtml:
 				'Instead of just showing mismatch, this step classifies tracts by how development relates to transit. Green outlines mark more transit-oriented development, while orange outlines mark more non-TOD patterns.<br><br>Now we can compare not just where growth happened, but how closely it tracks transit.',
 			legend:
-				'The key shows teal (TOD-dominated) vs orange (non-TOD-dominated) interior rims. Choropleth color is still % housing growth from the same diverging scale as before.'
+				'The key shows teal (TOD-dominated) vs orange (non-TOD-dominated) interior rims. Choropleth color is still % housing growth from the same diverging scale as before.',
+			methodsDetails: {
+				summary: 'Definitions for TOD and tract tiers',
+				bodyHtml:
+					'<p><strong>TOD developments</strong> are multifamily projects within roughly half a mile of an MBTA stop; farther projects go into the non-TOD bucket.</p>' +
+					'<p><strong>TOD-dominated tracts</strong> draw at least half of their filtered new housing units from those TOD projects <em>and</em> clear a modest housing growth screen. Non-TOD-dominated tracts still register growth but with a smaller transit-proximate share.</p>' +
+					'<p><strong>Minimal-development tracts</strong> remain below that growth cutoff.</p>'
+			}
 		},
 		{
 			kicker: 'Step 6',
@@ -4587,6 +4600,18 @@
 										</div>
 									</details>
 								{/if}
+								{#if guidedMode && step.methodsDetails}
+									<details class="poc-stepper-more poc-stepper-methods">
+										<summary>{step.methodsDetails.summary}</summary>
+										<div class="poc-stepper-more__body poc-stepper-methods__body">
+											{#if step.methodsDetails.bodyHtml}
+												{@html step.methodsDetails.bodyHtml}
+											{:else if step.methodsDetails.body}
+												<p class="poc-stepper-card-note">{step.methodsDetails.body}</p>
+											{/if}
+										</div>
+									</details>
+								{/if}
 								{#if guidedMode && i === 3 && guidedContrastExamples.length}
 									<div
 										use:focusWaypointRef={{ stage: 3, key: 'contrast_example' }}
@@ -5000,7 +5025,7 @@
 		gap: 14px;
 		width: 100%;
 		min-height: calc(76vh * 0.6);
-		padding: 14px 0 0;
+		padding: 14px 0 1.35rem;
 		border-left: 2px solid color-mix(in srgb, var(--accent) 16%, var(--border));
 		padding-left: 20px;
 		border-radius: var(--radius-sm);
@@ -5149,6 +5174,30 @@
 
 	.poc-stepper-more summary::-webkit-details-marker {
 		display: none;
+	}
+
+	.poc-stepper-methods {
+		max-width: 100%;
+	}
+
+	.poc-stepper-methods__body {
+		max-width: 58ch;
+	}
+
+	.poc-stepper-methods__body :global(p) {
+		margin: 0;
+		font-size: 0.9rem;
+		line-height: 1.54;
+		color: var(--text-muted, #526070);
+	}
+
+	.poc-stepper-methods__body :global(p + p) {
+		margin-top: 0.6rem;
+	}
+
+	.poc-stepper-methods__body :global(strong) {
+		color: var(--text);
+		font-weight: 700;
 	}
 
 	.poc-stepper-more summary::after {
