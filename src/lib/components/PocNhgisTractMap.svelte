@@ -145,9 +145,11 @@
 	let pendingHoverPos = $state(/** @type {{ x: number; y: number } | null} */ (null));
 	/** Tract ID waiting for debounce to complete. */
 	let pendingHoverId = $state(/** @type {string | null} */ (null));
-	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 10 : focusLowIncomeTracts);
+	const lowIncomeFocusOn = $derived(guidedMode ? revealStage === 11 : focusLowIncomeTracts);
 	/** Guided Steps 1–1.5: transit baseline only — no choropleth fills or growth colorbar. */
 	const guidedTransitOnlyChoro = $derived(guidedMode && revealStage <= 1);
+	/** Guided Step 10 (project examples): hide the tract colorbar; HTML key is developments-only. */
+	const guidedStepTenDevKeyOnly = $derived(guidedMode && revealStage === 10);
 	/**
 	 * Main page guided walkthrough: tracts/insights are not toggled by map click (scrolly and
 	 * in-text controls drive focus). The playground carousel keeps full click-to-select behavior.
@@ -237,6 +239,10 @@
 	 */
 	const CHORO_MAP_LEGEND_COLUMN_W = Math.round(92 * CHORO_MAP_LEGEND_SCALE);
 	/**
+	 * Playground (``/playground``): in-map colorbar — smaller glyphs than the main story strip legend.
+	 */
+	const PLAYGROUND_CHORO_LEGEND_SCALE = CHORO_MAP_LEGEND_SCALE * 0.76;
+	/**
 	 * Non–mismatch tracts when the mismatch layer is on (revealStage ≥2).
 	 * ~0.11 opacity ≈ 89% dimming vs full (≥50% reduction vs the previous 0.22 pass) so violet/lavender outlines read clearly.
 	 */
@@ -296,7 +302,7 @@
 
 	function showCohortOutlines() {
 		if (guidedMode) {
-			return (revealStage >= 5 && revealStage <= 8) || (revealStage === 10 && guidedLowerIncomeOverlay === 'cohort');
+			return (revealStage >= 5 && revealStage <= 8) || (revealStage === 11 && guidedLowerIncomeOverlay === 'cohort');
 		}
 		if (playgroundStoryCarousel) {
 			if (revealStage === 4) return playgroundSandboxCohortOutlines;
@@ -306,7 +312,7 @@
 	}
 
 	function showMismatchOutlines() {
-		if (guidedMode) return revealStage === 4 || (revealStage === 10 && guidedLowerIncomeOverlay === 'mismatch');
+		if (guidedMode) return revealStage === 4 || (revealStage === 11 && guidedLowerIncomeOverlay === 'mismatch');
 		return revealStage === 2;
 	}
 
@@ -549,30 +555,30 @@
 			methodsDetails: {
 				summary: 'Definitions for TOD and tract tiers',
 				bodyHtml:
-					'<p><strong>TOD developments</strong> are multifamily projects within roughly half a mile of an MBTA stop; farther projects go into the non-TOD bucket.</p>' +
-					'<p><strong>TOD-dominated tracts</strong> draw at least half of their filtered new housing units from those TOD projects <em>and</em> clear a modest housing growth screen. Non-TOD-dominated tracts still register growth but with a smaller transit-proximate share.</p>' +
-					'<p><strong>Minimal-development tracts</strong> remain below that growth cutoff.</p>'
+					'<p><strong>TOD developments</strong> are multifamily projects within 0.5 miles of an MBTA stop; farther projects and single-family projects go into the non-TOD bucket.</p>' +
+					'<p><strong>TOD-dominated tracts</strong> draw >50% of their new housing units from TOD developments <em>and</em> clear a 2% housing growth threshold. Non-TOD-dominated tracts still register >2% growth but with less TOD share.</p>' +
+					'<p><strong>Minimal-development tracts</strong> remain below the 2% growth cutoff.</p>'
 			}
 		},
 		{
 			kicker: 'Step 6',
 			title: 'TOD Patterns: Boston and Cambridge',
 			bodyHtml:
-				'Boston and Cambridge are the clearest reference case. Most tracts here are TOD-dominated, which fits the strongest transit geography in the region.<br><br>But even here, housing growth is slow in some regions, and in others most growth is not multifamily or transit-accessible, making them non-TOD regions.',
+				'Boston and Cambridge are the clearest reference case. Most tracts here are TOD-dominated, which fits the strongest transit geography in the region.<br><br>But even here, housing growth is slow in some tracts, and in others is dominated by non-TOD.',
 			legend:
-				'Teal / orange TOD split plus growth fill, same as step 5; zoom is tighter on the core so you can read individual tracts.'
+				'Green / orange TOD split plus growth fill, same as step 5; zoom is tighter on the core so you can read individual tracts.'
 		},
 		{
 			kicker: 'Step 7',
 			title: 'TOD Patterns: Quincy and Revere',
 			bodyHtml:
-				'Moving outward to Quincy and Revere, the pattern becomes more mixed. Transit is still present, but nearby tracts do not all show the same relationship between growth and TOD.<br><br>Compared with the core, development here looks less consistent and less tightly tied to transit.',
+				'Even outside the urban core, TOD is still very present, aided by access to bus lines and the commuter rail. TOD is clearly not an urban-only phenomenon.',
 			legend:
 				'Encodings match step 5: growth in color, TOD / non-TOD in the green vs orange ring treatment shown in the key.'
 		},
 		{
 			kicker: 'Step 8',
-			title: 'Outer-Ring Growth',
+			title: 'TOD Patterns: Outer-Ring Growth',
 			bodyHtml:
 				'In the outer ring, the pattern shifts more clearly. Many tracts sit farther from strong transit, and much of the development falls into non-TOD categories.<br><br>Growth is still happening, but it is more dispersed and less closely tied to the strongest access.',
 			legend:
@@ -582,23 +588,23 @@
 			kicker: 'Step 9',
 			title: 'Projects Enter the Picture',
 			bodyHtml:
-				'This step adds individual developments. Each dot is a project, with size showing units and color showing multifamily share. Green outlines indicate transit-accessible projects; yellow outlines indicate those that are not.<br><br>Most projects are heavily multifamily, but they are spread across a wider geography than the strongest transit network alone would suggest.',
+				'Individual developments offer a more granular view on project size, transit access, and multifamily share.<br><br>Most projects are heavily multifamily, but they are spread across a wider geography than the strongest transit network alone would suggest.',
 			legend:
 				'Key + map: dot area scales with project size (√ units); white→purple = multifamily share; green vs yellow project ring = transit-accessible or not. Tract color is still the growth layer.'
 		},
 		{
 			kicker: 'Step 10',
-			title: 'Projects as Examples',
+			title: 'Example Development Projects',
 			bodyHtml:
-				'These examples make the pattern more concrete. Assembly Row and 16 Boardman St are strong TOD cases with dense housing near transit. 16 Dyer sits in more of a middle ground. Mahoney Farm and The Pinehills show sizable growth much farther from strong transit access.<br><br>Together, they show that location, scale, and affordability do not line up in one predictable way.',
+				'These example projects show that location, scale, and affordability do not line up in one predictable way.',
 			legend:
-				'Read highlighted pins like other development dots: size = units, fill ramp = % multifamily, outline = transit access; compare with the named cards beside the map.'
+				'Only the developments key shows on the map: full-width multifamily ramp (0% multifamily → 100%), dot size = units, ring color = transit access. Compare with the named cards beside the map.'
 		},
 		{
 			kicker: 'Step 11',
 			title: 'Who This Affects',
 			bodyHtml:
-				'In this final step, higher-income tracts fade into the background so lower-income tracts are easier to see.<br><br>Many of those tracts fall inside the mismatch patterns: some are in high-access places with limited growth, while others are in growing places with weaker transit access.<br><br>The equity question is the point here: access is not equally shared if affordability does not come with it.',
+				'Focusing on lower-income tracts, it is clear that many of these tracts fall inside the mismatch patterns: some are in high-access places with limited growth, while others are in growing places with weaker transit access.<br><br>The equity question is the point here: access is not equally shared if affordability does not come with it.',
 			legend:
 				'Lower-income tracts stay vivid; other tracts wash out. Use the toggles in the key if cohort vs mismatch rims are shown—meaning matches the same swatches and line styles as earlier steps.'
 		}
@@ -835,7 +841,8 @@
 			af: allTractsGeo?.features?.length ?? 0,
 			ms: mbtaStops.length,
 			showDev: panelState.showDevelopments,
-			cmh: choroplethMapHeight
+			cmh: choroplethMapHeight,
+			pg: playgroundStoryCarousel
 		})
 	);
 
@@ -1317,7 +1324,8 @@
 		});
 
 		const cw = containerEl.clientWidth || 900;
-		const legendColW = CHORO_MAP_LEGEND_COLUMN_W;
+		/** Main story keeps the right-hand strip; playground overlays a compact colorbar inside the map. */
+		const legendColW = playgroundStoryCarousel ? 0 : CHORO_MAP_LEGEND_COLUMN_W;
 		const innerMax = Math.max(400, Math.min(1100, cw - 16));
 		mapW = Math.max(280, innerMax - legendColW);
 
@@ -1832,23 +1840,47 @@
 		if (legend) {
 			const legGroup = svg.select('.map-legend-group');
 			legGroup.selectAll('*').remove();
-			// Guided Steps 1–1.5: transit-only baselines; skip the growth colorbar.
-			if (!guidedTransitOnlyChoro) {
-				const legScale = CHORO_MAP_LEGEND_SCALE;
+			// Guided Steps 1–1.5: transit-only baselines; step 10: developments-only UI — skip tract colorbar.
+			if (!guidedTransitOnlyChoro && !guidedStepTenDevKeyOnly) {
+				const playgroundInsetLegend = playgroundStoryCarousel;
+				const legScale = playgroundInsetLegend ? PLAYGROUND_CHORO_LEGEND_SCALE : CHORO_MAP_LEGEND_SCALE;
 				const stripW = CHORO_MAP_LEGEND_COLUMN_W;
-				const barW = 10 * legScale;
+				const barW = (playgroundInsetLegend ? 8 : 10) * legScale;
 				const rightInset = 6 * legScale;
 				// Colorbar is flush to the SVG right edge inside the reserved strip (choropleth uses ``mapW`` only).
-				const barRight = stripW - rightInset;
-				const barLeft = barRight - barW;
-				const legGroupX = mapCanvasLeft + mapW;
+				let barRight;
+				let barLeft;
+				let legGroupX;
+				if (playgroundInsetLegend) {
+					const leftGutter = 40 * legScale;
+					barLeft = leftGutter;
+					barRight = barLeft + barW;
+					legGroupX = mapCanvasLeft + 10;
+				} else {
+					barRight = stripW - rightInset;
+					barLeft = barRight - barW;
+					legGroupX = mapCanvasLeft + mapW;
+				}
 				legGroup.attr('transform', `translate(${legGroupX},0)`);
-				const topPad = 8 * legScale;
 				const bottomPad = 3 * legScale;
 				// Reserve extra vertical space for two-line tan footnote (tspan + dy 1.1em).
-				const tanH = 20 * legScale;
-				const legBarH = Math.max(48, mapH - topPad - bottomPad - tanH);
-				const y0 = topPad;
+				const tanH = (playgroundInsetLegend ? 22 : 20) * legScale;
+				let legBarH;
+				let y0;
+				if (playgroundInsetLegend) {
+					const bottomInset = 10 * legScale;
+					const minY = 4 * legScale;
+					legBarH = Math.min(112, Math.max(50, Math.round(mapH * 0.29)));
+					y0 = mapH - bottomInset - tanH - legBarH;
+					if (y0 < minY) {
+						legBarH = Math.max(40, mapH - bottomInset - tanH - minY);
+						y0 = minY;
+					}
+				} else {
+					const topPad = 8 * legScale;
+					legBarH = Math.max(48, mapH - topPad - bottomPad - tanH);
+					y0 = topPad;
+				}
 				const fmtTick = (v) => {
 					const n = Number(invTransform(Number(v)));
 					if (!Number.isFinite(n)) return '';
@@ -1906,17 +1938,21 @@
 					.attr('font-weight', 600)
 					.text(legendTitle);
 	
-				// Tan tracts: right-aligned with the color strip within the legend column.
+				// Tan tracts: aligned with the color strip (right column: flush right; playground: left stack).
 				const tanNote = legendG
 					.append('text')
-					.attr('x', barRight)
+					.attr('x', playgroundInsetLegend ? barLeft : barRight)
 					.attr('y', y0 + legBarH + 9 * legScale)
-					.attr('text-anchor', 'end')
+					.attr('text-anchor', playgroundInsetLegend ? 'start' : 'end')
 					.attr('fill', 'var(--text-muted)')
 					.attr('font-size', `${6.5 * legScale}px`)
 					.attr('font-weight', 500);
 				tanNote.append('tspan').text('Tan = limited or');
-				tanNote.append('tspan').attr('x', barRight).attr('dy', '1.1em').text('unreliable data');
+				tanNote
+					.append('tspan')
+					.attr('x', playgroundInsetLegend ? barLeft : barRight)
+					.attr('dy', '1.1em')
+					.text('unreliable data');
 			}
 		}
 
@@ -2788,6 +2824,55 @@
 	}
 
 	function showDevelopmentTooltip(d, x, y, anchor = null) {
+		if (!d) return;
+
+		// Guided Step 10: curated project examples — scoped tooltip (story + category badge + compact stats).
+		if (guidedMode && revealStage === 10) {
+			const dk = developmentKey(d);
+			const stepTen =
+				guidedStepTenExamples.find((item) => developmentKey(item.dev) === dk) ?? null;
+			if (stepTen) {
+				const fmtPct = d3.format('.1f');
+				const fmtInt = d3.format(',.0f');
+				const primaryRows = [{ label: 'Units', value: fmtInt(Number(d.hu) || 0) }];
+				const mf = developmentMultifamilyShare(d);
+				if (mf != null && Number.isFinite(mf)) {
+					primaryRows.push({ label: 'Multifamily', value: `${fmtPct(mf * 100)}%` });
+				}
+				const affCap = developmentAffordableUnitsCapped(d);
+				primaryRows.push({
+					label: 'Affordable',
+					value: affCap > 0 ? fmtInt(affCap) : d.manualAffordableLabel || '—'
+				});
+				const transitM = transitDistanceMiToMetres(panelState.transitDistanceMi ?? 0.5);
+				const prox = developmentMbtaProximity(d, mbtaStops, transitM);
+				const nearestM = prox.nearestDistM;
+				if (nearestM != null && Number.isFinite(nearestM)) {
+					primaryRows.push({ label: 'Nearest stop', value: `${nearestM.toFixed(0)} m` });
+				}
+				let badgeTone = 'neutral';
+				if (stepTen.categoryTone === 'tod') badgeTone = 'tod';
+				else if (stepTen.categoryTone === 'nontod') badgeTone = 'nontod';
+				else if (stepTen.categoryTone === 'partial') badgeTone = 'partial';
+				tooltip = {
+					visible: true,
+					x,
+					y,
+					anchorX: anchor?.x ?? null,
+					anchorY: anchor?.y ?? null,
+					eyebrow: 'Project example',
+					title: stepTen.label,
+					summary: stepTen.note,
+					badge: stepTen.categoryLabel,
+					badgeTone,
+					primaryRows,
+					secondaryRows: []
+				};
+				pinnedTooltipStage = anchor ? revealStage : null;
+				return;
+			}
+		}
+
 		const fmtPct = d3.format('.1f');
 		const primaryRows = [
 			{ label: 'Municipality', value: d.municipal || '—' },
@@ -3525,7 +3610,7 @@
 				categoryLabel: 'TOD example',
 				categoryTone: 'tod',
 				note:
-					'Boston. 16 Boardman St is a real East Boston project in the dataset and works as another TOD case: new housing added very close to rapid transit, which is the kind of alignment transit-oriented policy is meant to encourage.',
+					'B16 Boardman St is an East Boston TOD project: new housing added very close to rapid transit, which is the kind of alignment transit-oriented policy is meant to encourage.',
 				fallback: {
 					id: 'manual-amaya-suffolk-downs',
 					name: '16 Boardman St',
@@ -3547,7 +3632,7 @@
 				categoryLabel: 'Partial TOD example',
 				categoryTone: 'partial',
 				note:
-					'Boston. 16 Dyer is a real project in the dataset and works as a partial-TOD case: it is near transit, but not in the same way as the strongest flagship TOD examples.',
+					'16 Dyer is a partial-TOD project: it is near the commuter rail and bus lines, but not in the urban core dominated by rapid-transit lines.',
 				fallback: {
 					id: 'manual-allston-yards',
 					name: '16 Dyer',
@@ -3569,7 +3654,7 @@
 				categoryLabel: 'Non-TOD contrast',
 				categoryTone: 'nontod',
 				note:
-					'Sudbury. Mahoney Farm is a real record in the dataset and works as a stronger non-TOD contrast case: housing growth can still happen well outside the strongest transit geography.',
+					'Mahoney Farm is a stronger non-TOD contrast case: housing growth (even multifamily housing) can still happen well outside the strongest transit geography.',
 				fallback: {
 					id: 'manual-weymouth-landing',
 					name: 'Mahoney Farm',
@@ -3591,7 +3676,7 @@
 				categoryLabel: 'Non-TOD contrast',
 				categoryTone: 'nontod',
 				note:
-					'Plymouth. The Pinehills: Phase 1 shows very large-scale housing growth far from strong MBTA access, making the non-TOD side of the regional pattern especially clear.',
+					'The Pinehills: Phase 1 shows very large-scale single-family housing growth far from strong MBTA access, making the non-TOD side of the regional pattern especially clear.',
 				fallback: {
 					id: 'manual-pinehills-phase-1',
 					name: 'The Pinehills: Phase 1',
@@ -3654,11 +3739,11 @@
 	function inspectGuidedDevelopment(d) {
 		if (!d) return;
 		const key = developmentKey(d);
+		const stepTenEx =
+			guidedStepTenExamples.find((item) => developmentKey(item.dev) === key) ?? null;
 		const example =
-			guidedStepTenExamples.find((item) => developmentKey(item.dev) === key) ??
-			guidedDevelopmentExamples.find((item) => developmentKey(item) === key) ??
-			null;
-		guidedTooltipSummaryOverride = example?.note || '';
+			stepTenEx ?? guidedDevelopmentExamples.find((item) => developmentKey(item) === key) ?? null;
+		guidedTooltipSummaryOverride = stepTenEx ? '' : example?.note || '';
 		activeGuidedDevelopmentKey = developmentKey(d);
 		zoomToDevelopment(d);
 		window.setTimeout(() => {
@@ -3847,22 +3932,6 @@
 			return;
 		}
 		if (revealStage === 10) {
-			if (guidedFocusDetail === '11_compare') {
-				const focus = tractFeatureByGeoFilter((t) => {
-					const lat = Number(t.centlat);
-					const lon = Number(t.centlon);
-					return (
-						Number.isFinite(lat) &&
-						Number.isFinite(lon) &&
-						lat >= 41.95 &&
-						lat <= 42.75 &&
-						lon >= -72.55 &&
-						lon <= -70.75
-					);
-				});
-				zoomToFeatureGroup(focus, 4.2);
-				return;
-			}
 			const rowsByGj = new Map((nhgisRows ?? []).map((r) => [r.gisjoin, r]));
 			const focus = tractFeatureByGeoFilter((t) => {
 				const lat = Number(t.centlat);
@@ -3874,8 +3943,21 @@
 			zoomToFeatureGroup(focus, 8.2);
 			return;
 		}
-		if (revealStage === 10) {
-			recenterMap();
+		if (revealStage === 11) {
+			const focus = tractFeatureByGeoFilter((t) => {
+				const lat = Number(t.centlat);
+				const lon = Number(t.centlon);
+				return (
+					Number.isFinite(lat) &&
+					Number.isFinite(lon) &&
+					lat >= 41.95 &&
+					lat <= 42.75 &&
+					lon >= -72.55 &&
+					lon <= -70.75
+				);
+			});
+			zoomToFeatureGroup(focus, 4.2);
+			return;
 		}
 	});
 
@@ -3945,6 +4027,13 @@
 			if (pinnedTooltipStage == null || !tooltip.visible) return;
 			if (guidedMode && revealStage === 3 && guidedFocusDetail?.startsWith('3_example:')) return;
 			if (guidedMode && revealStage === 4 && guidedFocusDetail?.startsWith('4_example:')) return;
+			if (
+				guidedMode &&
+				revealStage === 10 &&
+				(guidedFocusDetail?.startsWith('10_project:') || guidedFocusDetail === 'project_example')
+			) {
+				return;
+			}
 			const rect = containerEl.getBoundingClientRect();
 			const mapMostlyOutOfView = rect.bottom < 120 || rect.top > window.innerHeight - 120;
 			if (mapMostlyOutOfView) clearGuidedPopupState();
@@ -4392,7 +4481,11 @@
 						bind:clientHeight={mapMainBlockHeight}
 						onmouseleave={handleOverlayLeave}
 					>
-						<div class="map-widget">
+						<div
+							class="map-widget"
+							class:map-widget--guided={guidedMode}
+							class:map-widget--playground={playgroundStoryCarousel && !guidedMode}
+						>
 							{#if !guidedMode}
 							{#if playgroundStoryCarousel && panelState.selectedTracts.size > 0}
 								<div class="map-widget__clear" role="group" aria-label="Map selection">
@@ -4413,6 +4506,102 @@
 							</div>
 							{/if}
 							<div class="map-root" bind:this={containerEl}></div>
+							{#if showCohortOutlines() || showMismatchOutlines() || showDevelopmentDots()}
+								<div
+									class="poc-map-key-overlay"
+									role="region"
+									aria-label="Map legend"
+									style:--choro-strip-w="{playgroundStoryCarousel
+										? '0px'
+										: `${CHORO_MAP_LEGEND_COLUMN_W}px`}"
+								>
+									<div class="poc-map-key card-key">
+										<div
+											class="poc-map-key-compact"
+											class:poc-map-key-compact--split={revealStage === 1 && showDevelopmentDots() && (showCohortOutlines() || showMismatchOutlines())}
+											class:poc-map-key-compact--step10-dev={guidedStepTenDevKeyOnly}
+										>
+											{#if (showCohortOutlines() || showMismatchOutlines()) && !guidedStepTenDevKeyOnly}
+												<div class="poc-map-key-col poc-map-key-col--tract">
+													{#if showCohortOutlines()}
+														<ul class="poc-key-rings">
+															<li><span class="poc-k-ring poc-k-ring--tod"></span> TOD-dominated (significant development)</li>
+															<li><span class="poc-k-ring poc-k-ring--nontod"></span> Non-TOD-dominated (significant development)</li>
+														</ul>
+													{/if}
+													{#if showMismatchOutlines()}
+														<ul class="poc-key-rings">
+															<li>
+																<span class="poc-k-ring poc-k-ring--mismatch-ha"></span> High access, low growth (solid purple)
+															</li>
+															<li>
+																<span class="poc-k-ring poc-k-ring--mismatch-hg"></span> High growth, low access (dashed lavender)
+															</li>
+														</ul>
+													{/if}
+												</div>
+											{/if}
+											{#if showDevelopmentDots()}
+												<div class="poc-map-key-col poc-map-key-col--dev">
+													<p
+														class="poc-key-one poc-key-dev"
+														class:poc-key-one--step10-mf={guidedStepTenDevKeyOnly}
+													>
+														<strong>Developments</strong>
+														<span class="poc-key-tract-fill-body">
+															<span class="poc-key-tract-scale">
+																<span
+																	class="poc-key-tract-bar"
+																	style="background: linear-gradient(to right, #ffffff, #7c3f98);"
+																	aria-hidden="true"
+																></span>
+																<span class="poc-key-tract-scale-labels">
+																	{#if guidedStepTenDevKeyOnly}
+																		<span>0% multifamily</span>
+																		<span>100%</span>
+																	{:else}
+																		<span>0%</span>
+																		<span>100% multifamily</span>
+																	{/if}
+																</span>
+															</span>
+														</span>
+													</p>
+													{#if devSizeLegendTicks && devSizeLegendTicks.length > 0}
+														<div class="poc-key-dev-sizes" aria-label="Development dot size by unit count">
+															<div class="poc-key-dev-sizes-row">
+																<span class="poc-key-dev-sizes-title"># of units</span>
+																<ul class="poc-key-dev-sizes-list">
+																	{#each devSizeLegendTicks as t, i (i)}
+																		<li class="poc-key-dev-size-item">
+																			<span class="poc-key-dev-size-dot-wrap">
+																				<span
+																					class="poc-key-dev-size-dot"
+																					style:width="{2 * t.rPx}px"
+																					style:height="{2 * t.rPx}px"
+																				></span>
+																			</span>
+																			<span class="poc-key-dev-size-num">{formatDevUnitsLegend(t.units)}</span>
+																		</li>
+																	{/each}
+																</ul>
+															</div>
+														</div>
+													{/if}
+													<ul class="poc-key-rings" aria-label="Development dot outlines">
+														<li>
+															<span class="poc-k-ring poc-k-ring--dev-access"></span> Transit-accessible
+														</li>
+														<li>
+															<span class="poc-k-ring poc-k-ring--dev-noaccess"></span> Not transit-accessible
+														</li>
+													</ul>
+												</div>
+											{/if}
+										</div>
+									</div>
+								</div>
+							{/if}
 						</div>
 					{#if activeTooltip.visible}
 						<div
@@ -4449,6 +4638,7 @@
 									class:map-tooltip__primary--tod={activeTooltip.badgeTone === 'tod'}
 									class:map-tooltip__primary--nontod={activeTooltip.badgeTone === 'nontod'}
 									class:map-tooltip__primary--minimal={activeTooltip.badgeTone === 'minimal'}
+									class:map-tooltip__primary--partial={activeTooltip.badgeTone === 'partial'}
 								>
 									{#each activeTooltip.primaryRows as row, i (i)}
 										<div
@@ -4527,87 +4717,7 @@
 							<p class="poc-stepper-inline-hint">When you scroll here, the map adds one layer at a time.</p>
 						{/if}
 					</div>
-					{#if showCohortOutlines() || showMismatchOutlines() || showDevelopmentDots()}
-						<div class="poc-stepper-map-key" role="region" aria-label="Map legend">
-							<div class="poc-map-key card-key">
-								<div
-									class="poc-map-key-compact"
-									class:poc-map-key-compact--split={revealStage === 1 && showDevelopmentDots() && (showCohortOutlines() || showMismatchOutlines())}
-								>
-									{#if showCohortOutlines() || showMismatchOutlines()}
-										<div class="poc-map-key-col poc-map-key-col--tract">
-											{#if showCohortOutlines()}
-												<ul class="poc-key-rings">
-													<li><span class="poc-k-ring poc-k-ring--tod"></span> TOD-dominated (significant development)</li>
-													<li><span class="poc-k-ring poc-k-ring--nontod"></span> Non-TOD-dominated (significant development)</li>
-												</ul>
-											{/if}
-											{#if showMismatchOutlines()}
-												<p class="poc-key-mismatch-sub">
-													Mismatch outlines (quartiles): transit access vs housing growth are not always aligned—see charts below for income context.
-												</p>
-												<ul class="poc-key-rings">
-													<li>
-														<span class="poc-k-ring poc-k-ring--mismatch-ha"></span> High access, low growth (solid purple)
-													</li>
-													<li>
-														<span class="poc-k-ring poc-k-ring--mismatch-hg"></span> High growth, low access (dashed lavender)
-													</li>
-												</ul>
-											{/if}
-										</div>
-									{/if}
-									{#if showDevelopmentDots()}
-										<div class="poc-map-key-col poc-map-key-col--dev">
-											<p class="poc-key-one poc-key-dev">
-												<strong>Developments</strong>
-												<span class="poc-key-tract-fill-body">
-													<span class="poc-key-tract-scale">
-														<span
-															class="poc-key-tract-bar"
-															style="background: linear-gradient(to right, #ffffff, #7c3f98);"
-															aria-hidden="true"
-														></span>
-														<span class="poc-key-tract-scale-labels">
-															<span>0%</span>
-															<span>100% multifamily</span>
-														</span>
-													</span>
-												</span>
-											</p>
-											{#if devSizeLegendTicks && devSizeLegendTicks.length > 0}
-												<div class="poc-key-dev-sizes" aria-label="Development dot size by unit count">
-													<p class="poc-key-dev-sizes-title">Units (radius ∝ √units, same as map)</p>
-													<ul class="poc-key-dev-sizes-list">
-														{#each devSizeLegendTicks as t, i (i)}
-															<li class="poc-key-dev-size-item">
-																<span class="poc-key-dev-size-dot-wrap">
-																	<span
-																		class="poc-key-dev-size-dot"
-																		style:width="{2 * t.rPx}px"
-																		style:height="{2 * t.rPx}px"
-																	></span>
-																</span>
-																<span class="poc-key-dev-size-num">{formatDevUnitsLegend(t.units)}</span>
-															</li>
-														{/each}
-													</ul>
-												</div>
-											{/if}
-											<ul class="poc-key-rings" aria-label="Development dot outlines">
-												<li>
-													<span class="poc-k-ring poc-k-ring--dev-access"></span> Transit-accessible
-												</li>
-												<li>
-													<span class="poc-k-ring poc-k-ring--dev-noaccess"></span> Not transit-accessible
-												</li>
-											</ul>
-										</div>
-									{/if}
-								</div>
-							</div>
-						</div>
-					{/if}
+
 					<div
 						class="poc-stepper-inline-rail"
 						class:poc-stepper-inline-rail--single={playgroundStoryCarousel}
@@ -4708,14 +4818,6 @@
 									</details>
 								{/if}
 								{#if guidedMode && i === 3 && guidedContrastExamples.length}
-									<div
-										use:focusWaypointRef={{ stage: 3, key: 'contrast_example' }}
-										class="poc-stepper-waypoint"
-									>
-										<p class="poc-stepper-waypoint__label">
-											Scroll—the map tooltip highlights each tract and carries the narrative for Step 3.
-										</p>
-									</div>
 									<ul class="poc-stepper-contrast-anchors" aria-label="Contrast example scroll anchors">
 										{#each guidedContrastExamples as example (example.id)}
 											<li class="poc-stepper-contrast-anchors__item">
@@ -4738,14 +4840,6 @@
 									</ul>
 								{/if}
 								{#if guidedMode && i === 4 && guidedMismatchExamples.length}
-									<div
-										use:focusWaypointRef={{ stage: 4, key: 'mismatch_example' }}
-										class="poc-stepper-waypoint"
-									>
-										<p class="poc-stepper-waypoint__label">
-											Scroll—the map tooltip highlights each mismatch tract; the purple labels show which side of the mismatch you are on.
-										</p>
-									</div>
 									<ul class="poc-stepper-contrast-anchors" aria-label="Mismatch example scroll anchors">
 										{#each guidedMismatchExamples as example (example.id)}
 											<li class="poc-stepper-contrast-anchors__item">
@@ -4798,52 +4892,54 @@
 										use:focusWaypointRef={{ stage: 10, key: 'project_example' }}
 										class="poc-stepper-waypoint"
 									>
-										<p class="poc-stepper-waypoint__label">Scroll to focus on featured development examples.</p>
+										<p class="poc-stepper-waypoint__label">
+											Scroll—the map tooltip introduces each curated project with the category label and narrative.
+										</p>
 									</div>
-									<div class="poc-stepper-examples" aria-label="Important developments tied to the argument">
-										<p class="poc-stepper-examples-title">Important developments that help explain the pattern</p>
+									<ul class="poc-stepper-contrast-anchors" aria-label="Guided development example scroll anchors">
 										{#each guidedStepTenExamples as example (example.id)}
-											<div
-												use:focusWaypointRef={{ stage: 10, key: guidedProjectFocusKey(10, example.id) }}
-												class="poc-stepper-example-wrap"
-											>
+											<li class="poc-stepper-contrast-anchors__item">
 												<div
-													class="poc-stepper-example poc-stepper-example--static"
-													class:poc-stepper-example--active={guidedFocusDetail === guidedProjectFocusKey(10, example.id)}
+													use:focusWaypointRef={{ stage: 10, key: guidedProjectFocusKey(10, example.id) }}
+													class="poc-stepper-contrast-anchor poc-stepper-project-anchor"
+													class:poc-stepper-contrast-anchor--active={guidedFocusDetail === guidedProjectFocusKey(10, example.id)}
 												>
-													<div class="poc-stepper-example__head">
-														<span class="poc-stepper-example__label">{example.label}</span>
-														<span class="poc-stepper-example__cta" class:poc-stepper-example__cta--tod={example.categoryTone === 'tod'} class:poc-stepper-example__cta--partial={example.categoryTone === 'partial'} class:poc-stepper-example__cta--nontod={example.categoryTone === 'nontod'}>{example.categoryLabel}</span>
-													</div>
-													<p class="poc-stepper-example__note">{example.note}</p>
-													<div class="poc-stepper-example__metrics">
-														<span><strong>Total units:</strong> {example.units == null ? '—' : d3.format(',.0f')(example.units)}</span>
-														<span><strong>Affordable units:</strong> {example.affordableUnits == null ? 'Not listed' : d3.format(',.0f')(example.affordableUnits || 0)}</span>
-													</div>
-													<div class="poc-stepper-example__actions">
-														<button
-															type="button"
-															class="poc-stepper-example__button"
-															disabled={example.showOnMapDisabled}
-															onclick={() => example.dev && inspectGuidedDevelopment(example.dev)}
+													<div class="poc-stepper-mismatch-anchor__main">
+														<span class="poc-stepper-contrast-anchor__label">{example.label}</span>
+														<span
+															class="poc-stepper-example__cta"
+															class:poc-stepper-example__cta--tod={example.categoryTone === 'tod'}
+															class:poc-stepper-example__cta--partial={example.categoryTone === 'partial'}
+															class:poc-stepper-example__cta--nontod={example.categoryTone === 'nontod'}
 														>
-															Show on map
-														</button>
+															{example.categoryLabel}
+														</span>
 													</div>
+													<button
+														type="button"
+														class="poc-stepper-contrast-anchor__replay"
+														disabled={example.showOnMapDisabled}
+														onclick={() => example.dev && inspectGuidedDevelopment(example.dev)}
+													>
+														Show on map
+													</button>
 												</div>
-											</div>
+											</li>
 										{/each}
-									</div>
+									</ul>
 								{/if}
-								{#if guidedMode && i === 10}
+								{#if guidedMode && i === 11}
 									<div
-										use:focusWaypointRef={{ stage: 10, key: '11_compare' }}
+										use:focusWaypointRef={{ stage: 11, key: '11_compare' }}
 										class="poc-stepper-waypoint poc-stepper-waypoint--compact"
 									>
 										<p class="poc-stepper-waypoint__label">Next: compare the lower-income view against the broader tract patterns.</p>
 									</div>
-									{#if guidedFocusDetail === '11_compare'}
-										<div class="poc-stepper-overlay-toggle" aria-label="Choose which outline layer to compare in the lower-income step">
+									<div
+										class="poc-stepper-overlay-toggle"
+										class:poc-stepper-overlay-toggle--focused={guidedFocusDetail === '11_compare'}
+										aria-label="Choose which outline layer to compare in the lower-income step"
+									>
 											<p class="poc-stepper-examples-title">Compare the lower-income view with either tract grouping or mismatch outlines</p>
 											<div class="poc-stepper-overlay-toggle__buttons" role="group" aria-label="Lower-income outline view">
 												<button
@@ -4907,8 +5003,7 @@
 													{/if}
 												</div>
 											{/if}
-										</div>
-									{/if}
+									</div>
 								{/if}
 							</section>
 						{/each}
@@ -5004,39 +5099,11 @@
 		gap: 12px;
 		align-content: start;
 		padding-top: 2px;
+		/* Breathable right edge vs. column gutter / viewport (cards also pad inline-end). */
+		padding-inline-end: clamp(10px, 2vw, 16px);
 		min-width: 0;
 		position: relative;
 		z-index: 1;
-	}
-
-	/* Cohort / mismatch / MassBuilds keys (were bottom-left map overlay; live beside step copy). */
-	.poc-stepper-map-key {
-		width: 100%;
-		min-width: 0;
-		max-height: min(340px, 52vh);
-		overflow: hidden auto;
-		padding: 0;
-	}
-
-	.poc-stepper-map-key .poc-map-key {
-		background: color-mix(in srgb, var(--bg-card) 90%, transparent);
-		backdrop-filter: blur(4px);
-	}
-
-	.poc-stepper-map-key .poc-map-key-compact--split {
-		grid-template-columns: 1fr;
-	}
-
-	.poc-stepper-map-key .poc-map-key-col--dev {
-		border-left: none;
-		padding-left: 0;
-		border-top: 1px dashed var(--border);
-		padding-top: 8px;
-	}
-
-	.poc-stepper-map-key .poc-map-key-col--dev:only-child {
-		border-top: none;
-		padding-top: 0;
 	}
 
 	.poc-stepper-head {
@@ -5137,9 +5204,8 @@
 		gap: 14px;
 		width: 100%;
 		min-height: calc(76vh * 0.6);
-		padding: 14px 0 1.35rem;
+		padding: 14px 12px 1.35rem 20px;
 		border-left: 2px solid color-mix(in srgb, var(--accent) 16%, var(--border));
-		padding-left: 20px;
 		border-radius: var(--radius-sm);
 		border-top: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
 		border-right: 1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
@@ -5441,6 +5507,16 @@
 		border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
 		border-radius: 14px;
 		background: color-mix(in srgb, var(--accent) 4%, var(--bg-card));
+		transition:
+			border-color 160ms ease,
+			box-shadow 160ms ease,
+			background 160ms ease;
+	}
+
+	.poc-stepper-overlay-toggle--focused {
+		border-color: color-mix(in srgb, var(--accent) 42%, var(--border));
+		background: color-mix(in srgb, var(--accent) 9%, var(--bg-card));
+		box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 14%, transparent);
 	}
 
 	.poc-stepper-overlay-toggle__buttons {
@@ -6366,6 +6442,26 @@
 		align-items: start;
 	}
 
+	/* Guided step 10: multifamily ramp uses the full key width (labels: 0% multifamily … 100%). */
+	.poc-map-key-compact--step10-dev .poc-key-one--step10-mf {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 5px;
+	}
+
+	.poc-map-key-compact--step10-dev .poc-key-one--step10-mf .poc-key-tract-fill-body {
+		flex: none;
+		width: 100%;
+		align-self: stretch;
+	}
+
+	.poc-map-key-compact--step10-dev .poc-key-tract-scale {
+		width: 100%;
+		min-width: 0;
+		max-width: none;
+		align-self: stretch;
+	}
+
 	@media (max-width: 639px) {
 		.poc-control-stack {
 			grid-template-columns: 1fr;
@@ -6400,8 +6496,26 @@
 			padding-top: 8px;
 		}
 
-		.poc-stepper-map-key {
-			max-height: min(260px, 48vh);
+		.poc-map-key-overlay {
+			left: auto;
+			right: 0.5rem;
+			top: max(48px, env(safe-area-inset-top, 0px));
+			max-width: calc(62% - 0.5rem);
+			max-height: min(62vh, min(620px, calc(100% - 3.75rem)));
+		}
+
+		.map-widget--guided .poc-map-key-overlay {
+			top: max(10px, env(safe-area-inset-top, 0px));
+			max-height: min(70vh, calc(100% - 1.75rem));
+		}
+
+		.map-widget--playground .poc-map-key-overlay {
+			top: auto;
+			bottom: max(8px, env(safe-area-inset-bottom, 0px));
+			left: 0.45rem;
+			right: auto;
+			max-width: calc(100% - 0.9rem);
+			max-height: min(42vh, min(320px, calc(100% - 5rem)));
 		}
 	}
 
@@ -6490,32 +6604,45 @@
 
 	.poc-key-dev-sizes {
 		margin: 0;
-		padding: 4px 0 0;
+		padding: 3px 0 0;
+	}
+
+	.poc-key-dev-sizes-row {
+		display: flex;
+		align-items: flex-end;
+		flex-wrap: wrap;
+		gap: 4px 6px;
 	}
 
 	.poc-key-dev-sizes-title {
-		margin: 0 0 5px;
+		margin: 0;
+		flex-shrink: 0;
+		align-self: flex-end;
+		padding-bottom: 1px;
 		font-size: 0.58rem;
 		font-weight: 600;
 		color: var(--text-muted);
-		line-height: 1.25;
+		line-height: 1.15;
+		white-space: nowrap;
 	}
 
 	.poc-key-dev-sizes-list {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: flex-end;
-		gap: 6px 14px;
+		gap: 2px 8px;
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		flex: 1 1 auto;
+		min-width: 0;
 	}
 
 	.poc-key-dev-size-item {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 3px;
+		gap: 2px;
 	}
 
 	/* Match map max r (8); keeps small circles bottom-aligned with large ones. */
@@ -6701,7 +6828,136 @@
 		margin-bottom: clamp(4px, 1.25vh, 10px);
 	}
 
-	/* Growth colorbar sits in a dedicated right SVG column; cohort/mismatch/dot keys live in the stepper sidebar. */
+	/*
+	 * HTML layer key: top-right inside the choropleth, inset from the SVG colorbar (``--choro-strip-w``
+	 * from ``CHORO_MAP_LEGEND_COLUMN_W``). Playground lowers ``top`` to clear floating zoom controls.
+	 */
+	.map-widget--playground .poc-map-key-overlay {
+		top: auto;
+		bottom: max(10px, env(safe-area-inset-bottom, 0px));
+		left: 0.5rem;
+		right: auto;
+		max-width: min(300px, calc(100% - 1rem));
+		max-height: min(38vh, min(360px, calc(100% - 5.5rem)));
+	}
+
+	.map-widget--playground .poc-map-key-overlay > .poc-map-key.card-key {
+		zoom: 0.86;
+		padding: 6px 8px;
+	}
+
+	.poc-map-key-overlay {
+		position: absolute;
+		top: max(54px, env(safe-area-inset-top, 0px));
+		bottom: auto;
+		left: auto;
+		right: calc(var(--choro-strip-w, 120px) + 14px);
+		z-index: 5;
+		max-width: min(336px, calc(100% - var(--choro-strip-w, 120px) - 1.6rem));
+		max-height: min(72vh, min(620px, calc(100% - 4.5rem)));
+		overflow: hidden auto;
+		padding: 0 0 1px 0;
+		box-sizing: border-box;
+		/* Wheel / drag on legend should not pan the underlying map widget. */
+		pointer-events: auto;
+	}
+
+	.map-widget--guided .poc-map-key-overlay {
+		top: max(12px, env(safe-area-inset-top, 0px));
+		max-height: min(78vh, min(620px, calc(100% - 1.75rem)));
+	}
+
+	/* Stronger chroma/cover so the key reads as deliberate UI vs map texture. */
+	.poc-map-key-overlay > .poc-map-key.card-key {
+		/* Slightly above the tightened 1.134 baseline; keep inner layout unchanged. */
+		zoom: 1.2;
+		box-sizing: border-box;
+		border-radius: clamp(8px, 0.4rem + 6px, 12px);
+		border: 2px solid color-mix(in srgb, var(--accent) 52%, var(--border));
+		background: color-mix(in srgb, var(--bg-card) 94%, rgba(255, 255, 255, 0.65));
+		backdrop-filter: blur(12px);
+		box-shadow:
+			0 1px 0 rgba(255, 255, 255, 0.55) inset,
+			0 10px 28px rgba(15, 23, 42, 0.2),
+			0 0 0 3px rgba(255, 255, 255, 0.22),
+			0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+		padding: 8px 10px;
+	}
+
+	.poc-map-key-overlay .poc-map-key-compact {
+		color: color-mix(in srgb, var(--text-muted) 28%, var(--text));
+		font-weight: 500;
+	}
+
+	@supports not (zoom: 1) {
+		.poc-map-key-overlay > .poc-map-key.card-key {
+			zoom: unset;
+			padding: 8px 10px;
+		}
+
+		.poc-map-key-overlay .poc-map-key-compact {
+			font-size: 0.741rem;
+			line-height: 1.39;
+			gap: 7px;
+		}
+
+		.poc-map-key-overlay .poc-map-key-col {
+			gap: 7px;
+		}
+
+		.poc-map-key-overlay .poc-key-rings {
+			font-size: 0.667rem;
+			gap: 5px 11px;
+			font-weight: 600;
+		}
+
+		.poc-map-key-overlay .poc-key-rings li {
+			gap: 6px;
+		}
+
+		.poc-map-key-overlay .poc-k-ring {
+			width: 16px;
+			height: 16px;
+			border-width: 2px;
+			box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+		}
+
+		.poc-map-key-overlay .poc-key-mismatch-sub {
+			font-size: 0.688rem;
+			line-height: 1.42;
+			font-weight: 600;
+			color: color-mix(in srgb, var(--text-muted) 15%, var(--text));
+		}
+
+		.poc-map-key-overlay .poc-key-tract-scale-labels {
+			font-size: 0.635rem;
+			font-weight: 600;
+			color: color-mix(in srgb, var(--text-muted) 18%, var(--text));
+		}
+
+		.poc-map-key-overlay .poc-key-tract-bar {
+			height: 0.603rem;
+		}
+
+		.poc-map-key-overlay .poc-key-dev-sizes-title {
+			font-size: 0.635rem;
+			font-weight: 700;
+		}
+
+		.poc-map-key-overlay .poc-key-dev-size-dot-wrap {
+			min-height: 22px;
+		}
+
+		.poc-map-key-overlay .poc-key-dev-size-num {
+			font-size: 0.624rem;
+		}
+
+		.poc-map-key-overlay .poc-key-one strong {
+			font-size: 1.06em;
+			letter-spacing: -0.01em;
+			color: var(--text);
+		}
+	}
 
 	.poc-map-callouts {
 		padding: 4px 6px;
@@ -6910,6 +7166,12 @@
 		color: var(--text-muted);
 	}
 
+	.map-tooltip__badge--partial {
+		border-color: color-mix(in srgb, #2563eb 55%, var(--border));
+		background: color-mix(in srgb, #2563eb 11%, var(--bg-card));
+		color: #2563eb;
+	}
+
 	.map-tooltip__badge--mismatch_ha {
 		display: inline-flex;
 		align-items: center;
@@ -6952,6 +7214,11 @@
 	.map-tooltip__primary--nontod {
 		background: color-mix(in srgb, var(--warning) 9%, var(--bg-card));
 		border-color: color-mix(in srgb, var(--warning) 28%, var(--border));
+	}
+
+	.map-tooltip__primary--partial {
+		background: color-mix(in srgb, #2563eb 8%, var(--bg-card));
+		border-color: color-mix(in srgb, #2563eb 30%, var(--border));
 	}
 
 	.map-tooltip__primary--minimal {

@@ -37,6 +37,7 @@
 	} from '$lib/utils/derived.js';
 	import { MBTA_BLUE, MBTA_GREEN, MBTA_ORANGE } from '$lib/utils/mbtaColors.js';
 	import TodAffordabilityScatter from '$lib/components/TodAffordabilityScatter.svelte';
+	import { onMount } from 'svelte';
 
 	/** Minimal-cohort swatch: aligned with ``TodIntensityScatter`` / TOD map greys. */
 	const GREY_MINIMAL = '#a8908c';
@@ -698,6 +699,88 @@
 		affIncomePanelState.transitDistanceMi = t;
 		affEduPanelState.transitDistanceMi = t;
 	});
+
+	/** @type {HTMLElement | undefined} */
+	let tractPlotsScopeEl = $state();
+	/** @type {HTMLElement | undefined} */
+	let tractStickyBarEl = $state();
+	let tractStickyBarPinned = $state(false);
+	/** Layout gap when toolbar is docked — ``position: fixed`` pulls it out of flow. */
+	let tractStickyBarReservePx = $state(0);
+	/** Inline geometry for pinned bar (matches ``.poc-pre-explore`` column). */
+	let tractStickyBarDockGeom = $state('');
+
+	let tractStickyDockRaf = 0;
+
+	function tractPlotsStickyDockTick() {
+		const scopeEl = tractPlotsScopeEl;
+		const barEl = tractStickyBarEl;
+		if (typeof window === 'undefined' || !scopeEl || !barEl) {
+			tractStickyBarPinned = false;
+			tractStickyBarReservePx = 0;
+			tractStickyBarDockGeom = '';
+			return;
+		}
+		const h = Math.max(1, Math.round(barEl.getBoundingClientRect().height || barEl.offsetHeight));
+		const sRect = scopeEl.getBoundingClientRect();
+		const colEl = scopeEl.closest('.poc-pre-explore');
+		const cRect = colEl?.getBoundingClientRect();
+		const shouldPin =
+			!!colEl &&
+			!!cRect &&
+			cRect.width > 0 &&
+			sRect.top <= 0 &&
+			sRect.bottom > h;
+
+		if (shouldPin && cRect) {
+			const left = Math.round(cRect.left);
+			const width = Math.round(cRect.width);
+			tractStickyBarPinned = true;
+			tractStickyBarReservePx = h;
+			tractStickyBarDockGeom = `left:${left}px;width:${width}px;`;
+		} else {
+			tractStickyBarPinned = false;
+			tractStickyBarReservePx = 0;
+			tractStickyBarDockGeom = '';
+		}
+	}
+
+	function tractPlotsStickyDockSchedule() {
+		if (typeof window === 'undefined') return;
+		if (tractStickyDockRaf) return;
+		tractStickyDockRaf = requestAnimationFrame(() => {
+			tractStickyDockRaf = 0;
+			tractPlotsStickyDockTick();
+		});
+	}
+
+	onMount(() => {
+		tractPlotsStickyDockSchedule();
+		window.addEventListener('scroll', tractPlotsStickyDockSchedule, { passive: true });
+		window.addEventListener('resize', tractPlotsStickyDockSchedule, { passive: true });
+		return () => {
+			window.removeEventListener('scroll', tractPlotsStickyDockSchedule);
+			window.removeEventListener('resize', tractPlotsStickyDockSchedule);
+			cancelAnimationFrame(tractStickyDockRaf);
+			tractStickyDockRaf = 0;
+		};
+	});
+
+	/** Re-bind when tract markup mounts after data load. */
+	$effect(() => {
+		void tractPlotsScopeEl;
+		void tractStickyBarEl;
+		tractPlotsStickyDockSchedule();
+	});
+
+	/** Toolbar height changes (wrap, fonts) aren’t always paired with ``resize`` events. */
+	$effect(() => {
+		const bar = tractStickyBarEl;
+		if (typeof ResizeObserver === 'undefined' || !bar) return;
+		const ro = new ResizeObserver(() => tractPlotsStickyDockSchedule());
+		ro.observe(bar);
+		return () => ro.disconnect();
+	});
 </script>
 
 <div class="poc-root">
@@ -708,7 +791,7 @@
 		<h1>Massachusetts is building more near transit. Who benefits?</h1>
 		<p class="byline">By Krishna Parvataneni, Allison Eto, Hanna Chen, and Supriya Lall</p>
 		<p class="subtitle">
-			Boston is in a housing crisis, but if you rely on transit to reach work, school, or childcare, the real question is not just whether more housing is being built. It is whether that housing shows up in places you can actually reach and afford.
+			Boston is in a housing crisis, but if you rely on transit to reach work, school, or childcare, the real issue is not just whether more housing is being built. It is whether that housing shows up in places you can actually reach and afford.
 			This story explores three questions:
 		</p>
 		<div class="hero-questions" aria-label="Story questions">
@@ -868,6 +951,23 @@
 			</div>
 		</div>
 	</section>
+	<section class="story card">
+		<h2>Three places to notice</h2>
+		<div class="annotation-grid">
+			<div class="annotation-card">
+				<h3>Boston and Cambridge</h3>
+				<p>The strongest rapid-transit geography in the region, and the clearest version of the expected case: strong access and substantial growth in the same place.</p>
+			</div>
+			<div class="annotation-card">
+				<h3>Quincy and Revere</h3>
+				<p>Transit is still present here, but nearby tracts with similar access can still end up with different housing outcomes.</p>
+			</div>
+			<div class="annotation-card">
+				<h3>Outer-ring tracts west of Boston</h3>
+				<p>Some tracts far from the strongest MBTA access still show meaningful growth, revealing the other side of the mismatch story.</p>
+			</div>
+		</div>
+	</section>
 	
 	<section class="tract-section">
 
@@ -924,58 +1024,43 @@
 				</p>
 			</section>
 
-			<section class="story card">
-				<h2>Three places to notice</h2>
-				<p class="chart-note">
-					These are quick anchors while you scroll. They are not the whole story, but they make the regional pattern easier to read.
-				</p>
-				<div class="annotation-grid">
-					<div class="annotation-card">
-						<h3>Boston and Cambridge</h3>
-						<p>The strongest rapid-transit geography in the region, and the clearest version of the expected case: strong access and substantial growth in the same place.</p>
-					</div>
-					<div class="annotation-card">
-						<h3>Quincy and Revere</h3>
-						<p>Transit is still present here, but nearby tracts with similar access can still end up with different housing outcomes.</p>
-					</div>
-					<div class="annotation-card">
-						<h3>Outer-ring tracts west of Boston</h3>
-						<p>Some tracts far from the strongest MBTA access still show meaningful growth, revealing the other side of the mismatch story.</p>
-					</div>
-				</div>
-			</section>
 
-
-			<section class="story card">
+			<section class="story card story--centered story--cohort-intro">
 				<h2>Comparing TOD-heavy and non-TOD-heavy tracts</h2>
 				<p>
 					To separate TOD from development more generally, we compare three tract groups from the map.
 				</p>
-				<ul class="story-list story-list--nested">
-					<li>
-						<strong>Minimal development tracts</strong> grew too little to anchor the main comparison.
-					</li>
-					<li>
-						High-development tracts are then split in two:
-						<ul>
-							<li>
-								<strong>TOD-dominated tracts</strong>, where TOD makes up at least half of new development.
-							</li>
-							<li>
-								<strong>Non-TOD-dominated tracts</strong>, where it does not.
-							</li>
-						</ul>
-					</li>
-				</ul>
+				<div
+					class="takeaway-grid takeaway-grid--three takeaway-grid--tract-cohorts"
+					aria-label="Tract cohorts used in the comparison"
+				>
+					<div class="takeaway-card takeaway-card--tier takeaway-card--access">
+						<p class="takeaway-label">TOD-dominated</p>
+						<p class="takeaway-meta">
+							High-development tracts where <strong>TOD makes up at least half</strong> of new housing.
+						</p>
+					</div>
+					<div class="takeaway-card takeaway-card--tier takeaway-card--growth">
+						<p class="takeaway-label">Non-TOD-dominated</p>
+						<p class="takeaway-meta">
+							High-development tracts where <strong>TOD makes up less than half</strong> of new housing.
+						</p>
+					</div>
+					<div class="takeaway-card takeaway-card--tier takeaway-card--cohort-minimal">
+						<p class="takeaway-label">Minimal development</p>
+						<p class="takeaway-meta">
+							Tracts that <strong>grew too little</strong> to anchor the main comparison.
+						</p>
+					</div>
+				</div>
 			</section>
 
-			<section class="story card story--brief">
-				<p class="story-eyebrow">What the tract charts are for</p>
-				<h2>The next charts ask a simpler question</h2>
+			<section class="story card story--brief story--centered">
+				<h2>Investigating TOD's demographic effects</h2>
 				<p>
 					Once we separate TOD-heavy tracts from the rest, do they also show stronger signs of neighborhood change? The point is not to prove causation. It is to see whether the places absorbing more TOD also look different on income, education, and affordability.
 				</p>
-				<div class="takeaway-grid takeaway-grid--three">
+				<div class="takeaway-grid takeaway-grid--three takeaway-grid--tract-lens">
 					<div class="takeaway-card">
 						<p class="takeaway-label">Income</p>
 						<p class="takeaway-meta">TOD-heavy tracts tend to show larger median income increases.</p>
@@ -991,54 +1076,62 @@
 				</div>
 			</section>
 
+			<div class="tract-highlight-plots-scope full-width" bind:this={tractPlotsScopeEl}>
 			<section class="story card story--brief tract-interaction-card">
-				<p class="story-eyebrow">Try the tract charts</p>
-				<h2>Start with a few highlighted examples</h2>
-				<p>
-					Hover any point for the quick read. If you want a closer look, use these buttons to keep the same tracts highlighted across the charts below.
-				</p>
-				<div class="example-toggle-grid" role="group" aria-label="Highlight tract examples in the demographic charts">
-					<button
-						type="button"
-						class="example-toggle-card"
-						class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
-						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
-						disabled={!tractStoryExamples.incomeLeaders.length}
-						title={describeExampleSet(tractStoryExamples.incomeLeaders, 'higher-income-change TOD tracts')}
+				<h2>Highlight specific examples</h2>
+				<div class="tract-example-sticky-slot">
+					<div
+						class="tract-example-sticky-spacer"
+						style:height="{tractStickyBarReservePx}px"
+						aria-hidden="true"
+					></div>
+					<div
+						bind:this={tractStickyBarEl}
+						class="tract-example-sticky-bar"
+						class:tract-example-sticky-bar--dock={tractStickyBarPinned}
+						style={tractStickyBarPinned ? tractStickyBarDockGeom : ''}
 					>
-						<span class="example-toggle-card__eyebrow">Income examples</span>
-						<span class="example-toggle-card__body">See the TOD-heavy tracts where income has changed fastest.</span>
-						<span class="example-toggle-card__action">{sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin)) ? 'Hide examples' : 'Show examples'}</span>
-					</button>
-					<button
-						type="button"
-						class="example-toggle-card"
-						class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
-						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
-						disabled={!tractStoryExamples.eduLeaders.length}
-						title={describeExampleSet(tractStoryExamples.eduLeaders, 'higher-education-change TOD tracts')}
-					>
-						<span class="example-toggle-card__eyebrow">Education examples</span>
-						<span class="example-toggle-card__body">See the tracts where education change is most pronounced.</span>
-						<span class="example-toggle-card__action">{sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin)) ? 'Hide examples' : 'Show examples'}</span>
-					</button>
-					<button
-						type="button"
-						class="example-toggle-card"
-						class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
-						onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
-						disabled={!tractStoryExamples.lowerIncomeTod.length}
-						title={describeExampleSet(tractStoryExamples.lowerIncomeTod, 'lower-income TOD tracts')}
-					>
-						<span class="example-toggle-card__eyebrow">Lower-income TOD examples</span>
-						<span class="example-toggle-card__body">Focus on TOD-heavy tracts where the equity stakes are easiest to see.</span>
-						<span class="example-toggle-card__action">{sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin)) ? 'Hide examples' : 'Show examples'}</span>
-					</button>
+					<div class="example-toggle-grid" role="group" aria-label="Highlight tract examples in the demographic charts">
+						<button
+							type="button"
+							class="example-toggle-card"
+							class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
+							aria-pressed={sameSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
+							onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.incomeLeaders.map((row) => row.gisjoin))}
+							disabled={!tractStoryExamples.incomeLeaders.length}
+							title={describeExampleSet(tractStoryExamples.incomeLeaders, 'higher-income-change TOD tracts')}
+						>
+							Greatest income change
+						</button>
+						<button
+							type="button"
+							class="example-toggle-card"
+							class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
+							aria-pressed={sameSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
+							onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.eduLeaders.map((row) => row.gisjoin))}
+							disabled={!tractStoryExamples.eduLeaders.length}
+							title={describeExampleSet(tractStoryExamples.eduLeaders, 'higher-education-change TOD tracts')}
+						>
+							Greatest Education Change
+						</button>
+						<button
+							type="button"
+							class="example-toggle-card"
+							class:example-toggle-card--active={sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
+							aria-pressed={sameSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
+							onclick={() => toggleSelectedAcrossStoryCharts(tractStoryExamples.lowerIncomeTod.map((row) => row.gisjoin))}
+							disabled={!tractStoryExamples.lowerIncomeTod.length}
+							title={describeExampleSet(tractStoryExamples.lowerIncomeTod, 'lower-income TOD tracts')}
+						>
+							Lower-Income
+						</button>
+					</div>
+					<div class="tract-interaction-controls tract-interaction-controls--sticky-bar" role="group" aria-label="Clear tract example highlights">
+						<button type="button" class="chip-button chip-button--subtle" onclick={clearStoryChartSelections}>
+							Clear highlights
+						</button>
+					</div>
 				</div>
-				<div class="tract-interaction-controls" role="group" aria-label="Clear tract example highlights">
-					<button type="button" class="chip-button chip-button--subtle" onclick={clearStoryChartSelections}>
-						Clear highlights
-					</button>
 				</div>
 			</section>
 
@@ -1047,10 +1140,7 @@
 				<section class="story card story-chart-text">
 					<h2>Income change tends to be larger in TOD-heavy tracts</h2>
 					<p>
-						This does not prove displacement. It does suggest that tracts absorbing more TOD are also more likely to show faster income change.
-					</p>
-					<p>
-						On average, income change is <strong>{incomeRow.fmtTod}</strong> in TOD-dominated tracts, versus <strong>{incomeRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
+						This does not prove displacement, but it does suggest that tracts absorbing more TOD are also more likely to show faster income change.
 					</p>
 					{#if incomeMiniBar}
 						<figure class="cohort-mini-bar">
@@ -1154,11 +1244,8 @@
 
 				<section class="chart-card card story-chart-plot">
 					<h3>More TOD often lines up with faster income change</h3>
-					<div class="takeaway-strip takeaway-strip--compact">
-						<strong>Main takeaway:</strong> as TOD share rises, tracts are more likely to appear higher on the income-change axis.
-					</div>
-					<p class="chart-note">
-						Hover for a quick interpretation, or keep a few tracts highlighted with the buttons above.
+					<p>
+						Not only is income change often higher in TOD-dominated tracts, but <strong>more</strong> TOD development pushes incomes up far faster than <strong>more</strong> non-TOD development.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={incomePanelState} wideLayout showTrimControl={false} storyMode />
@@ -1174,9 +1261,6 @@
 					<h2>Education change shows a similar pattern</h2>
 					<p>
 						TOD-dominated tracts also tend to show bigger increases in the share of adults with bachelor’s degrees or higher.
-					</p>
-					<p>
-						The average change is <strong>{eduRow.fmtTod}</strong> in TOD-dominated tracts, compared with <strong>{eduRow.fmtCtrl}</strong> in non-TOD-dominated tracts.
 					</p>
 					{#if eduMiniBar}
 						<figure class="cohort-mini-bar">
@@ -1278,11 +1362,8 @@
 
 				<section class="chart-card card story-chart-plot">
 					<h3>More TOD often lines up with bigger education gains</h3>
-					<div class="takeaway-strip takeaway-strip--compact">
-						<strong>Main takeaway:</strong> the same TOD-heavy tracts often also sit higher on the education-change axis.
-					</div>
-					<p class="chart-note">
-						The highlighted tracts carry over, so it is easier to see whether the same places also sit higher on the education-change axis.
+					<p>
+						As with income change, increased TOD development is associated with bigger increases in the share of adults with bachelor's degrees or higher than increased non-TOD development.
 					</p>
 					<div class="scatter-container scatter-container--compact">
 						<TodIntensityScatter panelState={eduPanelState} wideLayout showTrimControl={false} storyMode />
@@ -1304,13 +1385,9 @@
 			<section class="story card full-width afford-compare">
 				<h2>How affordability could help</h2>
 				<p>
-					Here we narrow the question. Among TOD-heavy tracts, do places with more affordable housing show weaker signs of market pressure?
+					If TOD is associated with displacement pressure, does affordable housing actually help?
+					The broad pattern is encouraging: TOD-heavy places with more affordability tend to show less demographic change.
 				</p>
-				{#if affIncomeSplit && affEduSplit}
-					<p>
-						The broad pattern is encouraging: TOD-heavy places with more affordability tend to show smaller increases in both income and college-degree share.
-					</p>
-				{/if}
 
 				<div
 					class="afford-comparison-stack"
@@ -1323,15 +1400,13 @@
 						aria-label="Income change vs affordable TOD share"
 					>
 					<div class="afford-four-cell">
-						<h3 class="afford-four-cell__title">Income Change vs Affordability</h3>
-						<div class="takeaway-strip takeaway-strip--compact">
-							<strong>Main takeaway:</strong> higher affordable share generally points toward smaller income increases.
+						<div class="chart-note">
+							Increased affordable housing generally points toward smaller income increases in a region.
 						</div>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affIncomePanelState} showTrimControl={false} storyMode />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">The same selected tracts stay highlighted here, so you can compare whether more affordability also lines up with smaller income increases.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -1448,7 +1523,7 @@
 									{/each}
 								</svg>
 								<figcaption class="cohort-mini-bar__cap">
-									Tracts w/ &lt;50% affordable units see larger avg. income increases.{affIncomeSplit.significantDiff ? ' * difference is statistically distinguishable.' : ''}
+									Tracts w/ &lt;50% affordable units see larger avg. income increases.
 								</figcaption>
 							</figure>
 						{:else}
@@ -1464,15 +1539,13 @@
 						aria-label="Education change vs affordable TOD share"
 					>
 					<div class="afford-four-cell">
-						<h3 class="afford-four-cell__title">Education Change vs Affordability</h3>
-						<div class="takeaway-strip takeaway-strip--compact">
-							<strong>Main takeaway:</strong> higher affordable share also tends to line up with smaller education change.
+						<div class="chart-note">
+							Increased affordable housing generally points toward smaller education change in a region.
 						</div>
 						<figure class="afford-scatter-embed-figure">
 							<div class="scatter-container scatter-container--afford-embed">
 								<TodAffordabilityScatter panelState={affEduPanelState} showTrimControl={false} storyMode />
 							</div>
-							<figcaption class="cohort-mini-bar__cap">The same comparison carries over here too: more affordability generally points toward smaller education change.</figcaption>
 						</figure>
 					</div>
 					<div class="afford-four-cell afford-four-cell--bar">
@@ -1589,7 +1662,7 @@
 									{/each}
 								</svg>
 								<figcaption class="cohort-mini-bar__cap">
-									Tracts with &lt;50% affordable units see larger avg. education change.{affEduSplit.significantDiff ? ' * difference is statistically distinguishable.' : ''}
+									Tracts with &lt;50% affordable units see larger avg. education change.
 								</figcaption>
 							</figure>
 						{:else}
@@ -1604,6 +1677,7 @@
 					Source: MassBuilds affordable-unit fields paired with NHGIS tract income and education change measures.
 				</p>
 			</section>
+			</div>
 
 			<section class="story card conclusion-card">
 				<h2>What does this tell us?</h2>
@@ -2297,23 +2371,6 @@
 		border-top: 1px solid var(--line);
 	}
 
-	/* Nested methodology list: indent sub-bullets and leave space before the next paragraph */
-	.story-list--nested {
-		margin-bottom: 18px;
-		padding-left: 1.5em;
-	}
-
-	.story-list--nested ul {
-		margin-top: 8px;
-		margin-bottom: 0;
-		padding-left: 1.5em;
-		list-style-position: outside;
-	}
-
-	.story-list--nested > li:last-child > ul > li:last-child {
-		margin-bottom: 0;
-	}
-
 	.supplemental {
 		margin-top: 12px;
 		padding-top: 12px;
@@ -2774,28 +2831,73 @@
 		text-align: center;
 		max-width: 52rem;
 		margin-inline: auto;
+		padding-bottom: 4px;
+	}
+
+	.tract-interaction-card h2 {
+		margin-bottom: 8px;
+	}
+
+	.tract-example-sticky-slot {
+		width: 100%;
+		max-width: 52rem;
+		margin-inline: auto;
+	}
+
+	.tract-example-sticky-spacer {
+		width: 100%;
+		pointer-events: none;
+	}
+
+	.tract-example-sticky-bar {
+		position: relative;
+		z-index: 40;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 8px 10px;
+		margin-top: 10px;
+		margin-bottom: 4px;
+		padding: 8px 10px;
+		border-radius: 12px;
+		border: 1px solid rgba(16, 24, 40, 0.08);
+		background: color-mix(in srgb, var(--bg-card, #fffdf8) 92%, transparent);
+		backdrop-filter: blur(10px);
+		box-shadow: 0 6px 20px rgba(16, 24, 40, 0.06);
+	}
+
+	.tract-example-sticky-bar--dock {
+		position: fixed;
+		top: 0;
+		margin-top: 0;
+		box-sizing: border-box;
 	}
 
 	.example-toggle-grid {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 14px;
-		margin-top: 18px;
-		text-align: left;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		text-align: center;
 	}
 
 	.example-toggle-card {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 10px;
-		padding: 16px 18px;
-		border-radius: 18px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 0;
+		padding: 8px 12px;
+		border-radius: 999px;
 		border: 1px solid rgba(16, 24, 40, 0.1);
 		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 244, 0.94));
-		box-shadow: 0 10px 24px rgba(16, 24, 40, 0.05);
+		box-shadow: 0 6px 16px rgba(16, 24, 40, 0.05);
 		color: var(--ink);
 		font: inherit;
+		font-size: 0.88rem;
+		font-weight: 600;
+		line-height: 1.2;
 		cursor: pointer;
 		transition:
 			transform 0.16s ease,
@@ -2807,14 +2909,14 @@
 	.example-toggle-card:hover:not(:disabled) {
 		transform: translateY(-1px);
 		border-color: rgba(0, 132, 61, 0.26);
-		box-shadow: 0 14px 34px rgba(0, 132, 61, 0.09);
+		box-shadow: 0 10px 26px rgba(0, 132, 61, 0.09);
 	}
 
 	.example-toggle-card--active {
 		border-color: rgba(0, 132, 61, 0.48);
 		background: linear-gradient(180deg, rgba(233, 247, 237, 0.98), rgba(244, 251, 245, 0.98));
 		box-shadow:
-			0 18px 36px rgba(0, 132, 61, 0.12),
+			0 12px 28px rgba(0, 132, 61, 0.12),
 			inset 0 0 0 1px rgba(0, 132, 61, 0.14);
 	}
 
@@ -2825,33 +2927,22 @@
 		transform: none;
 	}
 
-	.example-toggle-card__eyebrow {
-		font-size: 0.78rem;
-		font-weight: 700;
-		letter-spacing: 0.11em;
-		text-transform: uppercase;
-		color: var(--green);
-	}
-
-	.example-toggle-card__body {
-		font-size: 1rem;
-		line-height: 1.5;
-		color: color-mix(in srgb, var(--ink) 86%, white 14%);
-	}
-
-	.example-toggle-card__action {
-		margin-top: auto;
-		font-size: 0.9rem;
-		font-weight: 700;
-		color: var(--green);
-	}
-
 	.tract-interaction-controls {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 10px;
 		margin-top: 16px;
+	}
+
+	.tract-interaction-controls--sticky-bar {
+		margin-top: 0;
+		gap: 8px;
+	}
+
+	.tract-interaction-controls--sticky-bar .chip-button {
+		padding: 7px 12px;
+		font-size: 0.88rem;
 	}
 
 	.tract-interaction-takeaways {
@@ -2902,12 +2993,6 @@
 	.chip-button--subtle:hover:not(:disabled) {
 		background: rgba(31, 36, 48, 0.08);
 		border-color: rgba(31, 36, 48, 0.18);
-	}
-
-	@media (max-width: 980px) {
-		.example-toggle-grid {
-			grid-template-columns: 1fr;
-		}
 	}
 
 	.story-chart-row--tract .story-chart-plot {
@@ -3358,6 +3443,38 @@
 		gap: 12px;
 	}
 
+	.takeaway-grid--tract-cohorts {
+		max-width: min(68rem, 100%);
+		margin-inline: auto;
+		margin-top: 18px;
+		gap: 12px;
+	}
+
+	/* Wider narrative column for cohort explainer — headline / intro were narrower than ``poc-pre-explore``. */
+	.story--cohort-intro h2 {
+		max-width: 48rem;
+	}
+
+	.story--cohort-intro > p {
+		max-width: 54rem;
+	}
+
+	/* Left-align copy so lines use full column width (``story--centered`` otherwise centers all descendants). */
+	.story--cohort-intro .takeaway-grid--tract-cohorts .takeaway-card {
+		text-align: left;
+		min-width: 0;
+	}
+
+	.story--cohort-intro .takeaway-grid--tract-cohorts .takeaway-card .takeaway-meta {
+		text-align: left;
+		line-height: 1.42;
+	}
+
+	/* Flat fill (no gradient); left edge still carries category color. */
+	.takeaway-grid--tract-cohorts .takeaway-card.takeaway-card--tier {
+		background: color-mix(in srgb, var(--tier-soft) 55%, var(--mpc-paper));
+	}
+
 	.takeaway-card.takeaway-card--tier {
 		padding: 18px;
 		border-radius: 14px;
@@ -3384,6 +3501,11 @@
 	.takeaway-card.takeaway-card--pressure {
 		--tier-edge: rgba(99, 80, 200, 0.85);
 		--tier-soft: rgba(99, 80, 200, 0.2);
+	}
+
+	.takeaway-card.takeaway-card--cohort-minimal {
+		--tier-edge: rgba(110, 112, 120, 0.78);
+		--tier-soft: rgba(110, 112, 120, 0.14);
 	}
 
 	.takeaway-card.takeaway-card--tier .takeaway-label {
@@ -3529,8 +3651,7 @@
 		margin-top: 10px;
 		padding-top: 10px;
 		border-top: 1px solid var(--line);
-		display: grid;
-		gap: 6px;
+		display: block;
 	}
 
 	.takeaway-statline {

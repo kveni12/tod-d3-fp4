@@ -623,13 +623,8 @@
 						d.tract.county && String(d.tract.county) !== 'County Name'
 							? String(d.tract.county)
 							: d.tract.gisjoin;
-					const storyTakeaway =
-						d.todFraction != null && Number.isFinite(d.todFraction) && d.todFraction >= 0.5
-							? `What this suggests: this TOD-heavy tract is part of the group more likely to show faster ${yBase === 'median_income_change_pct' ? 'income change' : "education change"}.`
-							: `What this suggests: this tract sits in the comparison group, where ${yBase === 'median_income_change_pct' ? 'income change' : "education change"} is usually smaller.`;
 					const lines = [
 						{ bold: true, text: name },
-						{ bold: false, text: storyTakeaway },
 						{ bold: false, text: `${yLabel}: ${fmt(d.y)}` },
 						{ bold: false, text: `${xLabel}: ${fmt(d.x)}` }
 					];
