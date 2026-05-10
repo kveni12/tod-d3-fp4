@@ -1693,32 +1693,32 @@
 				<p>
 					This project combines tract-level census data, MBTA network geometry, and project-level housing development records. Together, those sources make it possible to compare housing growth, transit access, affordability, and neighborhood change in the same regional frame.
 				</p>
+				<p>
+					<a href="https://www.mapc.org/" target="_blank" rel="noreferrer">This project was developed with guidance and feedback from the Metropolitan Area Planning Commission (MAPC).</a>
+				</p>
 				<ul class="story-list sources-list">
 					<li>
-						<strong>NHGIS / U.S. Census tract data:</strong> provides tract-level housing-unit counts, housing growth,
-						median household income, income change, and other demographic measures that anchor both the choropleth and the
-						lower-income context in the walkthrough.
+						<strong>NHGIS time-series tract data, drawing from decennial Census and ACS tract tables:</strong> provides tract-level housing-unit counts, income, education, commute, poverty, and demographic measures. Those fields are used to build the housing-growth choropleth and the tract-level income and education change comparisons.
 					</li>
 					<li>
-						<strong>Tract geometry:</strong> census tract boundary geometries are used to draw the base choropleth, support
-						linked tract selection, and make it possible to compare neighboring places directly on the map.
+						<strong>2010 Census tract geometry:</strong> provides the tract boundaries used to draw the choropleth, link selections, and compare neighboring tracts within a shared geography over time.
 					</li>
 					<li>
-						<strong>MassBuilds development records:</strong> provide project-level unit counts, affordable-unit fields,
-						multifamily share, completion year, and tract assignment. Those records drive the TOD / non-TOD tract grouping,
-						the project-dot layer, and the examples used later in the guided story.
+						<strong>MassBuilds development records:</strong> provide project-level unit counts, affordable-unit fields, multifamily share, completion year, and tract assignment. Those records drive the TOD / non-TOD tract grouping, the project-dot layer, and the development examples used later in the guided story.
 					</li>
 					<li>
-						<strong>HUD LIHTC match where available:</strong> supplements affordability information for some development
-						records when affordable-unit data is not complete in the base project file, helping us say a little more about
-						who may or may not benefit from new housing.
+						<strong>HUD LIHTC project records, where matched:</strong> supplement affordability information for some development records when affordable-unit counts are incomplete in the base project file.
 					</li>
 					<li>
-						<strong>MBTA stops and line geometry:</strong> provide the transit network used both for display and for
-						calculating project proximity to transit and tract-level stop access, which is what makes the TOD and mismatch
-						classifications possible.
+						<strong>MBTA stops, stations, and line geometry:</strong> provide the transit network used both for display and for calculating project proximity to transit and tract-level stop access, which is what makes the TOD and mismatch classifications possible.
+					</li>
+					<li>
+						<strong>Code and visual inspiration:</strong> the final site builds on our own earlier course prototypes and was iteratively revised with classroom critique, instructor feedback, and MAPC guidance.
 					</li>
 				</ul>
+				<p>
+					No Warren Group residential sales dataset is published on this website. That data use agreement does not allow us to post the residential sales files themselves, so the public site only includes the processed tract, transit, and housing-development materials used in this prototype.
+				</p>
 				<p>
 					The current prototype also reflects repeated classroom feedback and revision. It was designed to lead with the planning question, then open out into exploration only after the main pattern is visible.
 				</p>

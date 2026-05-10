@@ -11,6 +11,9 @@
 			This writeup focuses on the big decisions behind the proof of concept: what story we wanted to tell, how we designed the
 			interface to tell it, what still feels unfinished, and where we want to take the project next.
 		</p>
+		<p class="writeup-subtitle">
+			<a href="https://www.mapc.org/" target="_blank" rel="noreferrer">This project was developed with guidance and feedback from the Metropolitan Area Planning Commission (MAPC).</a>
+		</p>
 		<p class="writeup-linkback">
 			<a href={`${base}/`}>Back to the interactive visualization</a>
 		</p>
