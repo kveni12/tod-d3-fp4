@@ -5141,8 +5141,9 @@
 	}
 
 	.poc-scrolly-left--guided-vertical {
-		position: relative;
-		top: auto;
+		position: sticky;
+		top: 10px;
+		align-self: start;
 		width: min(100%, 1120px);
 		margin-inline: auto;
 	}
@@ -5161,6 +5162,7 @@
 	.poc-stepper-side--guided-vertical {
 		width: min(100%, 760px);
 		margin-inline: auto;
+		margin-top: 6px;
 		padding-inline-end: 0;
 	}
 
