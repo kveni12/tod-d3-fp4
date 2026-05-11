@@ -787,12 +787,16 @@
 	<!-- Narrative + tract story up to "Explore" use a narrower column; Explore stays full poc-root width. -->
 	<div class="poc-pre-explore">
 	<section class="hero-full card">
-		<!-- <div class="eyebrow">Guided Story</div> -->
-		<h1>Massachusetts is building more near transit. Who benefits?</h1>
-		<p class="byline">By Krishna Parvataneni, Allison Eto, Hanna Chen, and Supriya Lall</p>
+		<div class="hero-full__inner">
+			<h1>Massachusetts is building more near transit. Who benefits?</h1>
+			<p class="byline">By Krishna Parvataneni, Allison Eto, Hanna Chen, and Supriya Lall</p>
+			<p class="hero-scroll-cue">Scroll to enter the story</p>
+		</div>
+	</section>
+
+	<section class="story card story--centered story--hero-setup">
 		<p class="subtitle">
-			Boston is in a housing crisis, but if you rely on transit to reach work, school, or childcare, the real issue is not just whether more housing is being built. It is whether that housing shows up in places you can actually reach and afford.
-			This story explores three questions:
+			If you rely on transit to reach work, school, or childcare, the real question is not just whether more housing is being built. It is whether that housing shows up in places you can actually reach and afford.
 		</p>
 		<div class="hero-questions" aria-label="Story questions">
 			<div class="hero-question-box">
@@ -808,12 +812,10 @@
 				<p class="hero-question-text">Is housing growth associated with displacement pressure?</p>
 			</div>
 		</div>
-		<br>
 		<p class="signal-lead">
-			The data tells a complex story.
-			Housing growth and transit access do not line up as neatly as policy goals suggest—some well-connected places are still adding little housing, while growth also shows up far from strong transit.
+			Housing growth and transit access do not line up as neatly as policy goals suggest. Some well-connected places are still adding little housing, while growth also shows up far from strong transit.
 			<strong class="signal-lead-policy">
-				For planners, the key policy focus should be not only how much housing gets built, but where it lands and who can afford it.
+				For planners, the key policy focus is not only how much housing gets built, but where it lands and who can afford it.
 			</strong>
 		</p>
 	</section>
@@ -1968,10 +1970,20 @@
 
 	/* ── Hero ─────────────────────────────────────────── */
 	.hero-full {
-		padding: clamp(12px, 2vw, 22px) 0 28px;
-		margin-bottom: 18px;
+		min-height: min(90vh, 52rem);
+		display: grid;
+		place-items: center;
+		padding: clamp(24px, 4vw, 40px) 0;
+		margin-bottom: 10px;
 		border-bottom: 1px solid rgba(120, 114, 102, 0.2);
 		text-align: center;
+	}
+
+	.hero-full__inner {
+		display: grid;
+		gap: 16px;
+		align-content: center;
+		justify-items: center;
 	}
 
 	.hero-full h1 {
@@ -1995,12 +2007,21 @@
 	}
 
 	.byline {
-		margin: 0 auto 14px;
+		margin: 0 auto;
 		font-size: 0.95rem;
 		font-weight: 600;
 		line-height: 1.45;
 		color: var(--ink);
 		max-width: min(42rem, 92vw);
+	}
+
+	.hero-scroll-cue {
+		margin: 8px 0 0;
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--muted);
 	}
 
 	.subtitle {
@@ -2020,6 +2041,10 @@
 		max-width: min(52rem, 94vw);
 		margin-inline: auto;
 		text-align: left;
+	}
+
+	.story--hero-setup {
+		padding-top: 18px;
 	}
 
 	.hero-question-box {
@@ -2047,6 +2072,14 @@
 	}
 
 	@media (max-width: 820px) {
+		.hero-full {
+			min-height: 72vh;
+		}
+
+		.hero-full h1 {
+			width: min(92%, 34rem);
+		}
+
 		.hero-questions {
 			grid-template-columns: 1fr;
 		}
